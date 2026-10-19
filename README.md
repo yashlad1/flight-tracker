@@ -19,9 +19,11 @@ There are no API keys and nothing to install: the code uses only the Python stan
 
 1. **Cheapest trip** and **cheapest low-risk trip**, each with the total for all travellers and the cost per
    traveller.
-2. **Best options**: the cheapest way to book for each return date and each booking plan, within your risk limit.
+2. **Cheapest options table**: the cheapest way to book for each return date and each booking plan, within your
+   risk limit (`max_risk`).
 3. **Best low-risk options**: the same, using only low-risk flights.
 4. **Price history**: a chart and a table of the cheapest total on every run.
+5. **Where to book**: a short note at the bottom (see [Where to book](#where-to-book)).
 
 ### Reading the tables
 

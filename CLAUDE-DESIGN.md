@@ -42,7 +42,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | Exclude IndiGo, Air India, Akasa Air and Turkish Airlines on any leg |
 | 2026-10-19 | No single layover longer than 3 hours (started at 10 h) |
 | 2026-10-19 | Report: one table row per flight, city names only, every price split into total and per traveller, booking links |
-| 2026-10-19 | No geopolitical section in the report (risk scoring stays) and no full list of every flight |
+| 2026-10-19 | No geopolitical section in the report (risk scoring stays), no full list of every flight, no subtitle, no plan explanation above the tables (it is in the README) |
 | 2026-10-19 | Run on GitHub Actions instead of local cron; public repo with a GitHub Pages report link |
 
 ---

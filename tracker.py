@@ -421,22 +421,17 @@ def report(con, cfg, bags, geo, ev):
 </div>
 {''.join(f"<p><span class='pill high'>Incomplete run</span> no results for {html.escape(m)}</p>" for m in missing(cfg, quotes))}
 {''.join(f"<p><span class='pill medium'>Google Flights live notice</span> {html.escape(n)}</p>" for n in sorted(notices))}
-<h2>Best options (risk &le; {cfg['prefs']['max_risk']})</h2>
-<p class=small><b>Plan A:</b> one one-way ticket out for the traveller going to Boston, plus one booking back for
-both travellers. <b>Plan B:</b> a round trip for the traveller going to Boston, plus a one-way back for the 2nd
-traveller. Plan B prices are "from" prices: price the exact return flight both will share before booking.
-Bag fees are estimates; hover a Bags cell to see whose rule was used.</p>
+{rows_html(any_opts)}
+<h2>Best low-risk options</h2>{rows_html(low_opts)}
+<h2>Price history</h2><div><span class=key style="background:var(--s1)"></span>Any risk
+<span class=key style="background:var(--s2)"></span>Low risk only</div>{chart(con)}
+<details><summary>History table</summary><table><tr><th>Run</th><th>Scope</th><th>Best total</th><th>Option</th></tr>{hist_rows}</table></details>
 <p class=small><b>Where to book:</b> use the airline's own site when it is within about $50 of the agencies. If a
 flight is cancelled or rerouted, you deal with the airline directly; adding bags or moving up a fare level to get
 2&times;23kg is easier; and the US 24-hour free-cancellation rule applies (book 7+ days before departure).
 Expedia or Booking.com can be a little cheaper, but changes and refunds then go through the agency, which is slower
 when flights are disrupted. "Compare all" opens Google Flights, where clicking a flight lists every site selling
 it with its price. For Plan B, book both tickets on the same airline's site.</p>
-{rows_html(any_opts)}
-<h2>Best low-risk options</h2>{rows_html(low_opts)}
-<h2>Price history</h2><div><span class=key style="background:var(--s1)"></span>Any risk
-<span class=key style="background:var(--s2)"></span>Low risk only</div>{chart(con)}
-<details><summary>History table</summary><table><tr><th>Run</th><th>Scope</th><th>Best total</th><th>Option</th></tr>{hist_rows}</table></details>
 <p class=small>Scraped from Google Flights for personal use. Prices change by the minute; confirm on the airline site before paying.</p>
 </html>"""
     (HERE / "report.html").write_text(page)
