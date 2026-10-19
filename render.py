@@ -303,25 +303,8 @@ def journeys_html(cfg, jr, per_date=2, top=4):
   <table class=jt>{head(travellers(out['adults']).replace('traveller', 'person'))}<tbody>{o_rows}</tbody></table></div>
 <div class=jcard><h3>{e(city(cfg, ret['from']))} to {e(city(cfg, ret['to']))}</h3>
   <p class=jsub>{travellers(ret['adults']).replace('travellers', 'people')}, cheapest {per_date} for each day</p>
-  <table class=jt>{head(travellers(ret['adults']).replace('travellers', 'people'))}<tbody>{r_rows}</tbody></table>
-  {split_how(jr)}</div>
+  <table class=jt>{head(travellers(ret['adults']).replace('travellers', 'people'))}<tbody>{r_rows}</tbody></table></div>
 </div>"""
-
-
-def split_how(jr):
-    """Explain separate tickets, only when some flight on the page is cheaper that way."""
-    shown = [s for v in jr["ret"].values() for s in v[:2] if s.get("split")]
-    if not shown:
-        return ""
-    return """<div class=split-how><p><b>Cheaper as 2 separate tickets?</b> On the flights marked above, the airline has
-one seat left at a lower fare, so the first traveller can buy it alone and the second pays the normal price. Booking
-together is simpler: you are seated together and rebooked together if the flight changes. If you book separately:</p>
-<ol><li>Book the exact same flight (same date and flight numbers) twice. Book the cheaper ticket first, then the
-second straight away, because the price can rise once that seat is gone.</li>
-<li>Right after booking, open <i>Manage booking</i> on each ticket and pick seats next to each other. On the
-cheapest fares this can cost extra; free seats are given at check-in, when adjacent seats may be gone.</li>
-<li>Ask the airline (by phone or chat) to link the two bookings, so you stay together if the flight is changed.</li>
-<li>Check in together at the airport counter and ask to be seated together.</li></ol></div>"""
 
 
 def totals_html(cfg, jr, geo):
@@ -342,7 +325,7 @@ def totals_html(cfg, jr, geo):
         deal = t["deal"]
         split = r.get("split")
         tip = (f"<p class=t-deal>Booking the 2 return tickets separately saves about <b>{money(split['saving'])}</b> "
-               f"(whole trip about {money(t['total'] - split['saving'])}). See how to still sit together above.</p>"
+               f"(whole trip about {money(t['total'] - split['saving'])}).</p>"
                if split else "")
         tip += (f"<p class=t-deal>Booking trick: a round trip for the {e(names(cfg)[0])} plus a one-way for the "
                f"{e(names(cfg)[1])} brings this to <b>{money(deal['total'])}</b>, saving {money(t['total'] - deal['total'])}. "
@@ -451,8 +434,7 @@ padding:6px 0;border-bottom:1px solid var(--rule)}.jt th.num{text-align:right}
 .jlinks .lnk{min-height:36px}
 .h-total{margin-top:36px}
 .jt small.split{color:var(--low);font-weight:600}
-.split-how{border-top:1px solid var(--rule);margin:4px 0 12px;padding-top:12px;font-size:14px}
-.split-how ol{margin:8px 0 0;padding-left:20px}.split-how li{margin-bottom:6px}
+
 .tot{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin-bottom:12px;
 display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:center}
 .t-label b{display:block;font-size:18px;font-weight:800}.t-label small{display:block;color:var(--ink-2);font-size:13px}

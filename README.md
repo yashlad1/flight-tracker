@@ -25,8 +25,7 @@ From top to bottom:
 2. **Prices by journey**: two tables. **Mumbai to Boston, price for 1 person** (cheapest flights landing Fri 18
    Dec), and **Boston to Mumbai, price for 2 people** (the cheapest flights for each return day, with the price per
    person). Each price is fare + bags, and each flight has a booking link. A return flight marked "About $X less
-   as 2 separate tickets" is cheaper booked one traveller at a time; the steps to still sit together are under the
-   table.
+   as 2 separate tickets" is cheaper booked one traveller at a time.
 3. **Whole trip**: the 1-person price plus the 2-people price, written out as a sum (`$665 + $1,966 = $2,631`), for
    three choices: the cheapest, the cheapest with no high-risk flight (for example no Gulf stop), and the cheapest
    with every flight low risk. If a round trip + one-way booking beats a choice, it is flagged under it.
