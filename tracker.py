@@ -183,6 +183,33 @@ def options(quotes, cfg, bags, geo, max_risk):
     return sorted(best.values(), key=lambda r: r["total"])
 
 
+def journeys(quotes, cfg, bags, geo):
+    """The trip as the user thinks of it: 1 person out, N people back, and the sum.
+    out: allowed outbound flights landing on arrive_on, cheapest first; ret: {date: allowed return flights};
+    totals: per risk scope, cheapest outbound + cheapest return (+ the best round-trip deal for comparison)."""
+    out, ret = cfg["outbound"], cfg["return"]
+    legs_of = {(k, d): legs for k, d, legs, _ in searches(cfg)}
+
+    def scored(kind, d):
+        flights, pax, url = quotes.get((kind, d), ([], 0, ""))
+        return [dict(score(f, pax, cfg, bags, geo), url=url, search=legs_of.get((kind, d), []), date=d)
+                for f in flights if allowed(f, cfg)]
+
+    within = lambda s, scope: LEVELS.index(s["risk"]) <= LEVELS.index(scope)
+    outs = sorted((s for d in out["depart_dates"] for s in scored("out", d) if s["f"].arrive.startswith(out["arrive_on"])),
+                  key=lambda s: s["total"])
+    rets = {d: sorted(scored("ret", d), key=lambda s: s["total"]) for d in ret["depart_dates"]}
+    totals = []
+    for label, scope in (("Cheapest", "high"), ("No high-risk flight", "medium"), ("Low risk on every flight", "low")):
+        o = next((s for s in outs if within(s, scope)), None)
+        r = min((s for v in rets.values() for s in v if within(s, scope)), key=lambda s: s["total"], default=None)
+        deal = next((x for x in options(quotes, cfg, bags, geo, scope) if x["strategy"] == "B"), None)
+        totals.append({"label": label, "scope": scope, "out": o, "ret": r, "deal": deal,
+                       "total": o["total"] + r["total"] if o and r else None,
+                       "risk": max(o["risk"], r["risk"], key=LEVELS.index) if o and r else None})
+    return {"out": outs, "ret": rets, "totals": totals}
+
+
 # --- storage ---------------------------------------------------------------
 def db():
     con = sqlite3.connect(HERE / "prices.db")
@@ -254,8 +281,8 @@ def evaluate(con, cfg, bags, geo, run_at=None):
     run_at, quotes, levels, notices = latest(con, run_at)
     if run_at is None:
         sys.exit("No stored runs yet: run `python3 tracker.py` first.")
-    return run_at, quotes, levels, notices, options(quotes, cfg, bags, geo, cfg["prefs"]["max_risk"]), \
-        options(quotes, cfg, bags, geo, "low")
+    return (run_at, quotes, levels, notices, options(quotes, cfg, bags, geo, cfg["prefs"]["max_risk"]),
+            options(quotes, cfg, bags, geo, "low"), journeys(quotes, cfg, bags, geo))
 
 
 def report(con, cfg, bags, geo, ev):
@@ -265,7 +292,7 @@ def report(con, cfg, bags, geo, ev):
 
 def alert(con, ev, cfg):
     """Record this run's best totals; notify on an all-time low or on first dropping under target."""
-    run_at, quotes, _, _, any_opts, low_opts = ev
+    run_at, quotes, _, _, any_opts, low_opts, _ = ev
     if gaps := missing(cfg, quotes):                # a partial run would fake a price jump in history
         print("Incomplete run, not recorded in history; missing:", ", ".join(gaps), file=sys.stderr)
         return

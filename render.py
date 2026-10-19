@@ -263,31 +263,94 @@ def chart(history):
             "Cheapest low-risk whole trip</p>" + "".join(svg) + "</svg>")
 
 
-def compare(cfg, best, safe):
-    """One plain sentence on what the low-risk pick costs extra."""
-    if not (best and safe) or best is safe:
-        return ""
-    diff = safe["total"] - best["total"]
-    a, b = when(best)[0], when(safe)[0]
-    date = "" if a == b else f", and leaves {e(city(cfg, cfg['return']['from']))} on {b} instead of {a}"
-    return f"<p class=compare>The low-risk option costs <b>{money(diff)} more</b>{date}.</p>"
+def via_text(f):
+    return ", ".join(f"{n.split(', ')[-1]} {hm(m)}" for n, m in zip(f.layover_names or f.layovers, f.layover_min)) or "nonstop"
+
+
+def j_row(cfg, s, a, b):
+    """One flight in a journey table: what it is, what it costs for everyone on it, its risk."""
+    f, pax = s["f"], s["pax"]
+    links = book_links(s)
+    first, compare_all = links[0], links[-1]
+    lands = "" if f.arrive[:10] == f.depart[:10] else f" ({day(f.arrive)})"
+    bags = "bags included" if not s["bags"] else f"{money(s['bags'])} bags"
+    each = f"<small>{money(s['total'] / pax)} each</small>" if pax > 1 else ""
+    return f"""<tr class=r-{s['risk']}>
+  <td><b>{e(', '.join(f.airlines))}</b>
+    <small>{day(f.depart)}, {clock(f.depart)} {e(city(cfg, a))} to {clock(f.arrive)} {e(city(cfg, b))}{lands}</small>
+    <small>via {e(via_text(f))}</small>
+    <span class=jlinks><a class=lnk href='{e(first[1])}' target=_blank rel=noopener>{e(first[0])}</a>
+    <a class=lnk href='{e(compare_all[1])}' target=_blank rel=noopener>Compare prices</a></span></td>
+  <td class=num><b>{money(s['total'])}</b>{each}<small>{money(s['fare'])} fare + {bags}</small></td>
+  <td><span class=risk><span class=dot></span>{s['risk'].capitalize()}</span></td>
+</tr>"""
+
+
+def journeys_html(cfg, jr, per_date=2, top=4):
+    out, ret = cfg["outbound"], cfg["return"]
+    lands = datetime.fromisoformat(out["arrive_on"]).strftime("%a %-d %b")
+    o_rows = "".join(j_row(cfg, s, out["from"], out["to"]) for s in jr["out"][:top]) or \
+        "<tr><td colspan=3>No flights match.</td></tr>"
+    r_rows = ""
+    for d, flights in jr["ret"].items():
+        r_rows += f"<tr class=grp><th colspan=3 scope=colgroup>Leaving {day(d + 'T00:00')}</th></tr>"
+        r_rows += "".join(j_row(cfg, s, ret["from"], ret["to"]) for s in flights[:per_date]) or \
+            "<tr><td colspan=3>No flights match.</td></tr>"
+    head = lambda who: (f"<thead><tr><th scope=col>Flight</th><th scope=col class=num>Price for {who}</th>"
+                        "<th scope=col>Risk</th></tr></thead>")
+    return f"""<div class=jgrid>
+<div class=jcard><h3>{e(city(cfg, out['from']))} to {e(city(cfg, out['to']))}</h3>
+  <p class=jsub>{travellers(out['adults']).replace('traveller', 'person')}, landing {lands}, cheapest first</p>
+  <table class=jt>{head(travellers(out['adults']).replace('traveller', 'person'))}<tbody>{o_rows}</tbody></table></div>
+<div class=jcard><h3>{e(city(cfg, ret['from']))} to {e(city(cfg, ret['to']))}</h3>
+  <p class=jsub>{travellers(ret['adults']).replace('travellers', 'people')}, cheapest {per_date} for each day</p>
+  <table class=jt>{head(travellers(ret['adults']).replace('travellers', 'people'))}<tbody>{r_rows}</tbody></table></div>
+</div>"""
+
+
+def totals_html(cfg, jr, geo):
+    out, ret = cfg["outbound"], cfg["return"]
+    hubs = {n.split(", ")[-1] for v in [jr["out"], *jr["ret"].values()] for s in v
+            for c, n in zip(s["f"].layovers, s["f"].layover_names or s["f"].layovers)
+            if geo.get("hubs", {}).get(c, {}).get("level") == "high"}
+    notes = {"high": "The lowest price, whatever the risk.",
+             "medium": "Skips every flight rated high risk" + (f", such as stops in {', '.join(sorted(hubs))}." if hubs else "."),
+             "low": "Only flights rated low risk, in both directions."}
+    rows, seen = [], {}
+    for t in jr["totals"]:
+        if not t["total"]:
+            rows.append(f"<div class=tot><div class=t-label><b>{e(t['label'])}</b></div><p>No flights match.</p></div>")
+            continue
+        o, r = t["out"], t["ret"]
+        same = seen.setdefault((id(o), id(r)), t["label"])
+        deal = t["deal"]
+        tip = (f"<p class=t-deal>Booking trick: a round trip for the {e(names(cfg)[0])} plus a one-way for the "
+               f"{e(names(cfg)[1])} brings this to <b>{money(deal['total'])}</b>, saving {money(t['total'] - deal['total'])}. "
+               f"It is in the options list below.</p>" if deal and deal["total"] < t["total"] else "")
+        rows.append(f"""<div class="tot r-{t['risk']}">
+  <div class=t-label><b>{e(t['label'])}</b><small>{e(notes[t['scope']]) if same == t['label'] else 'Same flights as ' + e(same).lower() + '.'}</small>
+    <span class=risk><span class=dot></span>{t['risk'].capitalize()} risk</span></div>
+  <div class=t-sum>
+    <div class=t-leg><small>{e(city(cfg, out['from']))} to {e(city(cfg, out['to']))}, {travellers(out['adults']).replace('traveller', 'person')}</small>
+      <b>{money(o['total'])}</b><span>{e(o['f'].airlines[0])}, {day(o['f'].depart)}</span></div>
+    <div class=op aria-hidden=true>+</div>
+    <div class=t-leg><small>{e(city(cfg, ret['from']))} to {e(city(cfg, ret['to']))}, {travellers(ret['adults']).replace('travellers', 'people')}</small>
+      <b>{money(r['total'])}</b><span>{e(r['f'].airlines[0])}, {day(r['f'].depart)}, {money(r['total'] / r['pax'])} each</span></div>
+    <div class=op aria-hidden=true>=</div>
+    <div class="t-leg t-total"><small>Whole trip</small><b>{money(t['total'])}</b><span>for {'both' if ret['adults'] == 2 else 'all ' + str(ret['adults'])} travellers</span></div>
+  </div>{tip}
+</div>""")
+    return "".join(rows)
 
 
 def page(cfg, geo, ev, gaps, history):
-    run_at, _, _, notices, any_opts, low_opts = ev
-    best, safe = (any_opts or [None])[0], (low_opts or [None])[0]
-    if best and safe and best["total"] == safe["total"] and best["dates"] == safe["dates"]:
-        safe = best
-        picks = ticket(cfg, geo, best, "Cheapest, and low risk")
-    else:
-        picks = "".join(ticket(cfg, geo, o, lbl) for o, lbl in ((best, "Cheapest"), (safe, "Cheapest low-risk")) if o)
-    shown = {id(best), id(safe)}
+    run_at, _, _, notices, any_opts, low_opts, jr = ev
     warn = "".join(f"<p class=alert>No results for {e(g)} on the last check, so prices may be incomplete.</p>"
                    for g in gaps)
     notice = "".join(f"<p class=fine>Google Flights is also showing a general notice on these routes: "
                      f"{e(n[0].lower() + n[1:])}</p>" for n in sorted(notices))
-    rows_any = "".join(row(cfg, geo, o, id(o) in shown) for o in any_opts) or "<p>No options match.</p>"
-    rows_low = "".join(row(cfg, geo, o, id(o) in shown) for o in low_opts) or "<p>No low-risk options found.</p>"
+    rows_any = "".join(row(cfg, geo, o) for o in any_opts) or "<p>No options match.</p>"
+    rows_low = "".join(row(cfg, geo, o) for o in low_opts) or "<p>No low-risk options found.</p>"
     p = cfg["prefs"]
     left_out = [f"layovers over {p['max_layover_hours']} hours"] if p.get("max_layover_hours") else []
     left_out += p.get("exclude_airlines", [])
@@ -303,10 +366,16 @@ def page(cfg, geo, ev, gaps, history):
 {band(cfg)}
 <main>
 {warn}
-<section class=picks aria-labelledby=h-picks><h2 id=h-picks>What to book</h2>{compare(cfg, best, safe)}
-<div class=pick-grid>{picks}</div>{notice}</section>
-<section class=all aria-labelledby=h-all><h2 id=h-all>Every option, cheapest first</h2>
-<p class=intro>One line per return date and way of booking. Open a line to see its flights and booking links.</p>
+<section class=journeys aria-labelledby=h-j><h2 id=h-j>Prices by journey</h2>
+<p class=intro>Every price includes {cfg['prefs']['bags_per_person']} bags of 23&nbsp;kg for each person.</p>
+{journeys_html(cfg, jr)}
+<h2 class=h-total id=h-total>Whole trip</h2>
+<p class=intro>The cheapest {e(city(cfg, cfg['outbound']['from']))} to {e(city(cfg, cfg['outbound']['to']))} flight plus the
+cheapest flight home, at three levels of risk.</p>
+{totals_html(cfg, jr, geo)}{notice}</section>
+<section class=all aria-labelledby=h-all><h2 id=h-all>Every booking option, with details</h2>
+<p class=intro>Separate one-way tickets, or a round trip plus a one-way. Open a line to see each flight and how to
+book it.</p>
 <fieldset class=toggle><legend class=sr>Show</legend>
 <input type=radio name=show id=show-any checked><label for=show-any>Show everything</label>
 <input type=radio name=show id=show-low><label for=show-low>Show only low risk</label></fieldset>
@@ -361,16 +430,35 @@ main{padding-top:28px;padding-bottom:40px}
 section{margin-top:44px}section:first-of-type{margin-top:0}
 h2{font-size:24px;font-weight:800;margin-bottom:12px}
 .alert{margin:0 0 18px;padding:10px 14px;border-left:4px solid var(--high);background:var(--surface)}
-.compare{font-size:17px;margin:-4px 0 16px}.compare b{font-weight:800}
 .intro,.fine{color:var(--ink-2);font-size:14px}.intro{margin:-4px 0 14px}.fine{margin-top:8px}
+/* prices by journey */
+.jgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.jcard{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px 20px 8px}
+.jcard h3{font-size:22px;font-weight:800}.jsub{color:var(--ink-2);font-size:14px;margin-bottom:8px}
+.jt{width:100%;border-collapse:collapse}.jt th{font-size:13px;color:var(--ink-2);font-weight:600;text-align:left;
+padding:6px 0;border-bottom:1px solid var(--rule)}.jt th.num{text-align:right}
+.jt td{padding:12px 0;border-bottom:1px solid var(--hair);vertical-align:top}.jt tr:last-child td{border-bottom:0}
+.jt td:first-child{padding-right:12px}.jt td+td,.jt th+th{padding-left:14px}
+.jt td b{font-weight:800}.jt td small{display:block;color:var(--ink-2);font-size:13px;line-height:1.35}
+.jt td.num b{font-size:20px}.jt .grp th{padding-top:16px;font-size:15px;color:var(--ink);font-weight:800;border-bottom:1px solid var(--rule)}
+.jt .risk{margin:0;font-size:14px}.jlinks{display:flex;flex-wrap:wrap;gap:0 14px;font-size:14px}
+.jlinks .lnk{min-height:36px}
+.h-total{margin-top:36px}
+.tot{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin-bottom:12px;
+display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:center}
+.t-label b{display:block;font-size:18px;font-weight:800}.t-label small{display:block;color:var(--ink-2);font-size:13px}
+.t-label .risk{margin-top:4px;font-size:14px}
+.t-sum{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.t-leg{display:flex;flex-direction:column;line-height:1.25;min-width:150px}.t-leg small{color:var(--ink-2);font-size:13px}
+.t-leg b{font-size:24px;font-weight:800}.t-leg span{font-size:13px;color:var(--ink-2)}
+.op{font-size:24px;font-weight:800;color:var(--ink-2)}
+.t-total{background:var(--sign);color:var(--sign-ink);border-radius:10px;padding:8px 14px}
+.t-total small,.t-total span{color:var(--sign-ink)}.t-total b{font-size:28px}
+.t-deal{grid-column:1/-1;font-size:14px;border-top:1px dashed var(--rule);padding-top:10px}
 /* tickets */
-.pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.pick-grid>.ticket:only-child{grid-column:1/-1}
 .ticket{display:grid;grid-template-columns:1fr 220px;background:var(--surface);border:1px solid var(--rule);
 border-radius:14px;overflow:hidden}
-.pick-grid .ticket{grid-template-columns:1fr}
 .main{padding:18px 22px 16px;min-width:0}
-.label{font-weight:800;font-size:15px;color:var(--route);margin-bottom:2px}
 .ticket h3{font-size:20px;font-weight:800}.ticket h3 small{font-size:15px;font-weight:600;color:var(--ink-2)}
 .plan{font-size:15px;color:var(--ink-2)}
 .risk{display:flex;align-items:flex-start;gap:8px;font-size:15px;margin-top:6px;font-weight:600}
@@ -401,9 +489,9 @@ border-left:2px dashed var(--rule);background:var(--paper)}
 .stub::before,.stub::after{content:"";position:absolute;left:-11px;width:20px;height:20px;border-radius:50%;
 background:var(--paper)}
 .stub::before{top:-11px}.stub::after{bottom:-11px}
-.pick-grid .stub,.opt .stub{border-left:0;border-top:2px dashed var(--rule)}
-.pick-grid .stub::before,.opt .stub::before{top:-11px;left:-11px}
-.pick-grid .stub::after,.opt .stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
+.opt .stub{border-left:0;border-top:2px dashed var(--rule)}
+.opt .stub::before{top:-11px;left:-11px}
+.opt .stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
 .stub-k{font-size:14px;color:var(--ink-2)}.total{font-size:40px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
 .stub dl{margin:14px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:15px;max-width:340px}
 .stub dt{font-weight:600}.stub dt small{display:block;font-weight:400;color:var(--ink-2);font-size:13px}
@@ -440,13 +528,15 @@ circle.pt{stroke:var(--paper);stroke-width:2}circle.pt.s1{fill:var(--s1)}circle.
 border-radius:2px;vertical-align:middle;margin:0 6px 0 0}.key.s1{background:var(--s1)}.key.s2{background:var(--s2);margin-left:18px}
 .tips ul{margin:0;padding-left:20px;max-width:72ch}.tips li{margin-bottom:8px}
 footer{padding-bottom:40px;color:var(--ink-2);font-size:14px}footer p{max-width:80ch}
-@media (max-width:900px){.pick-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.jgrid{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
 @media (max-width:760px){
  .code{font-size:42px}.band-route{grid-template-columns:1fr 1fr;gap:14px}.flows{grid-column:1/-1;grid-row:2}
  .place.end{grid-column:2;grid-row:1}.flow,.flow.home{flex-direction:row;text-align:left}.track{margin:4px 0}
  .ticket{grid-template-columns:1fr}.stub{border-left:0;border-top:2px dashed var(--rule)}
  .stub::before{top:-11px;left:-11px}.stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
  .main{padding:16px}.pt b{font-size:19px}.airline{margin-left:0;width:100%}
+ .jcard{padding:14px 14px 4px}.t-sum{gap:8px}.t-leg{min-width:0}.t-leg b{font-size:21px}.op{font-size:20px}
+ .t-total{width:100%}
  .opt>summary{grid-template-columns:1fr auto 14px;gap:6px 12px}.o-when{grid-column:1}.o-route{grid-column:1}
  .opt>summary .risk{grid-column:1}.o-price{grid-column:2;grid-row:1/span 3;align-self:start}
  .opt>summary::after{grid-column:3;grid-row:1/span 3}

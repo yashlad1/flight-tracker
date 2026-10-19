@@ -45,6 +45,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | No geopolitical section in the report (risk scoring stays), no full list of every flight, no subtitle, no plan explanation above the tables (it is in the README) |
 | 2026-10-19 | Run on GitHub Actions instead of local cron; public repo with a GitHub Pages report link |
 | 2026-10-19 | "UI is super bad": full redesign of the report (see section 7) |
+| 2026-10-19 | The top of the report shows prices the way the user calculates them: 1 person out, 2 people back, and the sum, at three risk levels |
 
 ---
 
@@ -218,8 +219,12 @@ and whether it is safe.
 - **Options are tickets.** Each flight is a departure → layover city → arrival line with who is on it, then the
   arithmetic (`fare + bags = total for N travellers, $X each`), then booking buttons. A perforated stub holds the
   whole-trip total and each traveller's share.
-- **"What to book"** shows two full tickets: the cheapest, and the cheapest low-risk. If they are the same option,
-  it shows one ticket labelled "Cheapest, and low risk".
+- **"Prices by journey"** comes first, because the user thinks in journeys: a table of 1-person Mumbai→Boston
+  prices and a table of 2-people Boston→Mumbai prices (per day), then **"Whole trip"** as an explicit sum,
+  `out + back = total`, for three scopes: cheapest, no high-risk flight, and low risk on every flight.
+  `tracker.journeys()` computes these; the round-trip deal (Plan B) is flagged under a row only when it is cheaper.
+  The "no high-risk flight" row exists because the independent price audit found a trip $50 above the cheapest
+  that avoids the Gulf, which the any/low split hid.
 - **"Every option"** is a list of compact `<details>` rows that open into the full ticket. A CSS-only switch
   (`:has()` on two radio inputs) swaps between the any-risk and low-risk lists.
 - **Copy rules.** Risk is always written in words, never shown by colour alone. Plan A and Plan B are called

@@ -89,7 +89,11 @@ def test_render_page_says_who_flies_and_escapes_scraped_text():
     q = {("out", "2026-12-18"): ([F(500, ["Qatar Airways"])], 1, "https://g/out"),
          ("ret", "2026-12-28"): ([F(1800, ["<script>x</script>"])], 2, "https://g/ret")}
     opts = tracker.options(q, cfg, BAGS, GEO, "high")
-    page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, {}, set(), opts, []), [], [])
+    jr = tracker.journeys(q, cfg, BAGS, GEO)
+    cheapest = jr["totals"][0]                                  # 1 person out + 2 people back
+    assert (cheapest["out"]["total"], cheapest["ret"]["total"], cheapest["total"]) == (500, 2100, 2600)
+    page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, {}, set(), opts, [], jr), [], [])
+    assert "Prices by journey" in page and "Price for 1 person" in page and "Price for 2 people" in page
     assert "<b>1 traveller</b> to Boston" in page and "<b>2 travellers</b> home to Mumbai" in page
     assert "Mon 19 Oct, 3:45 pm" in page                       # UTC run time shown in Boston time
     assert "$2,600" in page and "for 2 travellers, $1,050 each" in page   # 500 out + (1800 + 1 missing bag x $150 x 2)

@@ -22,12 +22,16 @@ From top to bottom:
 1. **The trip band** (yellow): who flies which way. The **Mumbai traveller** flies to Boston (landing Fri 18 Dec)
    and back; the **Boston traveller** joins them for the flight home. Every price includes 2 bags of 23 kg per
    traveller on every flight.
-2. **What to book**: the cheapest option and the cheapest low-risk option side by side, with one line saying how
-   much more the low-risk one costs and whether it changes the date.
-3. **Every option, cheapest first**: one line per return date and way of booking, with a switch between "Show
-   everything" and "Show only low risk". Open a line to see its full ticket.
-4. **Price over time**: appears once there are checks on two different days.
-5. **Booking tips**, and in the footer, what is left out (long layovers, excluded airlines).
+2. **Prices by journey**: two tables. **Mumbai to Boston, price for 1 person** (cheapest flights landing Fri 18
+   Dec), and **Boston to Mumbai, price for 2 people** (the cheapest flights for each return day, with the price per
+   person). Each price is fare + bags, and each flight has a booking link.
+3. **Whole trip**: the 1-person price plus the 2-people price, written out as a sum (`$665 + $1,966 = $2,631`), for
+   three choices: the cheapest, the cheapest with no high-risk flight (for example no Gulf stop), and the cheapest
+   with every flight low risk. If a round trip + one-way booking beats a choice, it is flagged under it.
+4. **Every booking option, with details**: one line per return date and way of booking, with a switch between
+   "Show everything" and "Show only low risk". Open a line to see its full ticket.
+5. **Price over time**: appears once there are checks on two different days.
+6. **Booking tips**, and in the footer, what is left out (long layovers, excluded airlines).
 
 ### Reading a ticket
 
