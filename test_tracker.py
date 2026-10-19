@@ -60,6 +60,26 @@ def test_exclusions_hit_any_leg():
     assert not tracker.excluded(F(1, ["Emirates", "British Airways"]), cfg)
 
 
+def test_book_links_prefill_route_dates_and_travellers():
+    s = {"f": F(1, ["JetBlue", "Emirates"]), "pax": 2, "url": "https://g", "search": [("2026-12-28", "BOS", "BOM")]}
+    html = tracker.book_links(s)
+    assert html.index("jetblue.com") < html.index("Expedia")             # first listed carrier we know
+    assert "leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT" in html and "adults%3A2" in html
+    assert "BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2" in html and "depart=2026-12-28" in html
+    s["search"] = [("2026-12-18", "BOM", "BOS"), ("2026-12-28", "BOS", "BOM")]
+    html = tracker.book_links(s)
+    assert "trip=roundtrip" in html and "leg2=" in html and "type=ROUNDTRIP" in html and "return=2026-12-28" in html
+
+
+def test_prune_keeps_only_recent_runs():
+    import sqlite3
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE quotes(run_at TEXT, kind TEXT)")
+    con.executemany("INSERT INTO quotes VALUES(?, 'out')", [("r1",), ("r2",), ("r2",), ("r3",)])
+    tracker.prune(con, keep=2)
+    assert sorted(r for (r,) in con.execute("SELECT run_at FROM quotes")) == ["r2", "r2", "r3"]
+
+
 def test_lookup_whole_words_only():
     t = {"Air Canada": 1, "American Airlines": 2}
     assert tracker.lookup(t, "ANA") is None and tracker.lookup(t, "American") == 2

@@ -19,6 +19,7 @@ import subprocess
 import sys
 import time
 import tomllib
+import urllib.parse
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +29,7 @@ from gflights import Flight
 
 HERE = Path(__file__).resolve().parent
 LEVELS = ["low", "medium", "high"]
+KEEP_RUNS = 8      # raw quotes kept in prices.db; the best-price history keeps every run
 
 
 def load():
@@ -80,7 +82,7 @@ def risk(f, geo):
                 notes.append(f"{a}: {r['note']}")
     cities = dict(zip(f.layovers, (n.split(", ")[-1] for n in f.layover_names)))
     for code in f.layovers:
-        where = f"{cities[code]} ({code})" if code in cities else code
+        where = cities.get(code, code)
         r = geo.get("hubs", {}).get(code)
         if r:
             lvl = max(lvl, LEVELS.index(r["level"]))
@@ -131,10 +133,14 @@ def options(quotes, cfg, bags, geo, max_risk):
     """Best option per return date for each strategy. quotes: {(kind, dates): (flights, pax, url)}."""
     out, ret = cfg["outbound"], cfg["return"]
     lands = out["arrive_on"]
+    legs_of = {(k, d): legs for k, d, legs, _ in searches(cfg)}
+    city = lambda code: cfg.get("cities", {}).get(code, code)
+    go, back_name = f"{city(out['from'])} → {city(out['to'])}", f"{city(ret['from'])} → {city(ret['to'])}"
 
     def scored(kind, dates, legs=1):
         flights, pax, url = quotes.get((kind, dates), ([], 0, ""))
-        return [dict(score(f, pax, cfg, bags, geo, legs), url=url) for f in flights]
+        return [dict(score(f, pax, cfg, bags, geo, legs), url=url, search=legs_of.get((kind, dates), []))
+                for f in flights]
 
     best_out = min((s for d in out["depart_dates"] for s in scored("out", d)
                     if s["f"].arrive.startswith(lands) and ok(s, max_risk, cfg)),
@@ -144,7 +150,7 @@ def options(quotes, cfg, bags, geo, max_risk):
         back = min((s for s in scored("ret", d2) if ok(s, max_risk, cfg)), key=lambda s: s["total"], default=None)
         if best_out and back:
             rows.append({"strategy": "A", "dates": f"{best_out['f'].depart[:10]} > {d2}",
-                         "legs": [("Out", out["adults"], best_out), ("Back", ret["adults"], back)],
+                         "legs": [(go, out["adults"], best_out), (back_name, ret["adults"], back)],
                          "total": best_out["total"] + back["total"],
                          # everyone flying out also flies back; the rest fly back only
                          "per_person": [("Both ways", best_out["total"] / out["adults"] + back["total"] / ret["adults"]),
@@ -160,8 +166,8 @@ def options(quotes, cfg, bags, geo, max_risk):
                     continue
                 partner = min(same or extra, key=lambda s: s["total"])
                 rows.append({"strategy": "B", "dates": f"{d1} > {d2}",
-                             "legs": [("Round trip", out["adults"], rt),
-                                      ("Back (extra)", ret["adults"] - out["adults"], partner)],
+                             "legs": [(f"Round trip {go.replace('→', '⇄')}", out["adults"], rt),
+                                      (f"{back_name} (2nd traveller)", ret["adults"] - out["adults"], partner)],
                              "total": rt["total"] + partner["total"],
                              "per_person": [("Both ways", rt["total"] / out["adults"]),
                                             ("Return only", partner["total"] / partner["pax"])],
@@ -187,6 +193,15 @@ def db():
     return con
 
 
+def prune(con, keep=KEEP_RUNS):
+    """Drop raw quotes older than the last `keep` runs. CI commits prices.db every run, so unbounded
+    growth would bloat the git history. ponytail: old runs can no longer be re-scored after a rules change."""
+    con.execute("DELETE FROM quotes WHERE run_at NOT IN "
+                "(SELECT DISTINCT run_at FROM quotes ORDER BY run_at DESC LIMIT ?)", (keep,))
+    con.commit()
+    con.execute("VACUUM")
+
+
 def searches(cfg):
     """[(kind, dates, legs, adults)] for one tracker run."""
     out, ret = cfg["outbound"], cfg["return"]
@@ -210,11 +225,12 @@ def scrape(cfg, con):
         except Exception as e:                      # one bad search must not sink the run
             print(f"  {kind} {dates}: FAILED {e!r}", file=sys.stderr, flush=True)
             continue
-        print(f"  {kind:9} {dates:23} {pax} pax: {len(flights)} flights, "
+        print(f"  {kind:9} {dates:23} {pax} traveller(s): {len(flights)} flights, "
               f"from ${min((f.price for f in flights), default=0):,} (Google says {level})", flush=True)
         con.executemany("INSERT INTO quotes VALUES(?,?,?,?,?,?,?,?)",
                         [(run_at, kind, dates, pax, url, level, notice, json.dumps(asdict(f))) for f in flights])
         con.commit()
+    prune(con)
     return run_at
 
 
@@ -239,21 +255,55 @@ def when(iso):
 
 
 LEG_HEAD = ("<th>Airline</th><th>Departs</th><th>Arrives</th><th>Duration</th><th>Layovers</th>"
-            "<th class=num>Fare</th><th class=num>Bags</th><th class=num>Leg total<br>(all pax)</th>"
-            "<th class=num>Leg per<br>person</th>")
+            "<th class=num>Fare</th><th class=num>Bags</th><th class=num>Flight total<br>(all travellers)</th>"
+            "<th class=num>Flight cost<br>per traveller</th><th>Book on</th>")
+
+AIRLINE_SITES = {
+    "Emirates": "https://www.emirates.com/us/english/", "Etihad": "https://www.etihad.com/en-us/",
+    "Qatar Airways": "https://www.qatarairways.com/en-us/homepage.html",
+    "Lufthansa": "https://www.lufthansa.com/us/en/homepage", "SWISS": "https://www.swiss.com/us/en/homepage",
+    "Austrian": "https://www.austrian.com/us/en/homepage", "British Airways": "https://www.britishairways.com/",
+    "Virgin Atlantic": "https://www.virginatlantic.com/", "Air France": "https://wwws.airfrance.us/",
+    "KLM": "https://www.klm.us/", "Delta": "https://www.delta.com/", "American": "https://www.aa.com/",
+    "United": "https://www.united.com/", "JetBlue": "https://www.jetblue.com/", "Royal Jordanian": "https://www.rj.com/",
+    "Air Canada": "https://www.aircanada.com/", "Kuwait Airways": "https://www.kuwaitairways.com/",
+    "Ethiopian": "https://www.ethiopianairlines.com/", "Saudia": "https://www.saudia.com/",
+    "Gulf Air": "https://www.gulfair.com/", "Oman Air": "https://www.omanair.com/", "Finnair": "https://www.finnair.com/",
+    "Iberia": "https://www.iberia.com/", "Aer Lingus": "https://www.aerlingus.com/", "EgyptAir": "https://www.egyptair.com/",
+}
+
+
+def book_links(s):
+    """Airline site (first listed carrier we know, which usually sells the ticket) + prefilled agency searches."""
+    legs, pax = s["search"], s["pax"]
+    links = [(a, AIRLINE_SITES[a]) for a in s["f"].airlines if a in AIRLINE_SITES][:1]
+    if legs:
+        q = {"trip": "oneway" if len(legs) == 1 else "roundtrip", "passengers": f"adults:{pax}",
+             "options": "cabinclass:economy", "mode": "search"}
+        for i, (d, a, b) in enumerate(legs, 1):
+            q[f"leg{i}"] = f"from:{a},to:{b},departure:{d[5:7]}/{d[8:]}/{d[:4]}TANYT"
+        links.append(("Expedia", "https://www.expedia.com/Flights-Search?" + urllib.parse.urlencode(q)))
+        d, a, b = legs[0]
+        q = {"type": "ONEWAY" if len(legs) == 1 else "ROUNDTRIP", "adults": pax, "cabinClass": "ECONOMY",
+             "from": f"{a}.AIRPORT", "to": f"{b}.AIRPORT", "depart": d} | ({"return": legs[1][0]} if len(legs) > 1 else {})
+        links.append(("Booking.com", f"https://flights.booking.com/flights/{a}.AIRPORT-{b}.AIRPORT/?"
+                      + urllib.parse.urlencode(q)))
+    links.append(("Compare all (Google)", s["url"]))
+    return "<br>".join(f"<a href='{html.escape(u)}' target=_blank rel=noopener>{html.escape(n)}</a>" for n, u in links)
 
 
 def leg_cells(s):
     """The LEG_HEAD columns for one scored flight."""
     f = s["f"]
-    names = f.layover_names or f.layovers                  # runs stored before names were parsed
-    lay = ("<br>".join(f"{html.escape(n)} ({html.escape(c)}) &middot; {hm(m)}"
-                       for n, c, m in zip(names, f.layovers, f.layover_min)) if f.stops else "Nonstop")
-    return (f"<td><a href='{html.escape(s['url'])}'>{html.escape(', '.join(f.airlines))}</a></td>"
+    cities = [n.split(", ")[-1] for n in f.layover_names] or f.layovers   # old runs have codes only
+    lay = ("<br>".join(f"{html.escape(c)} &middot; {hm(m)}" for c, m in zip(cities, f.layover_min))
+           if f.stops else "Nonstop")
+    return (f"<td>{html.escape(', '.join(f.airlines))}</td>"
             f"<td class=nw>{when(f.depart)}</td><td class=nw>{when(f.arrive)}</td><td class=nw>{hm(f.duration_min)}</td>"
-            f"<td class=lay>{lay}</td><td class=num>${s['fare']:,.0f}</td>"
+            f"<td class=nw>{lay}</td><td class=num>${s['fare']:,.0f}</td>"
             f"<td class=num title='{html.escape('bag rule: ' + s['bag_rule'])}'>{bag_txt(s['bags'])}</td>"
-            f"<td class=num>${s['total']:,.0f}</td><td class=num>${s['total'] / s['pax']:,.0f}</td>")
+            f"<td class=num>${s['total']:,.0f}</td><td class=num>${s['total'] / s['pax']:,.0f}</td>"
+            f"<td class='nw small'>{book_links(s)}</td>")
 
 
 def pill(level):
@@ -278,19 +328,19 @@ def rows_html(opts):
     """One row per flight leg; option-level cells span the option's legs."""
     if not opts:
         return "<p class=muted>No option matched.</p>"
-    out = ["<div class=scroll><table><tr><th>#</th><th>Plan</th><th>Leg</th><th class=num>Pax</th>"
-           f"{LEG_HEAD}<th class=num>Trip total<br>(everyone)</th><th class=num>Trip cost<br>per person</th>"
-           "<th>Risk</th><th>Notes</th></tr>"]
+    out = ["<div class=scroll><table><tr><th>#</th><th>Plan</th><th class=num>Whole trip<br>(all travellers)</th>"
+           "<th class=num>Whole trip<br>per traveller</th><th>Risk</th><th>Journey</th><th class=num>Travellers</th>"
+           f"{LEG_HEAD}<th>Notes</th></tr>"]
     for i, r in enumerate(opts, 1):
         n = len(r["legs"])
         for j, (name, pax, s) in enumerate(r["legs"]):
             notes = s["notes"] + ([r["note"]] if r["note"] and j == 0 else [])
-            head = (f"<td rowspan={n}>{i}</td><td rowspan={n}>{r['strategy']}</td>" if j == 0 else "")
-            tail = (f"<td rowspan={n} class=num><b>${r['total']:,.0f}</b></td>"
+            head = (f"<td rowspan={n}>{i}</td><td rowspan={n}>{r['strategy']}</td>"
+                    f"<td rowspan={n} class=num><b>${r['total']:,.0f}</b></td>"
                     f"<td rowspan={n} class=num>{per_person_html(r)}</td><td rowspan={n}>{pill(r['risk'])}</td>"
                     if j == 0 else "")
             out.append(f"<tr class='{'first' if j == 0 else ''}'>{head}<td class=nw>{name}</td><td class=num>{pax}</td>"
-                       f"{leg_cells(s)}{tail}<td class=small>{notes_html(notes)}</td></tr>")
+                       f"{leg_cells(s)}<td class=small>{notes_html(notes)}</td></tr>")
     return "\n".join(out + ["</table></div>"])
 
 
@@ -329,7 +379,7 @@ CSS = """
 --low:#1c7c4a;--medium:#9a6400;--high:#c2302f}
 @media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--line:#33322f;
 --s1:#3987e5;--s2:#d95926;--low:#4fbf85;--medium:#e0a33a;--high:#f07070}}
-body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0 auto;max-width:1480px;padding:16px}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0;padding:16px 24px}
 a{color:inherit}table{border-collapse:collapse;width:100%;margin:8px 0 20px}th,td{border-bottom:1px solid var(--line);
 padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted,.small{color:var(--muted)}
 .small{font-size:12px}.nw{white-space:nowrap}td{white-space:normal}.pill{border:1px solid currentColor;border-radius:9px;padding:0 7px;font-size:12px}
@@ -349,9 +399,6 @@ def missing(cfg, quotes):
     return [f"{k} {d}" for k, d, _, _ in searches(cfg) if (k, d) not in quotes]
 
 
-SEARCH_NAMES = {"out": "One-way out", "ret": "One-way back", "rt": "Round trip", "ret_extra": "One-way back (extra)"}
-
-
 def evaluate(con, cfg, bags, geo, run_at=None):
     run_at, quotes, levels, notices = latest(con, run_at)
     if run_at is None:
@@ -361,19 +408,7 @@ def evaluate(con, cfg, bags, geo, run_at=None):
 
 
 def report(con, cfg, bags, geo, ev):
-    run_at, quotes, levels, notices, any_opts, low_opts = ev
-    detail = []
-    for (kind, dates), (flights, pax, url) in sorted(quotes.items()):
-        ss = sorted((dict(score(f, pax, cfg, bags, geo, 2 if kind == "rt" else 1), url=url)
-                     for f in flights if allowed(f, cfg)), key=lambda s: s["total"])
-        trs = "".join(f"<tr>{leg_cells(s)}<td>{pill(s['risk'])}</td><td class=small>{notes_html(s['notes'])}</td></tr>"
-                      for s in ss)
-        hidden = len(flights) - len(ss)
-        detail.append(f"<details><summary>{SEARCH_NAMES[kind]} {dates.replace('>', ' to ')} &middot; {pax} pax &middot; "
-                      f"{len(ss)} flights{f' ({hidden} hidden by trip.toml filters)' if hidden else ''} &middot; "
-                      f"Google price level: {levels[(kind, dates)] or 'n/a'} &middot; "
-                      f"<a href='{html.escape(url)}'>open search</a></summary>"
-                      f"<div class=scroll><table><tr>{LEG_HEAD}<th>Risk</th><th>Notes</th></tr>{trs}</table></div></details>")
+    run_at, quotes, _, notices, any_opts, low_opts = ev
     hist = con.execute("SELECT run_at, scope, total, label FROM best ORDER BY run_at DESC LIMIT 20").fetchall()
     hist_rows = "".join(f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>${r[2]:,.0f}</td><td>{html.escape(r[3])}</td></tr>" for r in hist)
     kpi = lambda o: (f"${o[0]['total']:,.0f}</b><span class=small>{per_person_html(o[0])}</span>" if o
@@ -381,27 +416,27 @@ def report(con, cfg, bags, geo, ev):
     page = f"""<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Flight Price Tracker</title><style>{CSS}</style>
 <h1>{html.escape(cfg.get('title', 'Flight price tracker'))}</h1>
-<p class=muted>Run {run_at} &middot; all prices USD, economy, totals for all travellers &middot;
-out {cfg['outbound']['adults']} adult landing {cfg['outbound']['arrive_on']} &middot;
-back {cfg['return']['adults']} adults on {', '.join(cfg['return']['depart_dates'])} &middot;
-bags costed to {cfg['prefs']['bags_per_person']}&times;23kg per person per direction &middot;
-excluding {html.escape(', '.join(cfg['prefs'].get('exclude_airlines', [])) or 'no airlines')}</p>
 <div class=kpis><div class=kpi>Cheapest trip, everyone<b>{kpi(any_opts)}</div>
 <div class=kpi>Cheapest low-risk trip, everyone<b>{kpi(low_opts)}</div>
 </div>
 {''.join(f"<p><span class='pill high'>Incomplete run</span> no results for {html.escape(m)}</p>" for m in missing(cfg, quotes))}
 {''.join(f"<p><span class='pill medium'>Google Flights live notice</span> {html.escape(n)}</p>" for n in sorted(notices))}
 <h2>Best options (risk &le; {cfg['prefs']['max_risk']})</h2>
-<p class=small>A = one-way out + one-way back on one booking. B = round trip for the outbound traveller + a one-way
-for the extra return traveller. B totals are "from" prices: Google pairs the round trip with its cheapest return, so
-price the exact return flight both travellers will share before booking. Bag fees are estimates from
-data/baggage.json; hover a cell for the rule used.</p>
+<p class=small><b>Plan A:</b> one one-way ticket out for the traveller going to Boston, plus one booking back for
+both travellers. <b>Plan B:</b> a round trip for the traveller going to Boston, plus a one-way back for the 2nd
+traveller. Plan B prices are "from" prices: price the exact return flight both will share before booking.
+Bag fees are estimates; hover a Bags cell to see whose rule was used.</p>
+<p class=small><b>Where to book:</b> use the airline's own site when it is within about $50 of the agencies. If a
+flight is cancelled or rerouted, you deal with the airline directly; adding bags or moving up a fare level to get
+2&times;23kg is easier; and the US 24-hour free-cancellation rule applies (book 7+ days before departure).
+Expedia or Booking.com can be a little cheaper, but changes and refunds then go through the agency, which is slower
+when flights are disrupted. "Compare all" opens Google Flights, where clicking a flight lists every site selling
+it with its price. For Plan B, book both tickets on the same airline's site.</p>
 {rows_html(any_opts)}
 <h2>Best low-risk options</h2>{rows_html(low_opts)}
 <h2>Price history</h2><div><span class=key style="background:var(--s1)"></span>Any risk
 <span class=key style="background:var(--s2)"></span>Low risk only</div>{chart(con)}
 <details><summary>History table</summary><table><tr><th>Run</th><th>Scope</th><th>Best total</th><th>Option</th></tr>{hist_rows}</table></details>
-<h2>Every flight found</h2>{''.join(detail)}
 <p class=small>Scraped from Google Flights for personal use. Prices change by the minute; confirm on the airline site before paying.</p>
 </html>"""
     (HERE / "report.html").write_text(page)
