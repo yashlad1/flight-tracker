@@ -54,7 +54,7 @@ jobs:
 
       - name: Build Pages site
         if: always()
-        run: mkdir -p site && cp report.html site/index.html
+        run: mkdir -p site && cp report.html site/index.html && cp robots.txt site/
       - uses: actions/upload-pages-artifact@v5
         if: always()
         with:

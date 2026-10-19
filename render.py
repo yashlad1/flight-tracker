@@ -371,12 +371,10 @@ def page(cfg, geo, ev, gaps, history):
                      f"{e(n[0].lower() + n[1:])}</p>" for n in sorted(notices))
     rows_any = "".join(row(cfg, geo, o) for o in any_opts) or "<p>No options match.</p>"
     rows_low = "".join(row(cfg, geo, o) for o in low_opts) or "<p>No low-risk options found.</p>"
-    p = cfg["prefs"]
-    left_out = [f"layovers over {p['max_layover_hours']} hours"] if p.get("max_layover_hours") else []
-    left_out += p.get("exclude_airlines", [])
     return f"""<!doctype html>
 <html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Flight Price Tracker</title>
+<meta name=robots content="noindex, nofollow, noarchive">
 <link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel=stylesheet>
 <style>{CSS}</style></head>
@@ -402,20 +400,7 @@ book it.</p>
 <div class=list-any>{rows_any}</div><div class=list-low>{rows_low}</div>
 </section>
 <section class=history aria-labelledby=h-hist><h2 id=h-hist>Price over time</h2>{chart(history)}</section>
-<section class=tips aria-labelledby=h-tips><h2 id=h-tips>Booking tips</h2>
-<ul><li>Book on the airline's own site unless Expedia or Booking.com is more than about $50 cheaper. If a flight is
-cancelled or rerouted, you then deal with the airline directly.</li>
-<li>To get 2 bags of 23&nbsp;kg, compare the airline's next fare level with paying for bags. The upgrade is often
-cheaper.</li>
-<li>If you book directly with the airline at least 7 days before the flight, US rules let you cancel within
-24 hours of booking for a full refund.</li>
-<li>Book the 2 travellers flying home on one booking unless this page shows a saving for separate tickets. One
-booking keeps you seated together and rebooked together.</li>
-<li>For a round trip + one-way: book the round trip first, then book the Boston traveller's one-way on the same
-flight as the round trip's return.</li></ul></section>
 </main>
-<footer><p>Prices come from Google Flights, in US dollars, economy class, and change by the minute. Bag fees are
-estimates. Left out of every list: {e(', '.join(left_out))}. Confirm the final price before you pay.</p></footer>
 </body></html>"""
 
 
@@ -432,7 +417,7 @@ font-variant-numeric:tabular-nums}
 a{color:var(--route)}
 a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
 h1,h2,h3,h4,p{margin:0}.nw{white-space:nowrap}
-.top,main,footer{max-width:1080px;margin:0 auto;padding:0 20px}
+.top,main{max-width:1080px;margin:0 auto;padding:0 20px}
 .top{padding-top:24px;padding-bottom:16px}
 .top h1{font-size:20px;font-weight:800}.top p{color:var(--ink-2);font-size:15px}
 /* the route band: the one loud element */
@@ -550,8 +535,6 @@ transform:rotate(45deg);justify-self:end;margin-top:-4px}
 circle.pt{stroke:var(--paper);stroke-width:2}circle.pt.s1{fill:var(--s1)}circle.pt.s2{fill:var(--s2)}
 .legend{font-size:14px;color:var(--ink-2);margin-bottom:6px}.key{display:inline-block;width:16px;height:3px;
 border-radius:2px;vertical-align:middle;margin:0 6px 0 0}.key.s1{background:var(--s1)}.key.s2{background:var(--s2);margin-left:18px}
-.tips ul{margin:0;padding-left:20px;max-width:72ch}.tips li{margin-bottom:8px}
-footer{padding-bottom:40px;color:var(--ink-2);font-size:14px}footer p{max-width:80ch}
 @media (max-width:900px){.jgrid{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
 @media (max-width:760px){
  .code{font-size:42px}.band-route{grid-template-columns:1fr 1fr;gap:14px}.flows{grid-column:1/-1;grid-row:2}

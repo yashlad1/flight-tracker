@@ -99,6 +99,7 @@ def test_render_page_says_who_flies_and_escapes_scraped_text():
     assert "$2,600" in page and "for 2 travellers, $1,050 each" in page   # 500 out + (1800 + 1 missing bag x $150 x 2)
     assert "<script>x</script>" not in page and "&lt;script&gt;" in page
     assert "Book on Qatar Airways" in page and "flights.booking.com" in page
+    assert '<meta name=robots content="noindex, nofollow, noarchive">' in page     # keep it out of search engines
 
 
 def test_split_fare_saving():

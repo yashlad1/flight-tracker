@@ -33,7 +33,7 @@ From top to bottom:
 4. **Every booking option, with details**: one line per return date and way of booking, with a switch between
    "Show everything" and "Show only low risk". Open a line to see its full ticket.
 5. **Price over time**: appears once there are checks on two different days.
-6. **Booking tips**, and in the footer, what is left out (long layovers, excluded airlines).
+
 
 ### Reading a ticket
 
@@ -190,6 +190,9 @@ Both JSON files are snapshots dated 2026-10-19 (`as_of`). Asking Claude to "refr
 - Plan B's return flight for the round-trip traveller isn't priced individually (see [Booking plans](#booking-plans)).
 - Prices change by the minute. Always confirm on the booking site before paying.
 - This scrapes Google Flights for personal use at a low request rate.
+- The report asks search engines not to index it (a `noindex` tag in the page, plus `robots.txt`). Only
+  well-behaved crawlers obey this. GitHub project pages can't set the domain-wide robots.txt, so the tag is
+  what actually works. The repo itself is public on github.com.
 
 ## Project layout
 
@@ -204,5 +207,6 @@ fixtures/          saved Google Flights page slice for tests
 .github/workflows/ track.yml (schedule, issue alerts, Pages)
 prices.db          price history (committed by CI)
 report.html        latest report (committed by CI, published to Pages)
+robots.txt         asks crawlers to stay away (published with the report)
 CLAUDE-DESIGN.md   design notes for reviewers
 ```

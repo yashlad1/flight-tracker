@@ -46,6 +46,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | Run on GitHub Actions instead of local cron; public repo with a GitHub Pages report link |
 | 2026-10-19 | "UI is super bad": full redesign of the report (see section 7) |
 | 2026-10-19 | The top of the report shows prices the way the user calculates them: 1 person out, 2 people back, and the sum, at three risk levels |
+| 2026-10-19 | Remove the booking tips and footer from the report; keep it out of search engines with `<meta name=robots content="noindex, nofollow, noarchive">` (robots.txt is also published, but crawlers only read it at the domain root, which a project page can't control) |
 | 2026-10-19 | Flag return flights that are cheaper as 2 separate tickets (`mark_split_fares`: matches the 2-person and 1-person searches flight by flight; saving = together price each − 1-person price, shown only when ≥ $10), with steps to still sit together |
 
 ---
