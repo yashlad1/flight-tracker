@@ -124,9 +124,6 @@ def band(cfg):
   </div>
   <div class="place end"><span class=code>{e(out['to'])}</span><span class=name>{e(b)}</span></div>
 </div>
-<p class=band-note>The {e(t1)} flies out on {lands}; the {e(t2)} joins them for the flight home.
-Every traveller checks {cfg['prefs']['bags_per_person']} bags of 23&nbsp;kg on every flight, and every price
-below includes those bags.</p>
 </section>"""
 
 
@@ -450,7 +447,6 @@ h1,h2,h3,h4,p{margin:0}.nw{white-space:nowrap}
 .track{position:relative;height:3px;background:var(--sign-ink);border-radius:2px}
 .plane{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%) rotate(90deg);
 fill:var(--sign-ink);background:var(--sign);border-radius:50%}
-.band-note{max-width:1040px;margin:18px auto 0;font-size:15px;max-width:1040px}
 main{padding-top:28px;padding-bottom:40px}
 section{margin-top:44px}section:first-of-type{margin-top:0}
 h2{font-size:24px;font-weight:800;margin-bottom:12px}
