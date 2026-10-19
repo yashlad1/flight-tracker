@@ -101,6 +101,14 @@ def test_render_page_says_who_flies_and_escapes_scraped_text():
     assert "Book on Qatar Airways" in page and "flights.booking.com" in page
 
 
+def test_split_fare_saving():
+    together = [{"f": F(2070, ["Lufthansa"]), "pax": 2}, {"f": F(2394, ["Virgin Atlantic"]), "pax": 2}]
+    alone = [F(929, ["Lufthansa"]), F(1197, ["Virgin Atlantic"])]          # same flights, 1 traveller
+    tracker.mark_split_fares(together, alone, 1)
+    assert together[0]["split"] == {"alone": 929, "each": 1035, "saving": 106}   # 1 seat left at the low fare
+    assert "split" not in together[1]                                          # 2394 / 2 == 1197: no gain
+
+
 def test_lookup_whole_words_only():
     t = {"Air Canada": 1, "American Airlines": 2}
     assert tracker.lookup(t, "ANA") is None and tracker.lookup(t, "American") == 2

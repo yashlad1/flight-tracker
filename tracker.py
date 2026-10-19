@@ -183,6 +183,22 @@ def options(quotes, cfg, bags, geo, max_risk):
     return sorted(best.values(), key=lambda r: r["total"])
 
 
+def mark_split_fares(together, alone, alone_pax, min_saving=10):
+    """Flag return flights that are cheaper booked one traveller at a time. Booked together, every traveller pays
+    the lowest fare with enough seats for all of them; if only one seat is left at a lower fare, one traveller can
+    buy it alone and the other pays the together price. So the saving is (together each) - (alone price).
+    Only meaningful when the 'alone' search is for exactly 1 traveller."""
+    if alone_pax != 1:
+        return
+    price_alone = {(tuple(f.airlines), f.depart, f.arrive): f.price for f in alone}
+    for s in together:
+        f = s["f"]
+        each = f.price / s["pax"]
+        cheap = price_alone.get((tuple(f.airlines), f.depart, f.arrive))
+        if cheap is not None and each - cheap >= min_saving:
+            s["split"] = {"alone": cheap, "each": each, "saving": each - cheap}
+
+
 def journeys(quotes, cfg, bags, geo):
     """The trip as the user thinks of it: 1 person out, N people back, and the sum.
     out: allowed outbound flights landing on arrive_on, cheapest first; ret: {date: allowed return flights};
@@ -199,6 +215,8 @@ def journeys(quotes, cfg, bags, geo):
     outs = sorted((s for d in out["depart_dates"] for s in scored("out", d) if s["f"].arrive.startswith(out["arrive_on"])),
                   key=lambda s: s["total"])
     rets = {d: sorted(scored("ret", d), key=lambda s: s["total"]) for d in ret["depart_dates"]}
+    for d, flights in rets.items():
+        mark_split_fares(flights, *quotes.get(("ret_extra", d), ([], 0, ""))[:2])
     totals = []
     for label, scope in (("Cheapest", "high"), ("No high-risk flight", "medium"), ("Low risk on every flight", "low")):
         o = next((s for s in outs if within(s, scope)), None)
