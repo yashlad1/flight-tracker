@@ -3,7 +3,7 @@
 This document explains how the flight tracker works and why it is built this way, and lists what is known to be
 weak, so a reviewer can suggest improvements. For user-facing docs, see `README.md`.
 
-Built 2026-10-19 with Claude Code. Snapshot: about 850 lines of Python and YAML, 11 tests, no third-party
+Built 2026-10-19 with Claude Code. Snapshot: about 950 lines of Python and YAML, 12 tests, no third-party
 dependencies.
 
 ---
@@ -44,6 +44,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | Report: one table row per flight, city names only, every price split into total and per traveller, booking links |
 | 2026-10-19 | No geopolitical section in the report (risk scoring stays), no full list of every flight, no subtitle, no plan explanation above the tables (it is in the README) |
 | 2026-10-19 | Run on GitHub Actions instead of local cron; public repo with a GitHub Pages report link |
+| 2026-10-19 | "UI is super bad": full redesign of the report (see section 7) |
 
 ---
 
@@ -70,8 +71,9 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | File | Lines | Responsibility |
 |---|---|---|
 | `gflights.py` | ~150 | Build the `tfs` protobuf query, fetch with retries, parse aria-labels into `Flight` |
-| `tracker.py` | ~500 | Config and data loading, costing, risk, filters, plan building, SQLite, report HTML, alerts, CLI |
-| `test_tracker.py` | ~140 | 11 plain-`assert` tests; runs with `python3` or `pytest` |
+| `tracker.py` | ~300 | Config and data loading, costing, risk, filters, plan building, SQLite, alerts, CLI |
+| `render.py` | ~400 | The report page: pure functions from data to one self-contained HTML file, booking links, chart |
+| `test_tracker.py` | ~170 | 12 plain-`assert` tests; runs with `python3` or `pytest` |
 | `.github/workflows/track.yml` | ~65 | Schedule, tests, scrape, issue alert, commit-back, Pages deploy |
 
 The split is deliberate: `gflights.py` knows nothing about this trip and could be reused; everything
@@ -196,23 +198,49 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
   December, each committing a whole binary database, would bloat the git history.
 - `best` keeps every run. It feeds the chart, the history table and the alert logic.
 - New `Flight` fields get defaults so old JSON rows still load.
+- `run_at` is stored in UTC with an offset (`2026-10-19T19:45:48+00:00`), and shown in Boston time. Earlier rows
+  mixed Mac local time and GitHub's UTC; they were converted once on 2026-10-19.
 
 ---
 
 ## 7. Report and alerts
 
-- `report.html` is a static file with inline CSS and an inline SVG line chart. It has light and dark themes,
-  colours from a palette pre-validated for colour-vision deficiency, and native tooltips. There is no JavaScript.
-- Booking links per flight:
-  - the airline's homepage (first known carrier);
-  - Expedia and Booking.com searches pre-filled with route, dates and traveller count (URL formats checked in a
-    browser on 2026-10-19);
-  - the Google Flights search, which lists every seller once you click a flight.
-- Alert rule:
-  - a new all-time low versus all earlier runs (scope "any"); or
-  - the first run at or under `target_total_usd`, compared with the previous run, so it doesn't repeat every run.
-- On macOS the alert is an `osascript` notification. In CI, an `ALERT:` line in the log makes the workflow open a
-  GitHub issue.
+`render.py` builds one static page: inline CSS, an inline SVG chart, Overpass from Google Fonts, and no
+JavaScript. It has a light and a dark theme (`prefers-color-scheme`).
+
+**Design brief.** The user called the first version, a wide spreadsheet-style table, "super bad", and later
+misread who flies which way. So the page is built around three questions: what to book, what each person pays,
+and whether it is safe.
+
+- **One loud element:** an airport-signage yellow band with person pictograms, 1 flying to Boston and 2 flying
+  home. Everything else is quiet: navy ink on cool white, one typeface (Overpass, derived from highway signage),
+  tabular figures.
+- **Options are tickets.** Each flight is a departure → layover city → arrival line with who is on it, then the
+  arithmetic (`fare + bags = total for N travellers, $X each`), then booking buttons. A perforated stub holds the
+  whole-trip total and each traveller's share.
+- **"What to book"** shows two full tickets: the cheapest, and the cheapest low-risk. If they are the same option,
+  it shows one ticket labelled "Cheapest, and low risk".
+- **"Every option"** is a list of compact `<details>` rows that open into the full ticket. A CSS-only switch
+  (`:has()` on two radio inputs) swaps between the any-risk and low-risk lists.
+- **Copy rules.** Risk is always written in words, never shown by colour alone. Plan A and Plan B are called
+  "Separate one-way tickets" and "Round trip + one-way". Jargon (PAX, leg) is gone.
+- **Quality floor.** Layout works from 375 px (no horizontal scroll) up to desktop, with visible focus outlines.
+  The only motion is the plane on the band, once, and only when reduced motion is not requested.
+
+**Booking links per flight:**
+
+- the airline's homepage (first known carrier);
+- Expedia and Booking.com searches pre-filled with route, dates and traveller count (URL formats checked in a
+  browser on 2026-10-19);
+- the Google Flights search, which lists every seller once you click a flight.
+
+**Alert rule:**
+
+- a new all-time low versus all earlier runs (scope "any"); or
+- the first run at or under `target_total_usd`, compared with the previous run, so it doesn't repeat every run.
+
+On macOS the alert is an `osascript` notification. In CI, an `ALERT:` line in the log makes the workflow open a
+GitHub issue.
 
 ### CI workflow
 
@@ -225,7 +253,7 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
 
 ## 8. How it was verified
 
-- **Unit tests (11):**
+- **Unit tests (12):**
   - `tfs` encoding against a known-good URL;
   - parsing a synthetic page and a slice of a real saved Google page;
   - nonstop rows never inherit layovers;
@@ -235,7 +263,8 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
   - the risk levels;
   - plan building (including the same-airline rule, the layover cap and the per-traveller split);
   - booking-link URLs;
-  - pruning.
+  - pruning;
+  - the rendered page (who flies which way, per-traveller arithmetic, Boston-time stamp, escaping of scraped text).
 - **Live checks:**
   - 6 full runs locally (one of them in a cron-like bare environment) and 1 on GitHub Actions;
   - scraped prices compared against the Google Flights UI in a browser (exact match);
@@ -244,7 +273,9 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
 - **Review:**
   - an independent code-review agent produced 11 findings; all were addressed, except one that a browser check
     disproved;
-  - an independent verifier agent passed the system end to end.
+  - an independent verifier agent passed the system end to end;
+  - the redesigned page was checked in a browser at 1280 px and 375 px, in light and dark, and critiqued by a
+    separate design-review agent.
 
 ---
 
@@ -266,8 +297,7 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
    to re-score.
 7. **Concurrency is single-writer.** It relies on the CI `concurrency` group; two local runs at once just
    interleave (seen once, harmless).
-8. **`tracker.py` mixes concerns** (costing, storage, HTML) in one 500-line file. This was chosen for size, not
-   layering.
+8. **`tracker.py` still mixes costing, storage and alerts** in one file. Page rendering moved to `render.py`.
 9. **Public repo.** Route, dates, traveller counts and prices are visible. There are no names or credentials.
 10. **Hard-coded airline homepages** in `AIRLINE_SITES` can go stale. Deep links into airline booking engines were
     avoided because they break often.
@@ -289,7 +319,7 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
    FAA notices)? Should the report warn when `as_of` is older than N days?
 6. **History.** Should `best` store the rules version (hash of `trip.toml` prefs) so the chart can mark rule
    changes instead of mixing them?
-7. **Code shape.** Is splitting `tracker.py` into pricing / storage / report modules worth it at this size, or is
-   one file easier to maintain?
+7. **Code shape.** Is splitting `tracker.py` further (pricing / storage) worth it at this size, or is one file
+   easier to maintain?
 8. **Alerting.** Are GitHub issues the right channel, compared with email via SMTP or a push service like ntfy?
    Should a drop of, say, 5% also alert, not just a new low?

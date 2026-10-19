@@ -17,40 +17,37 @@ There are no API keys and nothing to install: the code uses only the Python stan
 
 ## What the report shows
 
-1. **Cheapest trip** and **cheapest low-risk trip**, each with the total for all travellers and the cost per
-   traveller.
-2. **Cheapest options table**: the cheapest way to book for each return date and each booking plan, within your
-   risk limit (`max_risk`).
-3. **Best low-risk options**: the same, using only low-risk flights.
-4. **Price history**: a chart and a table of the cheapest total on every run.
-5. **Where to book**: a short note at the bottom (see [Where to book](#where-to-book)).
+From top to bottom:
 
-### Reading the tables
+1. **The trip band** (yellow): who flies which way. The **Mumbai traveller** flies to Boston (landing Fri 18 Dec)
+   and back; the **Boston traveller** joins them for the flight home. Every price includes 2 bags of 23 kg per
+   traveller on every flight.
+2. **What to book**: the cheapest option and the cheapest low-risk option side by side, with one line saying how
+   much more the low-risk one costs and whether it changes the date.
+3. **Every option, cheapest first**: one line per return date and way of booking, with a switch between "Show
+   everything" and "Show only low risk". Open a line to see its full ticket.
+4. **Price over time**: appears once there are checks on two different days.
+5. **Booking tips**, and in the footer, what is left out (long layovers, excluded airlines).
 
-Each trip option takes two rows, one per flight booking. Columns on the left describe the whole trip; the rest
-describe one flight.
+### Reading a ticket
 
-| Column | Meaning |
-|---|---|
-| Plan | **A** or **B**, see [Booking plans](#booking-plans) |
-| Whole trip (all travellers) | Everything you pay for this option: every fare plus every bag fee |
-| Whole trip per traveller | What each person's travel costs. "Both ways" is the person flying to Boston and back; "Return only" is the person flying back only. The two add up to the whole-trip total. |
-| Risk | Disruption risk for this option: low, medium or high (see [Risk rating](#risk-rating)) |
-| Journey | Which flight this row is, e.g. "Mumbai → Boston" |
-| Travellers | How many people are on this flight booking |
-| Layovers | Connecting city and how long you wait there |
-| Fare | Ticket price for everyone on this booking, as shown by Google Flights |
-| Bags | "included" if the cheapest fare already includes 2 × 23 kg per person, otherwise the estimated extra cost |
-| Flight total (all travellers) | Fare + bags for this flight booking |
-| Flight cost per traveller | Flight total ÷ travellers on it |
-| Book on | Links to book: the airline's own site, Expedia, Booking.com (both pre-filled with route, date and number of travellers) and Google Flights to compare every seller |
-| Notes | Why the risk is what it is, transit-visa warnings, and Plan B caveats. Hover a note for the full text. |
+- **The heading** gives the flight home: "Leave Boston Mon 28 Dec (land in Mumbai Tue 29 Dec)", then how you book
+  it in one sentence, then the disruption risk with its reason ("High disruption risk: connects in Abu Dhabi").
+- **Each flight** shows who is on it (Mumbai traveller, Boston traveller or Both travellers), the airline, local
+  departure and arrival times, the trip length and the layover city. Below that is the arithmetic, for example
+  `$1,566 fare + $400 bags = $1,966 for 2 travellers, $983 each`.
+- **Booking buttons** sit under each flight: the airline's own site, Expedia and Booking.com (already filled in
+  with the route, date and number of travellers), and "Compare all sellers" (Google Flights).
+- **The stub** shows the whole-trip total for both travellers and each traveller's share. The Mumbai traveller
+  pays for there and back; the Boston traveller pays for the flight home only. The two add up to the total.
+- **"Why … risk, and other notes"** expands to show the full reasons and any transit-visa warnings.
 
 ### Booking plans
 
-- **Plan A**: one one-way ticket for the traveller flying to Boston, plus one booking for both travellers back.
-- **Plan B**: a round-trip ticket for the traveller flying to Boston, plus a separate one-way ticket back for the
-  second traveller, on the same airline. Round trips that start in India are sometimes cheaper than two one-ways.
+- **Separate one-way tickets** (Plan A in the code): a one-way for the Mumbai traveller, then one booking home for
+  both travellers.
+- **Round trip + one-way** (Plan B): a round trip for the Mumbai traveller, plus a one-way home for the Boston
+  traveller on the same airline. Round trips that start in India are sometimes cheaper than two one-ways.
   Plan B prices are "from" prices: Google pairs the round trip with its cheapest return flight. Before booking,
   price the exact return flight both travellers will share.
 
@@ -115,8 +112,8 @@ effect on the last stored prices, or wait for the next run.
 
 | Key | Current value | What it does |
 |---|---|---|
-| `title` | Mumbai → Boston → Mumbai price tracker | Report heading |
-| `cities` | BOM = Mumbai, BOS = Boston | Names used for journeys in the report |
+| `title` | Flight price tracker | Report heading |
+| `cities` | BOM = Mumbai, BOS = Boston | City names used in the report, including the traveller names |
 | `outbound.from` / `to` | BOM / BOS | Outbound airports (IATA codes) |
 | `outbound.depart_dates` | 17 and 18 Dec | Departure dates to search |
 | `outbound.arrive_on` | 2026-12-18 | Outbound flights must land on this local date |
@@ -192,7 +189,8 @@ Both JSON files are snapshots dated 2026-10-19 (`as_of`). Asking Claude to "refr
 
 ```
 gflights.py        Google Flights query builder, fetcher and parser
-tracker.py         searches, pricing, risk, storage, report, alerts, CLI
+tracker.py         searches, pricing, risk, storage, alerts, CLI
+render.py          report.html: layout, booking links, chart
 trip.toml          the trip and preferences
 test_tracker.py    self-check (python3 test_tracker.py, or pytest)
 data/              baggage.json, geo_risk.json

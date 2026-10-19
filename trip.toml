@@ -1,5 +1,5 @@
 # Trip definition. Edit and re-run; nothing else needs to change.
-title = "Mumbai → Boston → Mumbai price tracker"
+title = "Flight price tracker"
 cities = { BOM = "Mumbai", BOS = "Boston" }   # names shown in the report
 
 [outbound]                 # Mumbai -> Boston, must land on arrive_on (local time)

@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import gflights
+import render
 import tracker
 from gflights import Flight
 
@@ -62,12 +63,12 @@ def test_exclusions_hit_any_leg():
 
 def test_book_links_prefill_route_dates_and_travellers():
     s = {"f": F(1, ["JetBlue", "Emirates"]), "pax": 2, "url": "https://g", "search": [("2026-12-28", "BOS", "BOM")]}
-    html = tracker.book_links(s)
-    assert html.index("jetblue.com") < html.index("Expedia")             # first listed carrier we know
+    html = ''.join(u for _, u in render.book_links(s))
+    assert render.book_links(s)[0] == ("Book on JetBlue", "https://www.jetblue.com/")   # first carrier we know
     assert "leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT" in html and "adults%3A2" in html
-    assert "BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2" in html and "depart=2026-12-28" in html
+    assert "BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&adults=2" in html and "depart=2026-12-28" in html
     s["search"] = [("2026-12-18", "BOM", "BOS"), ("2026-12-28", "BOS", "BOM")]
-    html = tracker.book_links(s)
+    html = ''.join(u for _, u in render.book_links(s))
     assert "trip=roundtrip" in html and "leg2=" in html and "type=ROUNDTRIP" in html and "return=2026-12-28" in html
 
 
@@ -78,6 +79,22 @@ def test_prune_keeps_only_recent_runs():
     con.executemany("INSERT INTO quotes VALUES(?, 'out')", [("r1",), ("r2",), ("r2",), ("r3",)])
     tracker.prune(con, keep=2)
     assert sorted(r for (r,) in con.execute("SELECT run_at FROM quotes")) == ["r2", "r2", "r3"]
+
+
+def test_render_page_says_who_flies_and_escapes_scraped_text():
+    cfg = {"cities": {"BOM": "Mumbai", "BOS": "Boston"},
+           "outbound": {"from": "BOM", "to": "BOS", "depart_dates": ["2026-12-18"], "arrive_on": "2026-12-18", "adults": 1},
+           "return": {"from": "BOS", "to": "BOM", "depart_dates": ["2026-12-28"], "adults": 2},
+           "prefs": {"bags_per_person": 2, "max_stops": 2, "max_risk": "high", "max_layover_hours": 3}}
+    q = {("out", "2026-12-18"): ([F(500, ["Qatar Airways"])], 1, "https://g/out"),
+         ("ret", "2026-12-28"): ([F(1800, ["<script>x</script>"])], 2, "https://g/ret")}
+    opts = tracker.options(q, cfg, BAGS, GEO, "high")
+    page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, {}, set(), opts, []), [], [])
+    assert "<b>1 traveller</b> to Boston" in page and "<b>2 travellers</b> home to Mumbai" in page
+    assert "Mon 19 Oct, 3:45 pm" in page                       # UTC run time shown in Boston time
+    assert "$2,600" in page and "for 2 travellers, $1,050 each" in page   # 500 out + (1800 + 1 missing bag x $150 x 2)
+    assert "<script>x</script>" not in page and "&lt;script&gt;" in page
+    assert "Book on Qatar Airways" in page and "flights.booking.com" in page
 
 
 def test_lookup_whole_words_only():

@@ -10,7 +10,6 @@ geopolitical / connection risk (data/geo_risk.json).
   python3 tracker.py --report   rebuild report.html from the latest stored run
 """
 import argparse
-import html
 import json
 import random
 import re
@@ -19,12 +18,12 @@ import subprocess
 import sys
 import time
 import tomllib
-import urllib.parse
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import gflights
+import render
 from gflights import Flight
 
 HERE = Path(__file__).resolve().parent
@@ -216,7 +215,7 @@ def searches(cfg):
 
 
 def scrape(cfg, con):
-    run_at = datetime.now().isoformat(timespec="seconds")
+    run_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     for i, (kind, dates, legs, pax) in enumerate(searches(cfg)):
         if i:
             time.sleep(3 + random.random() * 4)     # be polite; Google throttles bursts
@@ -245,155 +244,7 @@ def latest(con, run_at=None):
     return run_at, quotes, levels, notices - {None}
 
 
-# --- report ----------------------------------------------------------------
-def hm(minutes):
-    return f"{minutes // 60}h {minutes % 60:02d}m"
-
-
-def when(iso):
-    return datetime.fromisoformat(iso).strftime("%a %d %b %H:%M")
-
-
-LEG_HEAD = ("<th>Airline</th><th>Departs</th><th>Arrives</th><th>Duration</th><th>Layovers</th>"
-            "<th class=num>Fare</th><th class=num>Bags</th><th class=num>Flight total<br>(all travellers)</th>"
-            "<th class=num>Flight cost<br>per traveller</th><th>Book on</th>")
-
-AIRLINE_SITES = {
-    "Emirates": "https://www.emirates.com/us/english/", "Etihad": "https://www.etihad.com/en-us/",
-    "Qatar Airways": "https://www.qatarairways.com/en-us/homepage.html",
-    "Lufthansa": "https://www.lufthansa.com/us/en/homepage", "SWISS": "https://www.swiss.com/us/en/homepage",
-    "Austrian": "https://www.austrian.com/us/en/homepage", "British Airways": "https://www.britishairways.com/",
-    "Virgin Atlantic": "https://www.virginatlantic.com/", "Air France": "https://wwws.airfrance.us/",
-    "KLM": "https://www.klm.us/", "Delta": "https://www.delta.com/", "American": "https://www.aa.com/",
-    "United": "https://www.united.com/", "JetBlue": "https://www.jetblue.com/", "Royal Jordanian": "https://www.rj.com/",
-    "Air Canada": "https://www.aircanada.com/", "Kuwait Airways": "https://www.kuwaitairways.com/",
-    "Ethiopian": "https://www.ethiopianairlines.com/", "Saudia": "https://www.saudia.com/",
-    "Gulf Air": "https://www.gulfair.com/", "Oman Air": "https://www.omanair.com/", "Finnair": "https://www.finnair.com/",
-    "Iberia": "https://www.iberia.com/", "Aer Lingus": "https://www.aerlingus.com/", "EgyptAir": "https://www.egyptair.com/",
-}
-
-
-def book_links(s):
-    """Airline site (first listed carrier we know, which usually sells the ticket) + prefilled agency searches."""
-    legs, pax = s["search"], s["pax"]
-    links = [(a, AIRLINE_SITES[a]) for a in s["f"].airlines if a in AIRLINE_SITES][:1]
-    if legs:
-        q = {"trip": "oneway" if len(legs) == 1 else "roundtrip", "passengers": f"adults:{pax}",
-             "options": "cabinclass:economy", "mode": "search"}
-        for i, (d, a, b) in enumerate(legs, 1):
-            q[f"leg{i}"] = f"from:{a},to:{b},departure:{d[5:7]}/{d[8:]}/{d[:4]}TANYT"
-        links.append(("Expedia", "https://www.expedia.com/Flights-Search?" + urllib.parse.urlencode(q)))
-        d, a, b = legs[0]
-        q = {"type": "ONEWAY" if len(legs) == 1 else "ROUNDTRIP", "adults": pax, "cabinClass": "ECONOMY",
-             "from": f"{a}.AIRPORT", "to": f"{b}.AIRPORT", "depart": d} | ({"return": legs[1][0]} if len(legs) > 1 else {})
-        links.append(("Booking.com", f"https://flights.booking.com/flights/{a}.AIRPORT-{b}.AIRPORT/?"
-                      + urllib.parse.urlencode(q)))
-    links.append(("Compare all (Google)", s["url"]))
-    return "<br>".join(f"<a href='{html.escape(u)}' target=_blank rel=noopener>{html.escape(n)}</a>" for n, u in links)
-
-
-def leg_cells(s):
-    """The LEG_HEAD columns for one scored flight."""
-    f = s["f"]
-    cities = [n.split(", ")[-1] for n in f.layover_names] or f.layovers   # old runs have codes only
-    lay = ("<br>".join(f"{html.escape(c)} &middot; {hm(m)}" for c, m in zip(cities, f.layover_min))
-           if f.stops else "Nonstop")
-    return (f"<td>{html.escape(', '.join(f.airlines))}</td>"
-            f"<td class=nw>{when(f.depart)}</td><td class=nw>{when(f.arrive)}</td><td class=nw>{hm(f.duration_min)}</td>"
-            f"<td class=nw>{lay}</td><td class=num>${s['fare']:,.0f}</td>"
-            f"<td class=num title='{html.escape('bag rule: ' + s['bag_rule'])}'>{bag_txt(s['bags'])}</td>"
-            f"<td class=num>${s['total']:,.0f}</td><td class=num>${s['total'] / s['pax']:,.0f}</td>"
-            f"<td class='nw small'>{book_links(s)}</td>")
-
-
-def pill(level):
-    return f"<span class='pill {level}'>{level}</span>"
-
-
-def notes_html(notes):
-    """One short line per note; the full sentence is on hover."""
-    short = lambda n: n if len(n) <= 48 else n[:45].rstrip() + "..."
-    return "<br>".join(f"<span title='{html.escape(n)}'>{html.escape(short(n))}</span>" for n in notes)
-
-
-def bag_txt(fee):
-    return "included" if not fee else f"+${fee:,.0f}"
-
-
-def per_person_html(r):
-    return "<br>".join(f"{who}: <b>${cost:,.0f}</b>" for who, cost in r["per_person"])
-
-
-def rows_html(opts):
-    """One row per flight leg; option-level cells span the option's legs."""
-    if not opts:
-        return "<p class=muted>No option matched.</p>"
-    out = ["<div class=scroll><table><tr><th>#</th><th>Plan</th><th class=num>Whole trip<br>(all travellers)</th>"
-           "<th class=num>Whole trip<br>per traveller</th><th>Risk</th><th>Journey</th><th class=num>Travellers</th>"
-           f"{LEG_HEAD}<th>Notes</th></tr>"]
-    for i, r in enumerate(opts, 1):
-        n = len(r["legs"])
-        for j, (name, pax, s) in enumerate(r["legs"]):
-            notes = s["notes"] + ([r["note"]] if r["note"] and j == 0 else [])
-            head = (f"<td rowspan={n}>{i}</td><td rowspan={n}>{r['strategy']}</td>"
-                    f"<td rowspan={n} class=num><b>${r['total']:,.0f}</b></td>"
-                    f"<td rowspan={n} class=num>{per_person_html(r)}</td><td rowspan={n}>{pill(r['risk'])}</td>"
-                    if j == 0 else "")
-            out.append(f"<tr class='{'first' if j == 0 else ''}'>{head}<td class=nw>{name}</td><td class=num>{pax}</td>"
-                       f"{leg_cells(s)}<td class=small>{notes_html(notes)}</td></tr>")
-    return "\n".join(out + ["</table></div>"])
-
-
-def chart(con):
-    hist = con.execute("SELECT run_at, scope, total FROM best ORDER BY run_at").fetchall()
-    runs = sorted({h[0] for h in hist})
-    if len(runs) < 2:
-        return "<p class=muted>Price history appears after the second run.</p>"
-    W, H, L, R, T, B = 720, 220, 56, 120, 12, 28
-    vals = [h[2] for h in hist]
-    lo, hi = min(vals) * 0.97, max(vals) * 1.03
-    x = lambda i: L + i * (W - L - R) / (len(runs) - 1)
-    y = lambda v: T + (hi - v) * (H - T - B) / (hi - lo)
-    svg = [f"<svg viewBox='0 0 {W} {H}' role=img aria-label='Best total price per run'>"]
-    for k in range(5):
-        v = lo + k * (hi - lo) / 4
-        svg.append(f"<line x1={L} x2={W - R} y1={y(v):.1f} y2={y(v):.1f} class=grid />"
-                   f"<text x={L - 6} y={y(v) + 4:.1f} class=tick text-anchor=end>${v / 1000:.1f}K</text>")
-    for i in (0, len(runs) - 1):
-        svg.append(f"<text x={x(i):.1f} y={H - 8} class=tick text-anchor=middle>{runs[i][5:16].replace('T', ' ')}</text>")
-    for n, (scope, name) in enumerate((("any", "Any risk"), ("low", "Low risk only"))):
-        pts = [(runs.index(r), t) for r, s, t in hist if s == scope]
-        if not pts:
-            continue
-        path = " ".join(f"{'M' if j == 0 else 'L'}{x(i):.1f},{y(t):.1f}" for j, (i, t) in enumerate(pts))
-        svg.append(f"<path d='{path}' class='line s{n + 1}' />")
-        svg += [f"<circle cx={x(i):.1f} cy={y(t):.1f} r=4 class='dot s{n + 1}'><title>{name}: ${t:,.0f} "
-                f"({runs[i][:16]})</title></circle>" for i, t in pts]
-        i, t = pts[-1]
-        svg.append(f"<text x={x(i) + 8:.1f} y={y(t) + 4:.1f} class=lbl>{name} ${t:,.0f}</text>")
-    return "".join(svg) + "</svg>"
-
-
-CSS = """
-:root{color-scheme:light;--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--line:#e4e3df;--s1:#2a78d6;--s2:#eb6834;
---low:#1c7c4a;--medium:#9a6400;--high:#c2302f}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--line:#33322f;
---s1:#3987e5;--s2:#d95926;--low:#4fbf85;--medium:#e0a33a;--high:#f07070}}
-body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0;padding:16px 24px}
-a{color:inherit}table{border-collapse:collapse;width:100%;margin:8px 0 20px}th,td{border-bottom:1px solid var(--line);
-padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted,.small{color:var(--muted)}
-.small{font-size:12px}.nw{white-space:nowrap}td{white-space:normal}.pill{border:1px solid currentColor;border-radius:9px;padding:0 7px;font-size:12px}
-.pill.low{color:var(--low)}.pill.medium{color:var(--medium)}.pill.high{color:var(--high)}
-.kpis{display:flex;gap:24px;flex-wrap:wrap}.kpi>b{display:block;font-size:28px}.kpi span{display:block}
-svg{width:100%;max-width:720px}.grid{stroke:var(--line);stroke-width:1}.tick,.lbl{fill:var(--muted);font-size:11px}
-.lbl{fill:var(--fg)}.line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
-.line.s1{stroke:var(--s1)}.line.s2{stroke:var(--s2)}.dot{stroke:var(--bg);stroke-width:2}.dot.s1{fill:var(--s1)}
-.dot.s2{fill:var(--s2)}.key{display:inline-block;width:14px;height:3px;vertical-align:middle;margin:0 4px 0 12px}
-.scroll{overflow-x:auto}.lay{min-width:190px;max-width:240px}.num{text-align:right;white-space:nowrap}td.small{white-space:nowrap}
-tr.first td{border-top:2px solid var(--line)}details{margin:6px 0}summary{cursor:pointer}
-"""
-
-
+# --- report ---------------------------------------------------------------------------------------------
 def missing(cfg, quotes):
     """Searches of this run that returned nothing (failed, throttled or no flights)."""
     return [f"{k} {d}" for k, d, _, _ in searches(cfg) if (k, d) not in quotes]
@@ -408,33 +259,8 @@ def evaluate(con, cfg, bags, geo, run_at=None):
 
 
 def report(con, cfg, bags, geo, ev):
-    run_at, quotes, _, notices, any_opts, low_opts = ev
-    hist = con.execute("SELECT run_at, scope, total, label FROM best ORDER BY run_at DESC LIMIT 20").fetchall()
-    hist_rows = "".join(f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>${r[2]:,.0f}</td><td>{html.escape(r[3])}</td></tr>" for r in hist)
-    kpi = lambda o: (f"${o[0]['total']:,.0f}</b><span class=small>{per_person_html(o[0])}</span>" if o
-                     else "n/a</b>")
-    page = f"""<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<title>Flight Price Tracker</title><style>{CSS}</style>
-<h1>{html.escape(cfg.get('title', 'Flight price tracker'))}</h1>
-<div class=kpis><div class=kpi>Cheapest trip, everyone<b>{kpi(any_opts)}</div>
-<div class=kpi>Cheapest low-risk trip, everyone<b>{kpi(low_opts)}</div>
-</div>
-{''.join(f"<p><span class='pill high'>Incomplete run</span> no results for {html.escape(m)}</p>" for m in missing(cfg, quotes))}
-{''.join(f"<p><span class='pill medium'>Google Flights live notice</span> {html.escape(n)}</p>" for n in sorted(notices))}
-{rows_html(any_opts)}
-<h2>Best low-risk options</h2>{rows_html(low_opts)}
-<h2>Price history</h2><div><span class=key style="background:var(--s1)"></span>Any risk
-<span class=key style="background:var(--s2)"></span>Low risk only</div>{chart(con)}
-<details><summary>History table</summary><table><tr><th>Run</th><th>Scope</th><th>Best total</th><th>Option</th></tr>{hist_rows}</table></details>
-<p class=small><b>Where to book:</b> use the airline's own site when it is within about $50 of the agencies. If a
-flight is cancelled or rerouted, you deal with the airline directly; adding bags or moving up a fare level to get
-2&times;23kg is easier; and the US 24-hour free-cancellation rule applies (book 7+ days before departure).
-Expedia or Booking.com can be a little cheaper, but changes and refunds then go through the agency, which is slower
-when flights are disrupted. "Compare all" opens Google Flights, where clicking a flight lists every site selling
-it with its price. For Plan B, book both tickets on the same airline's site.</p>
-<p class=small>Scraped from Google Flights for personal use. Prices change by the minute; confirm on the airline site before paying.</p>
-</html>"""
-    (HERE / "report.html").write_text(page)
+    history = con.execute("SELECT run_at, scope, total, label FROM best ORDER BY run_at").fetchall()
+    (HERE / "report.html").write_text(render.page(cfg, geo, ev, missing(cfg, ev[1]), history))
 
 
 def alert(con, ev, cfg):

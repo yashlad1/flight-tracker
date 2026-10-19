@@ -1,58 +1,561 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<title>Flight Price Tracker</title><style>
-:root{color-scheme:light;--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--line:#e4e3df;--s1:#2a78d6;--s2:#eb6834;
---low:#1c7c4a;--medium:#9a6400;--high:#c2302f}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--line:#33322f;
---s1:#3987e5;--s2:#d95926;--low:#4fbf85;--medium:#e0a33a;--high:#f07070}}
-body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0;padding:16px 24px}
-a{color:inherit}table{border-collapse:collapse;width:100%;margin:8px 0 20px}th,td{border-bottom:1px solid var(--line);
-padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted,.small{color:var(--muted)}
-.small{font-size:12px}.nw{white-space:nowrap}td{white-space:normal}.pill{border:1px solid currentColor;border-radius:9px;padding:0 7px;font-size:12px}
-.pill.low{color:var(--low)}.pill.medium{color:var(--medium)}.pill.high{color:var(--high)}
-.kpis{display:flex;gap:24px;flex-wrap:wrap}.kpi>b{display:block;font-size:28px}.kpi span{display:block}
-svg{width:100%;max-width:720px}.grid{stroke:var(--line);stroke-width:1}.tick,.lbl{fill:var(--muted);font-size:11px}
-.lbl{fill:var(--fg)}.line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
-.line.s1{stroke:var(--s1)}.line.s2{stroke:var(--s2)}.dot{stroke:var(--bg);stroke-width:2}.dot.s1{fill:var(--s1)}
-.dot.s2{fill:var(--s2)}.key{display:inline-block;width:14px;height:3px;vertical-align:middle;margin:0 4px 0 12px}
-.scroll{overflow-x:auto}.lay{min-width:190px;max-width:240px}.num{text-align:right;white-space:nowrap}td.small{white-space:nowrap}
-tr.first td{border-top:2px solid var(--line)}details{margin:6px 0}summary{cursor:pointer}
-</style>
-<h1>Mumbai → Boston → Mumbai price tracker</h1>
-<div class=kpis><div class=kpi>Cheapest trip, everyone<b>$2,631</b><span class=small>Both ways: <b>$1,648</b><br>Return only: <b>$983</b></span></div>
-<div class=kpi>Cheapest low-risk trip, everyone<b>$3,227</b><span class=small>Both ways: <b>$1,850</b><br>Return only: <b>$1,377</b></span></div>
+<!doctype html>
+<html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Flight Price Tracker</title>
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel=stylesheet>
+<style>
+:root{color-scheme:light;--paper:#f5f7fa;--surface:#fff;--ink:#14213d;--ink-2:#4a5672;--rule:#a9b4c8;--hair:#e1e6ef;
+--sign:#ffcc00;--sign-ink:#14213d;--route:#2f5bea;--low:#1e7f4f;--medium:#a15c00;--high:#b4312a;
+--s1:#2a78d6;--s2:#c4501f;--focus:#2f5bea}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--paper:#0f1828;--surface:#16213a;--ink:#e9eef7;
+--ink-2:#a9b4ca;--rule:#4a5a80;--hair:#26324f;--route:#8eaaff;--low:#4fbf85;--medium:#e0a33a;--high:#f07a72;
+--s1:#3987e5;--s2:#e8743d;--focus:#ffcc00}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 Overpass,system-ui,sans-serif;
+font-variant-numeric:tabular-nums}
+a{color:var(--route)}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4,p{margin:0}.nw{white-space:nowrap}
+.top,main,footer{max-width:1080px;margin:0 auto;padding:0 20px}
+.top{padding-top:24px;padding-bottom:16px}
+.top h1{font-size:20px;font-weight:800}.top p{color:var(--ink-2);font-size:15px}
+/* the route band: the one loud element */
+.band{background:var(--sign);color:var(--sign-ink);padding:28px 20px 22px}
+.band-route{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+.place{display:flex;flex-direction:column;line-height:1}.place.end{text-align:right}
+.code{font-size:60px;font-weight:800;letter-spacing:-.02em}.name{font-size:18px;font-weight:600;margin-top:6px}
+.flows{display:grid;gap:10px}
+.flow{display:flex;align-items:center;gap:12px;font-size:18px;line-height:1.25}
+.flow small{display:block;font-size:15px}.flow.home{flex-direction:row-reverse;text-align:right}
+.people{display:inline-flex;gap:4px;flex:none}.person{width:18px;height:29px;fill:currentColor}
+.track{position:relative;height:3px;background:var(--sign-ink);border-radius:2px}
+.plane{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%) rotate(90deg);
+fill:var(--sign-ink);background:var(--sign);border-radius:50%}
+.band-note{max-width:1040px;margin:18px auto 0;font-size:15px;max-width:1040px}
+main{padding-top:28px;padding-bottom:40px}
+section{margin-top:44px}section:first-of-type{margin-top:0}
+h2{font-size:24px;font-weight:800;margin-bottom:12px}
+.alert{margin:0 0 18px;padding:10px 14px;border-left:4px solid var(--high);background:var(--surface)}
+.compare{font-size:17px;margin:-4px 0 16px}.compare b{font-weight:800}
+.intro,.fine{color:var(--ink-2);font-size:14px}.intro{margin:-4px 0 14px}.fine{margin-top:8px}
+/* tickets */
+.pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.pick-grid>.ticket:only-child{grid-column:1/-1}
+.ticket{display:grid;grid-template-columns:1fr 220px;background:var(--surface);border:1px solid var(--rule);
+border-radius:14px;overflow:hidden}
+.pick-grid .ticket{grid-template-columns:1fr}
+.main{padding:18px 22px 16px;min-width:0}
+.label{font-weight:800;font-size:15px;color:var(--route);margin-bottom:2px}
+.ticket h3{font-size:20px;font-weight:800}.ticket h3 small{font-size:15px;font-weight:600;color:var(--ink-2)}
+.plan{font-size:15px;color:var(--ink-2)}
+.risk{display:flex;align-items:flex-start;gap:8px;font-size:15px;margin-top:6px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;margin-top:.45em}
+.r-low .dot{background:var(--low)}.r-medium .dot{background:var(--medium)}.r-high .dot{background:var(--high)}
+.r-low .risk{color:var(--low)}.r-medium .risk{color:var(--medium)}.r-high .risk{color:var(--high)}
+.leg{border-top:1px solid var(--hair);margin-top:14px;padding-top:14px}
+.leg-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.leg-head h4{font-size:16px;font-weight:800}.who{font-size:14px;font-weight:600;padding:0 9px;border-radius:99px;
+background:var(--paper);border:1px solid var(--rule)}.airline{margin-left:auto;font-weight:600}
+.line{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin:10px 0 8px}
+.pt{display:flex;flex-direction:column;line-height:1.2}.pt b{font-size:22px;font-weight:800}
+.pt span{font-weight:600}.pt small{color:var(--ink-2);font-size:13px}.pt.end{text-align:right}
+.path{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 4px}
+.path::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed var(--rule)}
+.dur,.stops{position:relative;background:var(--surface);padding:0 8px;font-size:13px;color:var(--ink-2)}
+.stops{display:flex;gap:10px;color:var(--ink);font-weight:600}.stop small{font-weight:400;color:var(--ink-2)}
+.sum{font-size:15px}.sum b{font-weight:800}
+.book{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;font-size:15px}
+.btn,.lnk{display:inline-flex;align-items:center;min-height:44px}
+.btn{background:var(--ink);color:var(--surface);text-decoration:none;font-weight:700;padding:0 18px;border-radius:8px}
+.btn:hover{background:var(--route)}.lnk{font-weight:600;padding:0 2px}
+.why{margin-top:10px;font-size:14px;color:var(--ink-2)}.why summary{cursor:pointer;font-weight:600;padding:12px 0}
+.why ul{margin:0;padding-left:18px}
+/* the stub: perforation + price */
+.stub{position:relative;padding:20px 22px;display:flex;flex-direction:column;justify-content:center;
+border-left:2px dashed var(--rule);background:var(--paper)}
+.stub::before,.stub::after{content:"";position:absolute;left:-11px;width:20px;height:20px;border-radius:50%;
+background:var(--paper)}
+.stub::before{top:-11px}.stub::after{bottom:-11px}
+.pick-grid .stub,.opt .stub{border-left:0;border-top:2px dashed var(--rule)}
+.pick-grid .stub::before,.opt .stub::before{top:-11px;left:-11px}
+.pick-grid .stub::after,.opt .stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
+.stub-k{font-size:14px;color:var(--ink-2)}.total{font-size:40px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+.stub dl{margin:14px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:15px;max-width:340px}
+.stub dt{font-weight:600}.stub dt small{display:block;font-weight:400;color:var(--ink-2);font-size:13px}
+.stub dd{margin:0;font-weight:800;text-align:right}
+/* risk toggle, no JS */
+.toggle{position:relative;border:1px solid var(--rule);padding:0;margin:0 0 16px;display:inline-flex;
+background:var(--surface);border-radius:10px}
+.toggle input{position:absolute;width:1px;height:1px;opacity:0;margin:0}
+.toggle label{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;cursor:pointer;font-weight:600;
+font-size:15px;border-radius:9px}
+.toggle input:checked+label{background:var(--ink);color:var(--surface)}
+.toggle input:focus-visible+label{outline:3px solid var(--focus);outline-offset:-3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.list-low{display:none}body:has(#show-low:checked) .list-low{display:block}
+body:has(#show-low:checked) .list-any{display:none}
+/* compact option rows */
+.opt{background:var(--surface);border:1px solid var(--rule);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.opt>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1.3fr 1.4fr .9fr 1.3fr 20px;gap:14px;
+align-items:center;padding:14px 18px;min-height:44px}
+.opt>summary::-webkit-details-marker{display:none}
+.opt>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);
+transform:rotate(45deg);justify-self:end;margin-top:-4px}
+.opt[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.opt>summary>span{display:flex;flex-direction:column;line-height:1.3}.opt small{color:var(--ink-2);font-size:13px}
+.opt>summary .risk{flex-direction:row;margin:0}.o-price{text-align:right}.o-price b{font-size:22px;font-weight:800}
+.opt[open]>summary{border-bottom:1px solid var(--hair)}.opt>summary:hover{background:var(--paper)}
+.opt .ticket{border:0;border-radius:0;grid-template-columns:1fr}.opt .stub{background:var(--surface)}
+/* chart */
+.history svg{width:100%;max-width:760px;display:block}.grid{stroke:var(--hair);stroke-width:1}
+.tick{fill:var(--ink-2);font-size:12px}.end-lbl{fill:var(--ink);font-size:13px;font-weight:600}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}
+circle.pt{stroke:var(--paper);stroke-width:2}circle.pt.s1{fill:var(--s1)}circle.pt.s2{fill:var(--s2)}
+.legend{font-size:14px;color:var(--ink-2);margin-bottom:6px}.key{display:inline-block;width:16px;height:3px;
+border-radius:2px;vertical-align:middle;margin:0 6px 0 0}.key.s1{background:var(--s1)}.key.s2{background:var(--s2);margin-left:18px}
+.tips ul{margin:0;padding-left:20px;max-width:72ch}.tips li{margin-bottom:8px}
+footer{padding-bottom:40px;color:var(--ink-2);font-size:14px}footer p{max-width:80ch}
+@media (max-width:900px){.pick-grid{grid-template-columns:1fr}}
+@media (max-width:760px){
+ .code{font-size:42px}.band-route{grid-template-columns:1fr 1fr;gap:14px}.flows{grid-column:1/-1;grid-row:2}
+ .place.end{grid-column:2;grid-row:1}.flow,.flow.home{flex-direction:row;text-align:left}.track{margin:4px 0}
+ .ticket{grid-template-columns:1fr}.stub{border-left:0;border-top:2px dashed var(--rule)}
+ .stub::before{top:-11px;left:-11px}.stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
+ .main{padding:16px}.pt b{font-size:19px}.airline{margin-left:0;width:100%}
+ .opt>summary{grid-template-columns:1fr auto 14px;gap:6px 12px}.o-when{grid-column:1}.o-route{grid-column:1}
+ .opt>summary .risk{grid-column:1}.o-price{grid-column:2;grid-row:1/span 3;align-self:start}
+ .opt>summary::after{grid-column:3;grid-row:1/span 3}
+}
+@media (prefers-reduced-motion:no-preference){.plane{animation:fly 1.6s ease-out 1}
+ @keyframes fly{from{left:8%}to{left:50%}}}
+</style></head>
+<body>
+<header class=top><h1>Flight price tracker</h1>
+<p>Last checked Mon 19 Oct, 3:45 pm (Boston time). Prices are checked every 6 hours.</p></header>
+<section class=band aria-label="The trip">
+<div class=band-route>
+  <div class=place><span class=code>BOM</span><span class=name>Mumbai</span></div>
+  <div class=flows>
+    <div class="flow go"><span class=people aria-hidden=true><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg></span>
+      <span><b>1 traveller</b> to Boston<small>landing Fri 18 Dec</small></span></div>
+    <div class=track><svg class=plane viewBox='0 0 24 24' aria-hidden=true><path d='M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z'/></svg></div>
+    <div class="flow home"><span class=people aria-hidden=true><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg></span>
+      <span><b>2 travellers</b> home to Mumbai<small>leaving Sat 26, Sun 27 or Mon 28 Dec</small></span></div>
+  </div>
+  <div class="place end"><span class=code>BOS</span><span class=name>Boston</span></div>
 </div>
+<p class=band-note>The Mumbai traveller flies out on Fri 18 Dec; the Boston traveller joins them for the flight home.
+Every traveller checks 2 bags of 23&nbsp;kg on every flight, and every price
+below includes those bags.</p>
+</section>
+<main>
 
-<p><span class='pill medium'>Google Flights live notice</span> Air traffic disruptions may affect flights.</p>
-<div class=scroll><table><tr><th>#</th><th>Plan</th><th class=num>Whole trip<br>(all travellers)</th><th class=num>Whole trip<br>per traveller</th><th>Risk</th><th>Journey</th><th class=num>Travellers</th><th>Airline</th><th>Departs</th><th>Arrives</th><th>Duration</th><th>Layovers</th><th class=num>Fare</th><th class=num>Bags</th><th class=num>Flight total<br>(all travellers)</th><th class=num>Flight cost<br>per traveller</th><th>Book on</th><th>Notes</th></tr>
-<tr class='first'><td rowspan=2>1</td><td rowspan=2>A</td><td rowspan=2 class=num><b>$2,631</b></td><td rowspan=2 class=num>Both ways: <b>$1,648</b><br>Return only: <b>$983</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Mumbai → Boston</td><td class=num>1</td><td>Etihad</td><td class=nw>Fri 18 Dec 04:40</td><td class=nw>Fri 18 Dec 13:40</td><td class=nw>19h 30m</td><td class=nw>Abu Dhabi &middot; 2h 20m</td><td class=num>$465</td><td class=num title='bag rule: Etihad'>+$200</td><td class=num>$665</td><td class=num>$665</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai</td><td class=num>2</td><td>Lufthansa</td><td class=nw>Mon 28 Dec 20:40</td><td class=nw>Tue 29 Dec 23:55</td><td class=nw>16h 45m</td><td class=nw>Munich &middot; 1h 50m</td><td class=num>$1,566</td><td class=num title='bag rule: Lufthansa'>+$400</td><td class=num>$1,966</td><td class=num>$983</td><td class='nw small'><a href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Lufthansa</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.'>Lufthansa: Strikes in Feb-Apr 2026 cancelled...</span></td></tr>
-<tr class='first'><td rowspan=2>2</td><td rowspan=2>B</td><td rowspan=2 class=num><b>$2,680</b></td><td rowspan=2 class=num>Both ways: <b>$1,513</b><br>Return only: <b>$1,167</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Round trip Mumbai ⇄ Boston</td><td class=num>1</td><td>Emirates</td><td class=nw>Fri 18 Dec 04:15</td><td class=nw>Fri 18 Dec 13:55</td><td class=nw>20h 10m</td><td class=nw>Dubai &middot; 2h 30m</td><td class=num>$1,313</td><td class=num title='bag rule: Emirates'>+$200</td><td class=num>$1,513</td><td class=num>$1,513</td><td class='nw small'><a href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Emirates</a><br><a href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-28' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI4agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Emirates: Boston service runs (cut from 7 to 6 weekly from 15 Sep 2026), but everything connects through DXB, which is exposed to the unresolved Iran war and Gulf airspace closures.'>Emirates: Boston service runs (cut from 7 to...</span><br><span title='Dubai: Open and Emirates flies BOS 6x weekly, but DXB was hit by Iranian drones in March 2026, the war is unresolved, delays are heavy (about 300 on 18 Oct) and some foreign carriers (Lufthansa Group to 24 Oct, Air Canada to mid-Jan 2027) are still not flying there.'>Dubai: Open and Emirates flies BOS 6x weekly,...</span><br><span title='round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking'>round-trip return leg not pinned: total is Go...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai (2nd traveller)</td><td class=num>1</td><td>Emirates</td><td class=nw>Mon 28 Dec 22:10</td><td class=nw>Wed 30 Dec 02:15</td><td class=nw>17h 35m</td><td class=nw>Dubai &middot; 2h 15m</td><td class=num>$1,067</td><td class=num title='bag rule: Emirates'>+$100</td><td class=num>$1,167</td><td class=num>$1,167</td><td class='nw small'><a href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Emirates</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Emirates: Boston service runs (cut from 7 to 6 weekly from 15 Sep 2026), but everything connects through DXB, which is exposed to the unresolved Iran war and Gulf airspace closures.'>Emirates: Boston service runs (cut from 7 to...</span><br><span title='Dubai: Open and Emirates flies BOS 6x weekly, but DXB was hit by Iranian drones in March 2026, the war is unresolved, delays are heavy (about 300 on 18 Oct) and some foreign carriers (Lufthansa Group to 24 Oct, Air Canada to mid-Jan 2027) are still not flying there.'>Dubai: Open and Emirates flies BOS 6x weekly,...</span></td></tr>
-<tr class='first'><td rowspan=2>3</td><td rowspan=2>B</td><td rowspan=2 class=num><b>$2,895</b></td><td rowspan=2 class=num>Both ways: <b>$1,681</b><br>Return only: <b>$1,214</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Round trip Mumbai ⇄ Boston</td><td class=num>1</td><td>Etihad</td><td class=nw>Fri 18 Dec 04:40</td><td class=nw>Fri 18 Dec 13:40</td><td class=nw>19h 30m</td><td class=nw>Abu Dhabi &middot; 2h 20m</td><td class=num>$1,281</td><td class=num title='bag rule: Etihad'>+$400</td><td class=num>$1,681</td><td class=num>$1,681</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span><br><span title='round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking'>round-trip return leg not pinned: total is Go...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai (2nd traveller)</td><td class=num>1</td><td>Etihad</td><td class=nw>Sun 27 Dec 15:40</td><td class=nw>Mon 28 Dec 19:00</td><td class=nw>16h 50m</td><td class=nw>Abu Dhabi &middot; 1h 25m</td><td class=num>$1,014</td><td class=num title='bag rule: Etihad'>+$200</td><td class=num>$1,214</td><td class=num>$1,214</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-<tr class='first'><td rowspan=2>4</td><td rowspan=2>A</td><td rowspan=2 class=num><b>$3,069</b></td><td rowspan=2 class=num>Both ways: <b>$1,867</b><br>Return only: <b>$1,202</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Mumbai → Boston</td><td class=num>1</td><td>Etihad</td><td class=nw>Fri 18 Dec 04:40</td><td class=nw>Fri 18 Dec 13:40</td><td class=nw>19h 30m</td><td class=nw>Abu Dhabi &middot; 2h 20m</td><td class=num>$465</td><td class=num title='bag rule: Etihad'>+$200</td><td class=num>$665</td><td class=num>$665</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai</td><td class=num>2</td><td>Lufthansa</td><td class=nw>Sat 26 Dec 20:40</td><td class=nw>Sun 27 Dec 23:55</td><td class=nw>16h 45m</td><td class=nw>Munich &middot; 1h 50m</td><td class=num>$2,004</td><td class=num title='bag rule: Lufthansa'>+$400</td><td class=num>$2,404</td><td class=num>$1,202</td><td class='nw small'><a href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Lufthansa</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.'>Lufthansa: Strikes in Feb-Apr 2026 cancelled...</span></td></tr>
-<tr class='first'><td rowspan=2>5</td><td rowspan=2>A</td><td rowspan=2 class=num><b>$3,093</b></td><td rowspan=2 class=num>Both ways: <b>$1,879</b><br>Return only: <b>$1,214</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Mumbai → Boston</td><td class=num>1</td><td>Etihad</td><td class=nw>Fri 18 Dec 04:40</td><td class=nw>Fri 18 Dec 13:40</td><td class=nw>19h 30m</td><td class=nw>Abu Dhabi &middot; 2h 20m</td><td class=num>$465</td><td class=num title='bag rule: Etihad'>+$200</td><td class=num>$665</td><td class=num>$665</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai</td><td class=num>2</td><td>Etihad</td><td class=nw>Sun 27 Dec 15:40</td><td class=nw>Mon 28 Dec 19:00</td><td class=nw>16h 50m</td><td class=nw>Abu Dhabi &middot; 1h 25m</td><td class=num>$2,028</td><td class=num title='bag rule: Etihad'>+$400</td><td class=num>$2,428</td><td class=num>$1,214</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-<tr class='first'><td rowspan=2>6</td><td rowspan=2>B</td><td rowspan=2 class=num><b>$3,126</b></td><td rowspan=2 class=num>Both ways: <b>$1,681</b><br>Return only: <b>$1,445</b></td><td rowspan=2><span class='pill high'>high</span></td><td class=nw>Round trip Mumbai ⇄ Boston</td><td class=num>1</td><td>Etihad</td><td class=nw>Fri 18 Dec 04:40</td><td class=nw>Fri 18 Dec 13:40</td><td class=nw>19h 30m</td><td class=nw>Abu Dhabi &middot; 2h 20m</td><td class=num>$1,281</td><td class=num title='bag rule: Etihad'>+$400</td><td class=num>$1,681</td><td class=num>$1,681</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-26' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI2agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span><br><span title='round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking'>round-trip return leg not pinned: total is Go...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai (2nd traveller)</td><td class=num>1</td><td>Etihad</td><td class=nw>Sat 26 Dec 15:40</td><td class=nw>Sun 27 Dec 19:00</td><td class=nw>16h 50m</td><td class=nw>Abu Dhabi &middot; 1h 25m</td><td class=num>$1,245</td><td class=num title='bag rule: Etihad'>+$200</td><td class=num>$1,445</td><td class=num>$1,445</td><td class='nw small'><a href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Etihad</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.'>Etihad: Etihad flies a daily 787-9 Abu Dhabi-...</span><br><span title='Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.'>Abu Dhabi: Etihad flies a daily 787-9 to BOS,...</span></td></tr>
-</table></div>
-<h2>Best low-risk options</h2><div class=scroll><table><tr><th>#</th><th>Plan</th><th class=num>Whole trip<br>(all travellers)</th><th class=num>Whole trip<br>per traveller</th><th>Risk</th><th>Journey</th><th class=num>Travellers</th><th>Airline</th><th>Departs</th><th>Arrives</th><th>Duration</th><th>Layovers</th><th class=num>Fare</th><th class=num>Bags</th><th class=num>Flight total<br>(all travellers)</th><th class=num>Flight cost<br>per traveller</th><th>Book on</th><th>Notes</th></tr>
-<tr class='first'><td rowspan=2>1</td><td rowspan=2>B</td><td rowspan=2 class=num><b>$3,227</b></td><td rowspan=2 class=num>Both ways: <b>$1,850</b><br>Return only: <b>$1,377</b></td><td rowspan=2><span class='pill low'>low</span></td><td class=nw>Round trip Mumbai ⇄ Boston</td><td class=num>1</td><td>Virgin Atlantic</td><td class=nw>Fri 18 Dec 10:40</td><td class=nw>Fri 18 Dec 20:15</td><td class=nw>20h 05m</td><td class=nw>London &middot; 1h 40m</td><td class=num>$1,490</td><td class=num title='bag rule: Virgin Atlantic'>+$360</td><td class=num>$1,850</td><td class=num>$1,850</td><td class='nw small'><a href='https://www.virginatlantic.com/' target=_blank rel=noopener>Virgin Atlantic</a><br><a href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small><span title='round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking'>round-trip return leg not pinned: total is Go...</span></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai (2nd traveller)</td><td class=num>1</td><td>Virgin Atlantic</td><td class=nw>Sun 27 Dec 22:11</td><td class=nw>Tue 29 Dec 02:55</td><td class=nw>18h 14m</td><td class=nw>London &middot; 2h 30m</td><td class=num>$1,197</td><td class=num title='bag rule: Virgin Atlantic'>+$180</td><td class=num>$1,377</td><td class=num>$1,377</td><td class='nw small'><a href='https://www.virginatlantic.com/' target=_blank rel=noopener>Virgin Atlantic</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small></td></tr>
-<tr class='first'><td rowspan=2>2</td><td rowspan=2>A</td><td rowspan=2 class=num><b>$3,469</b></td><td rowspan=2 class=num>Both ways: <b>$2,092</b><br>Return only: <b>$1,377</b></td><td rowspan=2><span class='pill low'>low</span></td><td class=nw>Mumbai → Boston</td><td class=num>1</td><td>Virgin Atlantic</td><td class=nw>Fri 18 Dec 10:40</td><td class=nw>Fri 18 Dec 20:15</td><td class=nw>20h 05m</td><td class=nw>London &middot; 1h 40m</td><td class=num>$535</td><td class=num title='bag rule: Virgin Atlantic'>+$180</td><td class=num>$715</td><td class=num>$715</td><td class='nw small'><a href='https://www.virginatlantic.com/' target=_blank rel=noopener>Virgin Atlantic</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai</td><td class=num>2</td><td>Virgin Atlantic</td><td class=nw>Sun 27 Dec 22:11</td><td class=nw>Tue 29 Dec 02:55</td><td class=nw>18h 14m</td><td class=nw>London &middot; 2h 30m</td><td class=num>$2,394</td><td class=num title='bag rule: Virgin Atlantic'>+$360</td><td class=num>$2,754</td><td class=num>$1,377</td><td class='nw small'><a href='https://www.virginatlantic.com/' target=_blank rel=noopener>Virgin Atlantic</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small></td></tr>
-<tr class='first'><td rowspan=2>3</td><td rowspan=2>A</td><td rowspan=2 class=num><b>$3,470</b></td><td rowspan=2 class=num>Both ways: <b>$2,092</b><br>Return only: <b>$1,378</b></td><td rowspan=2><span class='pill low'>low</span></td><td class=nw>Mumbai → Boston</td><td class=num>1</td><td>Virgin Atlantic</td><td class=nw>Fri 18 Dec 10:40</td><td class=nw>Fri 18 Dec 20:15</td><td class=nw>20h 05m</td><td class=nw>London &middot; 1h 40m</td><td class=num>$535</td><td class=num title='bag rule: Virgin Atlantic'>+$180</td><td class=num>$715</td><td class=num>$715</td><td class='nw small'><a href='https://www.virginatlantic.com/' target=_blank rel=noopener>Virgin Atlantic</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small></td></tr>
-<tr class=''><td class=nw>Boston → Mumbai</td><td class=num>2</td><td>KLM</td><td class=nw>Mon 28 Dec 20:55</td><td class=nw>Wed 30 Dec 00:30</td><td class=nw>17h 05m</td><td class=nw>Amsterdam &middot; 1h 30m</td><td class=num>$2,355</td><td class=num title='bag rule: KLM'>+$400</td><td class=num>$2,755</td><td class=num>$1,378</td><td class='nw small'><a href='https://www.klm.us/' target=_blank rel=noopener>KLM</a><br><a href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><br><a href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><br><a href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all (Google)</a></td><td class=small></td></tr>
-</table></div>
-<h2>Price history</h2><div><span class=key style="background:var(--s1)"></span>Any risk
-<span class=key style="background:var(--s2)"></span>Low risk only</div><svg viewBox='0 0 720 220' role=img aria-label='Best total price per run'><line x1=56 x2=600 y1=192.0 y2=192.0 class=grid /><text x=50 y=196.0 class=tick text-anchor=end>$2.6K</text><line x1=56 x2=600 y1=147.0 y2=147.0 class=grid /><text x=50 y=151.0 class=tick text-anchor=end>$2.8K</text><line x1=56 x2=600 y1=102.0 y2=102.0 class=grid /><text x=50 y=106.0 class=tick text-anchor=end>$3.1K</text><line x1=56 x2=600 y1=57.0 y2=57.0 class=grid /><text x=50 y=61.0 class=tick text-anchor=end>$3.3K</text><line x1=56 x2=600 y1=12.0 y2=12.0 class=grid /><text x=50 y=16.0 class=tick text-anchor=end>$3.6K</text><text x=56.0 y=212 class=tick text-anchor=middle>10-19 15:06</text><text x=600.0 y=212 class=tick text-anchor=middle>10-19 19:45</text><path d='M56.0,178.1 L133.7,178.1 L211.4,178.1 L289.1,178.1 L366.9,178.1 L444.6,178.1 L522.3,178.1 L600.0,178.1' class='line s1' /><circle cx=56.0 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T15:06)</title></circle><circle cx=133.7 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T15:10)</title></circle><circle cx=211.4 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T15:13)</title></circle><circle cx=289.1 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T15:13)</title></circle><circle cx=366.9 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T15:23)</title></circle><circle cx=444.6 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T19:31)</title></circle><circle cx=522.3 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T19:34)</title></circle><circle cx=600.0 cy=178.1 r=4 class='dot s1'><title>Any risk: $2,631 (2026-10-19T19:45)</title></circle><text x=608.0 y=182.1 class=lbl>Any risk $2,631</text><path d='M56.0,30.3 L133.7,30.3 L211.4,30.3 L289.1,30.3 L366.9,30.5 L444.6,73.3 L522.3,73.3 L600.0,73.3' class='line s2' /><circle cx=56.0 cy=30.3 r=4 class='dot s2'><title>Low risk only: $3,471 (2026-10-19T15:06)</title></circle><circle cx=133.7 cy=30.3 r=4 class='dot s2'><title>Low risk only: $3,471 (2026-10-19T15:10)</title></circle><circle cx=211.4 cy=30.3 r=4 class='dot s2'><title>Low risk only: $3,471 (2026-10-19T15:13)</title></circle><circle cx=289.1 cy=30.3 r=4 class='dot s2'><title>Low risk only: $3,471 (2026-10-19T15:13)</title></circle><circle cx=366.9 cy=30.5 r=4 class='dot s2'><title>Low risk only: $3,470 (2026-10-19T15:23)</title></circle><circle cx=444.6 cy=73.3 r=4 class='dot s2'><title>Low risk only: $3,227 (2026-10-19T19:31)</title></circle><circle cx=522.3 cy=73.3 r=4 class='dot s2'><title>Low risk only: $3,227 (2026-10-19T19:34)</title></circle><circle cx=600.0 cy=73.3 r=4 class='dot s2'><title>Low risk only: $3,227 (2026-10-19T19:45)</title></circle><text x=608.0 y=77.3 class=lbl>Low risk only $3,227</text></svg>
-<details><summary>History table</summary><table><tr><th>Run</th><th>Scope</th><th>Best total</th><th>Option</th></tr><tr><td>2026-10-19T19:45:48</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T19:45:48</td><td>low</td><td>$3,227</td><td>B 2026-12-18 &gt; 2026-12-27</td></tr><tr><td>2026-10-19T19:34:23</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T19:34:23</td><td>low</td><td>$3,227</td><td>B 2026-12-18 &gt; 2026-12-27</td></tr><tr><td>2026-10-19T19:31:28</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T19:31:28</td><td>low</td><td>$3,227</td><td>B 2026-12-18 &gt; 2026-12-27</td></tr><tr><td>2026-10-19T15:23:54</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:23:54</td><td>low</td><td>$3,470</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:13:33</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:13:33</td><td>low</td><td>$3,471</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:13:16</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:13:16</td><td>low</td><td>$3,471</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:10:13</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:10:13</td><td>low</td><td>$3,471</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:06:31</td><td>any</td><td>$2,631</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr><tr><td>2026-10-19T15:06:31</td><td>low</td><td>$3,471</td><td>A 2026-12-18 &gt; 2026-12-28</td></tr></table></details>
-<p class=small><b>Where to book:</b> use the airline's own site when it is within about $50 of the agencies. If a
-flight is cancelled or rerouted, you deal with the airline directly; adding bags or moving up a fare level to get
-2&times;23kg is easier; and the US 24-hour free-cancellation rule applies (book 7+ days before departure).
-Expedia or Booking.com can be a little cheaper, but changes and refunds then go through the agency, which is slower
-when flights are disrupted. "Compare all" opens Google Flights, where clicking a flight lists every site selling
-it with its price. For Plan B, book both tickets on the same airline's site.</p>
-<p class=small>Scraped from Google Flights for personal use. Prices change by the minute; confirm on the airline site before paying.</p>
-</html>
+<section class=picks aria-labelledby=h-picks><h2 id=h-picks>What to book</h2><p class=compare>The low-risk option costs <b>$596 more</b>, and leaves Boston on Sun 27 Dec instead of Mon 28 Dec.</p>
+<div class=pick-grid><article class="ticket r-high">
+<div class=main>
+  <header><p class=label>Cheapest</p><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high; Lufthansa rated medium</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Lufthansa</span></div>
+  <div class=line>
+    <div class=pt><b>20:40</b><span>Boston</span><small>Mon 28 Dec</small></div>
+    <div class=path><span class=dur>16h 45m</span><span class=stops><span class=stop>Munich <small>1h 50m</small></span></span></div>
+    <div class="pt end"><b>23:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,566 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,966</b> for 2 travellers, $983 each</span></p>
+  <div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$2,631</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,648</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$983</dd></dl>
+</aside>
+</article><article class="ticket r-low">
+<div class=main>
+  <header><p class=label>Cheapest low-risk</p><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
+    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
+    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,490 fare</span> + <span class=nw>$360 bags</span> = <span class=nw><b>$1,850</b> for 1 traveller</span></p>
+  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
+    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,197 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$1,377</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why low risk, and other notes</summary><ul><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,227</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,850</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,377</dd></dl>
+</aside>
+</article></div><p class=fine>Google Flights is also showing a general notice on these routes: air traffic disruptions may affect flights.</p></section>
+<section class=all aria-labelledby=h-all><h2 id=h-all>Every option, cheapest first</h2>
+<p class=intro>One line per return date and way of booking. Open a line to see its flights and booking links.</p>
+<fieldset class=toggle><legend class=sr>Show</legend>
+<input type=radio name=show id=show-any checked><label for=show-any>Show everything</label>
+<input type=radio name=show id=show-low><label for=show-low>Show only low risk</label></fieldset>
+<div class=list-any><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Separate one-ways, shown above</small></span>
+  <span class=o-route>Etihad and Lufthansa<small>via Abu Dhabi, Munich</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$2,631</b><small>Mumbai traveller $1,648<br>Boston traveller $983</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high; Lufthansa rated medium</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Lufthansa</span></div>
+  <div class=line>
+    <div class=pt><b>20:40</b><span>Boston</span><small>Mon 28 Dec</small></div>
+    <div class=path><span class=dur>16h 45m</span><span class=stops><span class=stop>Munich <small>1h 50m</small></span></span></div>
+    <div class="pt end"><b>23:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,566 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,966</b> for 2 travellers, $983 each</span></p>
+  <div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$2,631</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,648</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$983</dd></dl>
+</aside>
+</article></details><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Round trip + one-way</small></span>
+  <span class=o-route>Emirates<small>via Dubai</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$2,680</b><small>Mumbai traveller $1,513<br>Boston traveller $1,167</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Wed 30 Dec)</small></h3>
+    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Dubai; Emirates rated high</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Emirates</span></div>
+  <div class=line>
+    <div class=pt><b>04:15</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 10m</span><span class=stops><span class=stop>Dubai <small>2h 30m</small></span></span></div>
+    <div class="pt end"><b>13:55</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,313 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,513</b> for 1 traveller</span></p>
+  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI4agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Emirates</span></div>
+  <div class=line>
+    <div class=pt><b>22:10</b><span>Boston</span><small>Mon 28 Dec</small></div>
+    <div class=path><span class=dur>17h 35m</span><span class=stops><span class=stop>Dubai <small>2h 15m</small></span></span></div>
+    <div class="pt end"><b>02:15</b><span>Mumbai</span><small>Wed 30 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,067 fare</span> + <span class=nw>$100 bags</span> = <span class=nw><b>$1,167</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Emirates: Boston service runs (cut from 7 to 6 weekly from 15 Sep 2026), but everything connects through DXB, which is exposed to the unresolved Iran war and Gulf airspace closures.</li><li>Dubai: Open and Emirates flies BOS 6x weekly, but DXB was hit by Iranian drones in March 2026, the war is unresolved, delays are heavy (about 300 on 18 Oct) and some foreign carriers (Lufthansa Group to 24 Oct, Air Canada to mid-Jan 2027) are still not flying there.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$2,680</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,513</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,167</dd></dl>
+</aside>
+</article></details><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Round trip + one-way</small></span>
+  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$2,895</b><small>Mumbai traveller $1,681<br>Boston traveller $1,214</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Mon 28 Dec)</small></h3>
+    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,681</b> for 1 traveller</span></p>
+  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>15:40</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
+    <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Mon 28 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,014 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,214</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$2,895</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,681</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,214</dd></dl>
+</aside>
+</article></details><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Sat 26 Dec</b><small>Separate one-ways</small></span>
+  <span class=o-route>Etihad and Lufthansa<small>via Abu Dhabi, Munich</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$3,069</b><small>Mumbai traveller $1,867<br>Boston traveller $1,202</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Sat 26 Dec <small>(land in Mumbai Sun 27 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high; Lufthansa rated medium</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Lufthansa</span></div>
+  <div class=line>
+    <div class=pt><b>20:40</b><span>Boston</span><small>Sat 26 Dec</small></div>
+    <div class=path><span class=dur>16h 45m</span><span class=stops><span class=stop>Munich <small>1h 50m</small></span></span></div>
+    <div class="pt end"><b>23:55</b><span>Mumbai</span><small>Sun 27 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$2,004 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,404</b> for 2 travellers, $1,202 each</span></p>
+  <div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,069</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,867</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,202</dd></dl>
+</aside>
+</article></details><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Separate one-ways</small></span>
+  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$3,093</b><small>Mumbai traveller $1,879<br>Boston traveller $1,214</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Mon 28 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>15:40</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
+    <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Mon 28 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$2,028 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,428</b> for 2 travellers, $1,214 each</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,093</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,879</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,214</dd></dl>
+</aside>
+</article></details><details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Sat 26 Dec</b><small>Round trip + one-way</small></span>
+  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
+  <span class=risk><span class=dot></span>High risk</span>
+  <span class=o-price><b>$3,126</b><small>Mumbai traveller $1,681<br>Boston traveller $1,445</small></span>
+</summary><article class="ticket r-high">
+<div class=main>
+  <header><h3>Leave Boston Sat 26 Dec <small>(land in Mumbai Sun 27 Dec)</small></h3>
+    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
+    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
+    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,681</b> for 1 traveller</span></p>
+  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI2agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Etihad</span></div>
+  <div class=line>
+    <div class=pt><b>15:40</b><span>Boston</span><small>Sat 26 Dec</small></div>
+    <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
+    <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Sun 27 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,245 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,445</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,126</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,681</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,445</dd></dl>
+</aside>
+</article></details></div><div class=list-low><details class="opt r-low"><summary>
+  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Round trip + one-way, shown above</small></span>
+  <span class=o-route>Virgin Atlantic<small>via London</small></span>
+  <span class=risk><span class=dot></span>Low risk</span>
+  <span class=o-price><b>$3,227</b><small>Mumbai traveller $1,850<br>Boston traveller $1,377</small></span>
+</summary><article class="ticket r-low">
+<div class=main>
+  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
+    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
+    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,490 fare</span> + <span class=nw>$360 bags</span> = <span class=nw><b>$1,850</b> for 1 traveller</span></p>
+  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
+    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$1,197 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$1,377</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  <details class=why><summary>Why low risk, and other notes</summary><ul><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,227</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,850</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,377</dd></dl>
+</aside>
+</article></details><details class="opt r-low"><summary>
+  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Separate one-ways</small></span>
+  <span class=o-route>Virgin Atlantic<small>via London</small></span>
+  <span class=risk><span class=dot></span>Low risk</span>
+  <span class=o-price><b>$3,469</b><small>Mumbai traveller $2,092<br>Boston traveller $1,377</small></span>
+</summary><article class="ticket r-low">
+<div class=main>
+  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
+    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$535 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$715</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
+    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$2,394 fare</span> + <span class=nw>$360 bags</span> = <span class=nw><b>$2,754</b> for 2 travellers, $1,377 each</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,469</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$2,092</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,377</dd></dl>
+</aside>
+</article></details><details class="opt r-low"><summary>
+  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Separate one-ways</small></span>
+  <span class=o-route>Virgin Atlantic and KLM<small>via London, Amsterdam</small></span>
+  <span class=risk><span class=dot></span>Low risk</span>
+  <span class=o-price><b>$3,470</b><small>Mumbai traveller $2,092<br>Boston traveller $1,378</small></span>
+</summary><article class="ticket r-low">
+<div class=main>
+  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Wed 30 Dec)</small></h3>
+    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
+    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
+  <div class=leg>
+  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
+  <div class=line>
+    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
+    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$535 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$715</b> for 1 traveller</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div><div class=leg>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>KLM</span></div>
+  <div class=line>
+    <div class=pt><b>20:55</b><span>Boston</span><small>Mon 28 Dec</small></div>
+    <div class=path><span class=dur>17h 05m</span><span class=stops><span class=stop>Amsterdam <small>1h 30m</small></span></span></div>
+    <div class="pt end"><b>00:30</b><span>Mumbai</span><small>Wed 30 Dec</small></div>
+  </div>
+  <p class=sum><span class=nw>$2,355 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,755</b> for 2 travellers, $1,378 each</span></p>
+  <div class=book><a class=btn href='https://www.klm.us/' target=_blank rel=noopener>Book on KLM</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+</div>
+  
+</div>
+<aside class=stub>
+  <span class=stub-k>Whole trip</span><b class=total>$3,470</b><span class=stub-k>for both travellers</span>
+  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$2,092</dd>
+      <dt>Boston traveller <small>home only</small></dt><dd>$1,378</dd></dl>
+</aside>
+</article></details></div>
+</section>
+<section class=history aria-labelledby=h-hist><h2 id=h-hist>Price over time</h2><p class=fine>Not enough history yet: prices have been checked 8 times, all on one day. The chart appears once there are checks on two different days.</p></section>
+<section class=tips aria-labelledby=h-tips><h2 id=h-tips>Booking tips</h2>
+<ul><li>Book on the airline's own site unless Expedia or Booking.com is more than about $50 cheaper. If a flight is
+cancelled or rerouted, you then deal with the airline directly.</li>
+<li>To get 2 bags of 23&nbsp;kg, compare the airline's next fare level with paying for bags. The upgrade is often
+cheaper.</li>
+<li>If you book directly with the airline at least 7 days before the flight, US rules let you cancel within
+24 hours of booking for a full refund.</li>
+<li>For a round trip + one-way: book the round trip first, then book the Boston traveller's one-way on the same
+flight as the round trip's return.</li></ul></section>
+</main>
+<footer><p>Prices come from Google Flights, in US dollars, economy class, and change by the minute. Bag fees are
+estimates. Left out of every list: layovers over 3 hours, IndiGo, Air India, Akasa Air, Turkish Airlines. Confirm the final price before you pay.</p></footer>
+</body></html>
