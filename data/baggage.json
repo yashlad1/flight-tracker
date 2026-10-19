@@ -1,0 +1,288 @@
+{
+  "as_of": "2026-10-19",
+  "default": {
+    "lowest_fare_pieces": 1,
+    "extra_bag_usd": 150,
+    "note": "fallback for unknown airlines"
+  },
+  "airlines": {
+    "Air India": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 120,
+      "note": "Economy Value/Classic/Flex: Value gets 1x23kg US/Canada->India (India-origin pages still say 2x23 for all economy), Classic/Flex 2x23; extra_bag_usd is an estimated Value->Classic upgrade, airport excess piece is USD 240.",
+      "confidence": "medium",
+      "sources": [
+        "https://www.airindia.com/in/en/travel-information/baggage-guidelines/checked-baggage-allowance/usa-canada.html",
+        "https://www.airindia.com/in/en/travel-information/visa-documents/travel-to-united-states/baggage-allowance.html"
+      ]
+    },
+    "Emirates": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 100,
+      "note": "Piece concept to/from the Americas: Economy Special 1x23kg, Saver/Flex/Flex Plus 2x23kg (weight concept applies if the trip has a Europe sector or >24h Dubai stopover); extra_bag_usd is an estimated Special->Saver upgrade, cheaper than a paid extra piece.",
+      "confidence": "high",
+      "sources": [
+        "https://www.emirates.com/us/english/before-you-fly/baggage/checked-baggage/"
+      ]
+    },
+    "Qatar Airways": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 100,
+      "note": "To/from the Americas: Economy Lite 1x23kg, Classic/Convenience/Comfort 2x23kg; extra_bag_usd is an estimated Lite->Classic upgrade (airport extra piece is reportedly ~USD 255).",
+      "confidence": "high",
+      "sources": [
+        "https://www.qatarairways.com/en-us/baggage/allowance.html"
+      ]
+    },
+    "Etihad": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 100,
+      "note": "To/from USA & Canada: Economy Basic has no checked bag (fees apply), Value/Comfort/Deluxe 2x23kg; Basic may not be sold on every India-US itinerary; extra_bag_usd estimated (official prepaid 23kg piece ~USD 140, upgrading Basic->Value usually cheaper per piece).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.etihad.com/en-us/help/faq/fares",
+        "https://www.etihad.com/en-il/fly-etihad/baggage/excess"
+      ]
+    },
+    "Turkish Airlines": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 100,
+      "note": "USA piece concept is 1x23kg or 2x23kg 'depending on route' (EcoFly/ExtraFly/PrimeFly); India-US is often 2x23 but unconfirmed, so EcoFly is set conservatively to 1; extra_bag_usd estimated (EcoFly->ExtraFly upgrade or prepaid piece).",
+      "confidence": "low",
+      "sources": [
+        "https://www.turkishairlines.com/en-int/any-questions/baggage-information/usa-free-baggage-rules/",
+        "https://www.turkishairlines.com/en-int/any-questions/checked-baggage/"
+      ]
+    },
+    "Lufthansa": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Intercontinental: Economy Light 0 bags, Economy Classic 1x23kg, no current India-USA 2-piece exception; Light first bag ~USD 85-100 online, discounted 2nd piece ~USD 100 on USA routes (standard long-haul extra bag USD 235-255).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.lufthansa.com/in/en/freigepaeck-regeln",
+        "https://www.lufthansa.com/in/en/uebergepaeck"
+      ]
+    },
+    "SWISS": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Intercontinental: Economy Light 0 bags, Classic/Flex 1x23kg; Lufthansa Group excess rates (Light first bag ~USD 90-100, discounted 2nd piece ~USD 100 on USA routes) assumed.",
+      "confidence": "medium",
+      "sources": [
+        "https://www.swiss.com/US/en/prepare/baggage/checked-baggage",
+        "https://www.lufthansa.com/in/en/uebergepaeck"
+      ]
+    },
+    "Austrian": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Long-haul: Economy Light 0 bags (first bag at reduced prepaid rate), Classic/Flex 1x23kg, discounted 2nd piece on some intercontinental routes; fee estimated from Lufthansa Group rates.",
+      "confidence": "medium",
+      "sources": [
+        "https://www.austrian.com/xx/en/economy-tariffs",
+        "https://www.austrian.com/us/en/excess-baggage"
+      ]
+    },
+    "British Airways": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "World Traveller Basic is hand-baggage only, Standard/Plus/Flex include 1x23kg on India routes; extra_bag_usd estimated (BA long-haul paid bag ~GBP 65-80).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.britishairways.com/content/information/baggage-essentials",
+        "https://www.britishairways.com/content/en/us/flights/india/delhi"
+      ]
+    },
+    "Virgin Atlantic": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 90,
+      "note": "Economy Light has no checked bag; Classic/Delight get 2x23kg on USA/Canada-India and UK-India; extra_bag_usd estimated (paid bag via calculator, or Light->Classic upgrade).",
+      "confidence": "high",
+      "sources": [
+        "https://www.virginatlantic.com/en-US/help/articles/are-there-any-virgin-atlantic-routes-that-allow-extra-baggage-free-of-charge----198ea115-ecd3-4bc2-bb37-3bc332671b9d",
+        "https://www.virginatlantic.com/en-US/help/articles/how-much-is-an-extra-bag----f1102355-6499-427d-94c4-6b36630f4785"
+      ]
+    },
+    "Air France": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Economy Light 0 bags, Standard/Flex 1x23kg, India not in the 2-piece exception list; US fee table: 2nd piece USD 75 (USA-Europe) / USD 100 (Europe-India), 20% off online.",
+      "confidence": "medium",
+      "sources": [
+        "https://wwws.airfrance.us/information/legal/us-regulation"
+      ]
+    },
+    "KLM": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Same Air France-KLM economy brands (Light 0, Standard/Flex 1x23kg) and fee table as Air France; India-US has no 2-piece exception.",
+      "confidence": "medium",
+      "sources": [
+        "https://wwws.airfrance.us/information/legal/us-regulation",
+        "https://www.klm.com/information/legal/fees-paid-options"
+      ]
+    },
+    "United": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 165,
+      "note": "BOS-BOM calculator: Basic Economy 1st bag USD 90 + 2nd USD 240, Economy 1st free + 2nd USD 240; extra_bag_usd 165 is the per-piece average for Basic (use 240 if the cheapest fare is regular Economy).",
+      "confidence": "high",
+      "sources": [
+        "https://www.united.com/en/us/checked-bag-fee-calculator/any-flights",
+        "https://www.united.com/en/us/fly/baggage/checked-bags.html"
+      ]
+    },
+    "American": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "India: 1st bag free in Main Cabin and Basic Economy (Basic for tickets issued on/after 23 Apr 2026), 2nd bag USD 100.",
+      "confidence": "high",
+      "sources": [
+        "https://www.aa.com/i18n/travel-info/baggage/checked-baggage-policy.jsp"
+      ]
+    },
+    "Delta": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Delta's US-India terms show 1st bag free and 2nd bag USD 100 (stated for Main Basic; Main Cabin assumed the same), most BOS-BOM trips route via AF/KLM/Virgin.",
+      "confidence": "low",
+      "sources": [
+        "https://www.delta.com/us/en/flight-deals/asia-flights/flights-to-mumbai",
+        "https://www.delta.com/us/en/baggage/overview"
+      ]
+    },
+    "Aer Lingus": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 90,
+      "note": "Transatlantic Saver has no checked bag, Smart/Flex 1x23kg; no own India service so it only appears on combined itineraries; extra_bag_usd estimated (online bag ~EUR 60-75).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.aerlingus.com/prepare/bags/checked-baggage/"
+      ]
+    },
+    "Saudia": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Guest Saver/Basic/Semi Flex/Flex: Saver is hand-baggage only, Basic and up 1x23kg to North America per Saudia's table (older pages said 2x23kg); extra_bag_usd estimated.",
+      "confidence": "low",
+      "sources": [
+        "https://www.saudia.com/en-US/book/travel-information/branded-fares",
+        "https://www.saudia.com/pages/before-flying/baggage/baggage-allowances"
+      ]
+    },
+    "Gulf Air": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 100,
+      "note": "USA routes use the piece concept: Economy Light 1x23kg, Smart/Flex 2x23kg per secondary sources (Gulf Air says allowance depends on fare family); extra_bag_usd estimated.",
+      "confidence": "low",
+      "sources": [
+        "https://www.gulfair.com/transparency/fees-and-services",
+        "https://www.gulfair.com/help/baggage/baggage-information"
+      ]
+    },
+    "Kuwait Airways": {
+      "lowest_fare_pieces": 2,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 150,
+      "note": "Economy 2x23kg; Economy Saver is 1x32kg except to/from New York (2 pieces) and the Zero Bag fare excludes JFK, so India-New York economy keeps 2x23kg.",
+      "confidence": "medium",
+      "sources": [
+        "https://kuwaitairways.com/en/is/free-baggage"
+      ]
+    },
+    "Oman Air": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 150,
+      "note": "Super Saver has no checked bag, Comfort/Flex include bags; Oman Air's India-North America FAQ lists economy 1x23kg with extra piece USD 200; no own US flights (codeshare only); extra_bag_usd estimated.",
+      "confidence": "low",
+      "sources": [
+        "https://www.omanair.com/en_us/faqs-fare-bundles",
+        "https://www-dr.omanair.com/in/en/faqs-baggage"
+      ]
+    },
+    "IndiGo": {
+      "lowest_fare_pieces": 1,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 120,
+      "note": "No own US service; long-haul (AMS/MAN) uses weight concept, 30kg on base fares, which is short of 2x23kg, and US trips via KLM/Delta/Virgin codeshares may follow partner rules; extra_bag_usd estimated.",
+      "confidence": "low",
+      "sources": [
+        "https://www.goindigo.in/travel-information/en/baggage-allowance.html"
+      ]
+    },
+    "Air Canada": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 105,
+      "note": "Tickets bought on/after 14 May 2026 (Canada/US-Asia): Economy Basic 1st bag USD 90 + 2nd USD 120, Standard/Flex 1st free + 2nd USD 120; extra_bag_usd 105 is the Basic per-piece average (use 120 for Standard).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.aircanada.com/cn/en/aco/home/book/travel-news-and-updates/baggage-fee-changes.html",
+        "https://www.aircanada.com/us/en/aco/home/plan/baggage/checked.html"
+      ]
+    },
+    "Finnair": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Economy Light 0 bags, Classic/Flex 1x23kg on both Asia and North America routes; extra_bag_usd estimated (long-haul extra bag ~EUR 80-100).",
+      "confidence": "high",
+      "sources": [
+        "https://www.finnair.com/us-en/baggage-on-finnair-flights/checked-baggage"
+      ]
+    },
+    "Iberia": {
+      "lowest_fare_pieces": 0,
+      "standard_fare_pieces": 1,
+      "extra_bag_usd": 100,
+      "note": "Long-haul Basic has no checked bag, Optima/Comfort 1x23kg; no own India service; extra_bag_usd estimated (2nd long-haul bag ~USD 80-100).",
+      "confidence": "medium",
+      "sources": [
+        "https://www.iberia.com/us/fare-classes/economy/",
+        "https://www.iberia.com/us/faqs/fares/"
+      ]
+    },
+    "EgyptAir": {
+      "lowest_fare_pieces": 2,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 150,
+      "note": "Economy allowance is 'according to fare rules' (23kg pieces); North America is usually 2x23kg but some promo/saver fares may drop to 1 piece; extra_bag_usd estimated.",
+      "confidence": "low",
+      "sources": [
+        "https://www.egyptair.com/en/fly/baggage/pages/baggage-allowance.aspx",
+        "https://www.egyptair.com/en/fly/baggage/Pages/excess-baggage.aspx"
+      ]
+    },
+    "Ethiopian": {
+      "lowest_fare_pieces": 2,
+      "standard_fare_pieces": 2,
+      "extra_bag_usd": 150,
+      "note": "Economy 2x23kg (India FAQ); a USA-India promo gives 3x23kg for travel through 30 Nov 2026; extra_bag_usd estimated.",
+      "confidence": "medium",
+      "sources": [
+        "https://www.ethiopianairlines.com/in/information/baggage-information/free-baggage-allowance",
+        "https://www.ethiopianairlines.com/en-et/usa-to-india-more-baggage"
+      ]
+    }
+  }
+}

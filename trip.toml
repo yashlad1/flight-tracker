@@ -1,0 +1,24 @@
+# Trip definition. Edit and re-run; nothing else needs to change.
+title = "Mumbai (BOM) → Boston Logan (BOS) → Mumbai (BOM) price tracker"
+
+[outbound]                 # Mumbai -> Boston, must land on arrive_on (local time)
+from = "BOM"
+to = "BOS"
+depart_dates = ["2026-12-17", "2026-12-18"]   # BOM->BOS lands same/next day
+arrive_on = "2026-12-18"
+adults = 1
+
+[return]                   # Boston -> Mumbai
+from = "BOS"
+to = "BOM"
+depart_dates = ["2026-12-26", "2026-12-27", "2026-12-28"]
+adults = 2
+
+[prefs]
+bags_per_person = 2        # 23 kg checked pieces needed, each direction
+max_stops = 2
+max_layover_hours = 3      # skip itineraries with any single layover longer than this
+return_together = true     # strategy B: both return travellers must be on the same airline
+max_risk = "high"          # hide options above this in "Best options": low | medium | high
+exclude_airlines = ["IndiGo", "Air India", "Akasa Air", "Turkish Airlines"]   # dropped if on any leg
+target_total_usd = 2600    # macOS notification when the cheapest whole trip is at/below this

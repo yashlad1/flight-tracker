@@ -1,0 +1,754 @@
+{
+  "as_of": "2026-10-19",
+  "summary": "The US/Israel-Iran war that began on 28 Feb 2026 is still going with no durable ceasefire, so Gulf hubs (DXB, DOH, AUH, KWI, BAH) have been through repeated short-notice closures and drone/missile strikes this year, and EASA's Persian Gulf conflict-zone bulletin runs to at least 16 Nov 2026. On top of that, Houthi missile attacks shut Riyadh airport in October, the Houthis have warned airlines away from Saudi airspace, and the FAA has told US carriers to use caution over Saudi Arabia until 10 Dec 2026. Air India is the most exposed carrier: Pakistan's ban on Indian aircraft now runs to 24 Nov 2026 (19th extension, likely to be renewed), so its US flights take long southern detours with Rome/Vienna technical stops, and frequencies have been cut because of fuel costs. European and Turkish one-stop routings (LHR, FRA, MUC, ZRH, AMS, IST, DUB) are the lowest-risk options, and since mid-2026 Indian passport holders no longer need an airport transit visa at FRA, MUC, CDG or MAD. Canada still requires a transit visa for Indians, and a US visa does not exempt them. On the US side, government funding expires on 11 Dec 2026, so a shutdown hitting TSA and ATC during the 18-28 Dec travel window is possible, layered on peak holiday demand and Boston/New York winter storms.",
+  "hubs": {
+    "DXB": {
+      "level": "high",
+      "note": "Open and Emirates flies BOS 6x weekly, but DXB was hit by Iranian drones in March 2026, the war is unresolved, delays are heavy (about 300 on 18 Oct) and some foreign carriers (Lufthansa Group to 24 Oct, Air Canada to mid-Jan 2027) are still not flying there.",
+      "sources": [
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700",
+        "https://blog.wego.com/uae-flight-resumption-2026-updates/",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/",
+        "https://www.iranintl.com/en/202609303787"
+      ]
+    },
+    "DOH": {
+      "level": "high",
+      "note": "Qatar Airways is back to about 90-95% of 2025 traffic, but Qatari airspace closed several times between Feb and Jul 2026 (Iranian missiles at Al Udeid on 17 Jul), so short-notice disruption is still plausible.",
+      "sources": [
+        "https://www.euronews.com/2026/09/11/behind-the-scenes-at-qatar-airways-an-inside-look-at-passenger-numbers-new-aircraft-and-wi",
+        "https://blog.wego.com/qatar-airspace-closure-doha-airport-status-qatar-airways-cancellations-what-travelers-need-to-know/",
+        "https://www.iranintl.com/en/202609303787"
+      ]
+    },
+    "AUH": {
+      "level": "high",
+      "note": "Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA's Gulf conflict bulletin.",
+      "sources": [
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700",
+        "https://info.flightmapper.net/route/Etihad_EY_BOS_AUH",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    "KWI": {
+      "level": "high",
+      "note": "Kuwait closed its airspace on 28 Feb 2026, a drone heavily damaged a terminal on 3 Jun, and later short-notice suspensions and cancellations have continued.",
+      "sources": [
+        "https://www.ch-aviation.com/news/164379",
+        "https://blog.wego.com/emirates-usa-flights-resumption-2026/",
+        "https://travelandtourworld.com/news/article/cx7lb4sr89rl/"
+      ]
+    },
+    "BAH": {
+      "level": "high",
+      "note": "Bahrain briefly closed its airspace after Iranian strikes in June 2026, and Gulf Air is reported to be at elevated bankruptcy risk after the prolonged closures.",
+      "sources": [
+        "https://blog.wego.com/emirates-usa-flights-resumption-2026/",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    "MCT": {
+      "level": "medium",
+      "note": "Muscat has stayed open, but it lies inside EASA's Persian Gulf/Gulf of Oman conflict bulletin area (extended to 16 Nov 2026) and next to the Hormuz shipping attacks (uncertain: little Oct 2026 reporting).",
+      "sources": [
+        "https://connectingtravel.com/news/oman-air-to-resume-dubai-bahrain-and-khasab-flights",
+        "https://www.iranintl.com/en/202609303787",
+        "https://www.aljazeera.com/news/2026/10/11/hormuz-attacks-intensify-as-efforts-to-end-war-on-iran-stall"
+      ]
+    },
+    "RUH": {
+      "level": "high",
+      "note": "Houthi missiles killed at least 13 people at Riyadh airport on 10 Oct 2026, and the airport has been closed (an Indian Embassy advisory still lists it closed on 19 Oct), with Air India, Lufthansa and others suspending service.",
+      "sources": [
+        "https://www.cnn.com/2026/10/10/middleeast/riyadh-airport-saudi-houthis-intl",
+        "https://en.wikipedia.org/wiki/October_2026_attacks_on_Saudi_Arabia_airports",
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700"
+      ]
+    },
+    "JED": {
+      "level": "high",
+      "note": "Jeddah is operating with disruptions, but the Houthis have warned airlines off Saudi airports and airspace (sparing only Makkah/Madinah), the FAA has a caution NOTAM until 10 Dec, and Air India and IndiGo have suspended Saudi flights.",
+      "sources": [
+        "https://www.jpost.com/middle-east/article-911273",
+        "https://aerocorner.com/news/faa-notam-saudi-arabia-caution-us-airlines/",
+        "https://aninews.in/news/world/asia/air-india-extends-temporary-suspension-of-flights-to-saudi-arabia-until-oct-24-amid-houthi-attacks20261017132759/"
+      ]
+    },
+    "IST": {
+      "level": "low",
+      "note": "Istanbul has had no closures; Turkish flies Mumbai-Istanbul and Istanbul-Boston and keeps a European-style northern routing, though weather delays were reported on 18 Oct.",
+      "sources": [
+        "https://www.jetpacglobal.com/blog/is-it-safe-to-travel-to-turkey-right-now/",
+        "https://www.travelandtourworld.com/news/article/0lb6da0pttrm/"
+      ]
+    },
+    "LHR": {
+      "level": "low",
+      "note": "Heathrow is unaffected by the Middle East closures; the only extra risk is Air India-operated BOM-LHR legs, which have to detour over Saudi Arabia and Egypt.",
+      "sources": [
+        "https://simpleflying.com/air-india-launches-new-17-hour-nonstop-flights-to-north-america-in-1-month/",
+        "https://businesstraveller.com/news/air-india-nears-completion-of-cabin-upgrades-on-heathrow-routes"
+      ]
+    },
+    "FRA": {
+      "level": "low",
+      "note": "Frankfurt is stable; Lufthansa has added India capacity, and pilot strikes are suspended under an August 2026 arbitration deal (the cabin-crew dispute with UFO is still unresolved).",
+      "sources": [
+        "https://business.lufthansagroup.com/xx/en/program/experts/news/lufthansa-group-airlines-expand-capacity-in-march",
+        "https://aviospace.org/lufthansa-reaches-deal-with-pilots-to-end-strike-threat-after-e200-million-disruption/"
+      ]
+    },
+    "MUC": {
+      "level": "low",
+      "note": "Same Lufthansa labour picture as FRA, plus Munich's usual winter snow and de-icing delays in December.",
+      "sources": [
+        "https://aviospace.org/lufthansa-reaches-deal-with-pilots-to-end-strike-threat-after-e200-million-disruption/",
+        "https://business.lufthansagroup.com/xx/en/program/experts/news/lufthansa-group-airlines-expand-capacity-in-march"
+      ]
+    },
+    "ZRH": {
+      "level": "low",
+      "note": "No 2026 disruption found; SWISS kept extra India capacity at least through 24 Oct 2026.",
+      "sources": [
+        "https://business.lufthansagroup.com/xx/en/program/experts/news/lufthansa-group-airlines-expand-capacity-in-march"
+      ]
+    },
+    "VIE": {
+      "level": "low",
+      "note": "Vienna is mainly an Air India technical stop on some North America flights (Delhi-Vienna ends 31 Oct 2026); no hub disruption was found.",
+      "sources": [
+        "https://aviationa2z.com/index.php/2026/10/17/air-india-to-cancel-all-its-flights-to-these-2-european-cities/"
+      ]
+    },
+    "FCO": {
+      "level": "medium",
+      "note": "Rome is Air India's technical stop for Mumbai-Newark and Mumbai-JFK, which pushes these trips past 20 hours and adds a point where crew or fuel problems can cause delays.",
+      "sources": [
+        "https://www.aeroroutes.com/eng/260313-aimar26nyc",
+        "https://www.insideflyer.com/posts/air-india-adds-seven-ultra-long-north-american-routes/"
+      ]
+    },
+    "CDG": {
+      "level": "medium",
+      "note": "French ATC and public-sector strikes recurred through 2026 (DGAC ordered CDG cuts on 29 Sep), so a December strike notice is plausible; no December date has been announced.",
+      "sources": [
+        "https://aerocorner.com/news/france-dgac-strike-cdg-marseille-flight-cuts/",
+        "https://pixidia.com/en/france-atc-strike-ascension-may-2026/"
+      ]
+    },
+    "AMS": {
+      "level": "low",
+      "note": "No 2026 hub disruption found; IndiGo moves Mumbai-Amsterdam to the A321XLR from 25 Oct 2026 and connects to KLM/Delta for Boston.",
+      "sources": [
+        "https://www.goindigo.in/press-releases/indigo-concludes-norse-atlantic-damp-lease-operations.html",
+        "https://www.visaverge.com/guides/amsterdam-schiphol-transit-visa/"
+      ]
+    },
+    "DUB": {
+      "level": "low",
+      "note": "No 2026 disruption found; US preclearance at Dublin means you land at BOS as a domestic arrival.",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "YYZ": {
+      "level": "medium",
+      "note": "Air India starts Mumbai-Toronto 3x weekly on 25 Oct 2026 (one outlet doubts it will really be nonstop), Toronto has December snow, and Indians need a Canadian transit visa here.",
+      "sources": [
+        "https://simpleflying.com/air-india-launches-new-17-hour-nonstop-flights-to-north-america-in-1-month/",
+        "https://www.blogto.com/travel/2026/08/toronto-to-mumbai-flights/"
+      ]
+    },
+    "YUL": {
+      "level": "medium",
+      "note": "Montreal has winter-weather exposure in late December, and Indians need a Canadian transit visa here, the same as at YYZ.",
+      "sources": [
+        "https://useteleport.com/blog/canada-transit-visa"
+      ]
+    },
+    "EWR": {
+      "level": "medium",
+      "note": "Air India Mumbai-Newark runs only 3x weekly with a Rome stop; Newark is exposed to December storms, FAA controller shortages (about 10,800 certified vs a 13,800 target) and a possible shutdown after 11 Dec.",
+      "sources": [
+        "https://www.indianeagle.com/traveldiary/air-india-indigo-international-flights-routes",
+        "https://www.traveltourister.com/news/us-government-shutdown-october-2026-tsa-faa-flights-airport-queues-travel-guide/"
+      ]
+    },
+    "JFK": {
+      "level": "medium",
+      "note": "Air India Mumbai-JFK is back to daily for winter but still routes via Rome; JFK carries the same December weather and shutdown exposure as EWR.",
+      "sources": [
+        "https://www.indianeagle.com/traveldiary/air-india-indigo-international-flights-routes",
+        "https://en.wikipedia.org/wiki/2026_United_States_federal_government_shutdowns"
+      ]
+    },
+    "DEL": {
+      "level": "medium",
+      "note": "Delhi's dense-fog season (DGCA fog window about 10 Dec-10 Feb) routinely causes mass delays and cancellations in late December, which matters for a BOM-DEL connection.",
+      "sources": [
+        "https://www.siasat.com/delhi-airport-sees-cancellation-of-66-flights-due-to-fog-3320141/",
+        "https://happyfares.in/blog/delhi-fog-cat-iii-landings-explained-2026/"
+      ]
+    }
+  },
+  "airlines": {
+    "Air India": {
+      "level": "high",
+      "note": "Barred from Pakistani airspace (now to 24 Nov 2026) and avoiding Iran and Russia, Air India detours over Saudi Arabia and Egypt with Rome/Vienna technical stops; its US flights were cut for fuel costs, and it does not fly to BOS, so you would connect via EWR/JFK/YYZ.",
+      "sources": [
+        "https://thekashmirimages.com/2026/10/19/pakistan-extends-airspace-ban-on-indian-aircraft-till-november-24/",
+        "https://simpleflying.com/air-india-launches-new-17-hour-nonstop-flights-to-north-america-in-1-month/",
+        "https://livefromalounge.com/air-india-makes-deep-cuts-to-international-flight-network-june-2026-onwards-singapore-us-china-australia-and-canada-see-many-cuts/",
+        "https://www.indianeagle.com/traveldiary/air-india-indigo-international-flights-routes",
+        "https://aninews.in/news/world/asia/air-india-extends-temporary-suspension-of-flights-to-saudi-arabia-until-oct-24-amid-houthi-attacks20261017132759/"
+      ]
+    },
+    "IndiGo": {
+      "level": "medium",
+      "note": "IndiGo ends widebody flying on 25 Oct 2026 and pauses London Heathrow; Mumbai-Amsterdam continues on a narrowbody A321XLR under the same Pakistan-airspace ban, with Saudi flights suspended to 24 Oct.",
+      "sources": [
+        "https://www.goindigo.in/press-releases/indigo-concludes-norse-atlantic-damp-lease-operations.html",
+        "https://www.airwaysmag.com/new-post/indigo-ends-norse-atlantic-lease-widebody-operations",
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700"
+      ]
+    },
+    "Emirates": {
+      "level": "high",
+      "note": "Boston service runs (cut from 7 to 6 weekly from 15 Sep 2026), but everything connects through DXB, which is exposed to the unresolved Iran war and Gulf airspace closures.",
+      "sources": [
+        "https://www.aeroroutes.com/eng/260811-eksep26us",
+        "https://blog.wego.com/emirates-usa-flights-resumption-2026/",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    "Qatar Airways": {
+      "level": "high",
+      "note": "Doha-Boston drops to 4 weekly from 27 Oct 2026 through March 2027, so rebooking options are thin, and Qatar was the hardest-hit Gulf carrier (89% of flights cancelled from 28 Feb to 24 Mar).",
+      "sources": [
+        "https://www.insideflyer.com/posts/qatar-airways-maintains-reduced-us-flights-for-winter-2026-27",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    "Etihad": {
+      "level": "high",
+      "note": "Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.",
+      "sources": [
+        "https://info.flightmapper.net/route/Etihad_EY_BOS_AUH",
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    "Turkish Airlines": {
+      "level": "low",
+      "note": "No India or Boston suspensions were found in 2026; Turkish's suspensions were limited to Iran, Iraq, Syria, Lebanon and Jordan.",
+      "sources": [
+        "https://www.jetpacglobal.com/blog/is-it-safe-to-travel-to-turkey-right-now/",
+        "https://info.flightmapper.net/route/Turkish_Airlines_TK_IST_BOM"
+      ]
+    },
+    "Lufthansa": {
+      "level": "medium",
+      "note": "Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots' pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.",
+      "sources": [
+        "https://aviospace.org/lufthansa-reaches-deal-with-pilots-to-end-strike-threat-after-e200-million-disruption/",
+        "https://www.galvnews.com/news_reuters/business/lufthansa-german-pilots-union-agree-process-to-resolve-labour-disputes/article_4494b334-1c71-5767-a39c-6c93ec8f3ba0.html",
+        "https://euronews.com/2026/02/12/lufthansa-strike-thousands-of-flights-affected"
+      ]
+    },
+    "SWISS": {
+      "level": "low",
+      "note": "SWISS has expanded India capacity; as a Lufthansa Group airline it is outside the German pilot/cabin disputes, and no 2026 SWISS strikes were found.",
+      "sources": [
+        "https://business.lufthansagroup.com/xx/en/program/experts/news/lufthansa-group-airlines-expand-capacity-in-march"
+      ]
+    },
+    "British Airways": {
+      "level": "low",
+      "note": "No India or Boston route problems were found for 2026; BA cut only some Dubai and Abu Dhabi flights.",
+      "sources": [
+        "https://blog.wego.com/uae-flight-resumption-2026-updates/"
+      ]
+    },
+    "Virgin Atlantic": {
+      "level": "low",
+      "note": "Virgin avoids Iranian airspace, so its Mumbai flights run somewhat longer, but no suspensions were found.",
+      "sources": [
+        "https://www.expressandstar.com/news/transport/british-airways-among-airlines-rerouting-flights-to-avoid-iran-and-iraq-6126060"
+      ]
+    },
+    "Air France": {
+      "level": "medium",
+      "note": "Air France has suspended Dubai and Riyadh to 24 Oct (irrelevant to India-Boston), but French ATC and public-sector strikes have hit CDG repeatedly in 2026.",
+      "sources": [
+        "https://gulfnews.com/business/aviation/uae-flight-status-today-full-list-of-delays-cancellations-saudi-travel-warnings-1.500715700",
+        "https://aerocorner.com/news/france-dgac-strike-cdg-marseille-flight-cuts/"
+      ]
+    },
+    "KLM": {
+      "level": "low",
+      "note": "No 2026 suspensions on India or Boston routes were found; Air France-KLM is resisting being moved from Mumbai T2 to Navi Mumbai.",
+      "sources": [
+        "https://www.theweek.in/news/biz-tech/2026/10/01/flying-out-of-mumbai-today-check-if-the-flight-or-terminal-has-shifted.html"
+      ]
+    },
+    "United": {
+      "level": "medium",
+      "note": "Newark-Delhi (UA83) is operating, but no United nonstop to Mumbai was found (one source says it is suspended); United's Dubai service is suspended, and it faces US shutdown and ATC risk after 11 Dec.",
+      "sources": [
+        "https://blog.wego.com/united-airlines-flight-status/",
+        "https://www.myticketstoindia.com/travel-news/updated-list-of-non-stop-flights-between-usa-india/"
+      ]
+    },
+    "American": {
+      "level": "medium",
+      "note": "JFK-Delhi (AA292) shows as scheduled through Sep 2026 on trackers and no 2026 suspension was found (uncertain); a Mumbai trip would need a Delhi connection during fog season.",
+      "sources": [
+        "https://airadvisor.com/en/flight-tracker/aa292",
+        "https://www.siasat.com/delhi-airport-sees-cancellation-of-66-flights-due-to-fog-3320141/"
+      ]
+    },
+    "Air Canada": {
+      "level": "medium",
+      "note": "Air Canada's Toronto-Mumbai nonstop status this winter is unclear (one report says Air India is the only nonstop), it dropped London-Mumbai, and Dubai is cancelled to mid-Jan 2027; Indians also need a Canadian transit visa.",
+      "sources": [
+        "https://www.blogto.com/travel/2026/08/toronto-to-mumbai-flights/",
+        "https://www.aerotelegraph.com/ticker/air-canada-streicht-fluege-zwischen-london-und-mumbai/985gpek",
+        "https://blog.wego.com/uae-flight-resumption-2026-updates/"
+      ]
+    },
+    "Saudia": {
+      "level": "high",
+      "note": "Houthi strikes destroyed a Saudia A320 at Riyadh on 8 Oct 2026; Riyadh is closed and Saudi airspace is under Houthi threat and an FAA caution NOTAM.",
+      "sources": [
+        "https://en.wikipedia.org/wiki/October_2026_attacks_on_Saudi_Arabia_airports",
+        "https://aerocorner.com/news/faa-notam-saudi-arabia-caution-us-airlines/"
+      ]
+    },
+    "Kuwait Airways": {
+      "level": "high",
+      "note": "Kuwait Airways' home airport was closed from 28 Feb 2026 and hit by a drone in June, and disruption since then has been repeated.",
+      "sources": [
+        "https://www.ch-aviation.com/news/164379",
+        "https://blog.wego.com/emirates-usa-flights-resumption-2026/"
+      ]
+    },
+    "Gulf Air": {
+      "level": "high",
+      "note": "Gulf Air is reported to be at heightened bankruptcy risk after the prolonged 2026 closures, and its Bahrain hub was briefly shut in June.",
+      "sources": [
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/",
+        "https://blog.wego.com/emirates-usa-flights-resumption-2026/"
+      ]
+    }
+  },
+  "transit_visa": {
+    "LHR": {
+      "indian_passport": "A Direct Airside Transit Visa is required unless you hold a valid US visa (or a US green card), or are flying from the US within 6 months of your last entry on a valid visa (a secondary source; confirm if the F-1 stamp has expired); the UK ETA is not open to Indian nationals.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens",
+        "https://www.gov.uk/transit-visa",
+        "https://legalclarity.org/direct-airside-transit-visa-who-needs-one-and-how-to-apply/"
+      ]
+    },
+    "FRA": {
+      "indian_passport": "Since 3 Jun 2026, no airport transit visa is needed for airside transit (you must stay in the international area); entering Germany still needs a Schengen visa.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://blog.wego.com/indian-nationals-no-longer-need-airport-transit-visa-for-german-layovers/",
+        "https://www.outlooktraveller.com/News/germany-removes-airport-transit-visa-rule-for-indians-from-june-2026"
+      ]
+    },
+    "MUC": {
+      "indian_passport": "Since 3 Jun 2026, no airport transit visa is needed for airside transit at Munich.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://blog.wego.com/indian-nationals-no-longer-need-airport-transit-visa-for-german-layovers/"
+      ]
+    },
+    "CDG": {
+      "indian_passport": "Since 10 Apr 2026, ordinary Indian passport holders staying in the international zone do not need an airport transit visa.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens",
+        "https://blog.wego.com/indian-nationals-no-longer-need-airport-transit-visa-for-german-layovers/"
+      ]
+    },
+    "AMS": {
+      "indian_passport": "India is on neither the EU nor the Dutch airport transit visa list, so an airside connection needs no visa.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://www.visaverge.com/guides/amsterdam-schiphol-transit-visa/"
+      ]
+    },
+    "ZRH": {
+      "indian_passport": "No Schengen category A airport transit visa is needed in the international transit area.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "VIE": {
+      "indian_passport": "No airport transit visa is needed for airside transit at Vienna.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "FCO": {
+      "indian_passport": "Italy does not require an airport transit visa for Indians in the international area (Air India's Rome technical-stop passengers usually stay on board).",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "MAD": {
+      "indian_passport": "Spain dropped the airport transit visa for ordinary Indian passports on 4 Mar 2026.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://www.exteriores.gob.es/Embajadas/nuevadelhi/es/Comunicacion/Noticias/Paginas/Articulos/19022026_NOT.aspx"
+      ]
+    },
+    "IST": {
+      "indian_passport": "Airside transit needs no visa; a free e-Airport Transit Visa is required only when continuing to Mexico, Panama, Colombia or Venezuela.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://mumbai-cg.mfa.gov.tr/Mission/ShowAnnouncement/409495",
+        "https://airconnect.live/en/transit-visa/istanbul"
+      ]
+    },
+    "DXB": {
+      "indian_passport": "No visa is needed if you stay airside; a visa is needed only to leave the airport (Indians with a valid US visa can get a UAE visa on arrival).",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://www.zurichkotak.com/knowledge-center/travel-insurance/dubai-transit-visa-for-indians",
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "AUH": {
+      "indian_passport": "No visa is needed for an airside connection; a visa on arrival is available to Indians with a valid US visa if leaving the airport.",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://www.dookinternational.com/blog/airport-layover-guide-indians-transit-rules/",
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "DOH": {
+      "indian_passport": "No visa is needed for an airside connection at Hamad, and Qatar is visa-free for Indians if leaving the airport (secondary sources).",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://www.dookinternational.com/blog/airport-layover-guide-indians-transit-rules/",
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "DUB": {
+      "indian_passport": "Indians may transit airside without an Irish visa (India is not on Ireland's transit-visa list).",
+      "us_visa_exempts": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens",
+        "https://api.ireland.ie/en/india/newdelhi/services/visas/visas-for-ireland/"
+      ]
+    },
+    "YYZ": {
+      "indian_passport": "A Canadian transit visa (or visitor visa) is required; Indians are not eligible for Transit Without Visa or the China Transit Program, so a US visa alone does not exempt them (a US green card does).",
+      "us_visa_exempts": false,
+      "sources": [
+        "https://useteleport.com/blog/canada-transit-visa",
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    },
+    "YUL": {
+      "indian_passport": "Same as YYZ: a Canadian transit visa is required, and a US visa does not exempt.",
+      "us_visa_exempts": false,
+      "sources": [
+        "https://useteleport.com/blog/canada-transit-visa",
+        "https://en.wikipedia.org/wiki/Visa_requirements_for_Indian_citizens"
+      ]
+    }
+  },
+  "events": [
+    {
+      "name": "Pakistan airspace closure to Indian carriers",
+      "status": "active",
+      "since": "2025-04-23",
+      "affects": [
+        "Air India",
+        "IndiGo"
+      ],
+      "effect": "NOTAM A0590 extends the ban to 24 Nov 2026 (19th monthly extension, so expect it to cover December too), which forces Indian carriers onto long southern detours to Europe and North America.",
+      "sources": [
+        "https://thekashmirimages.com/2026/10/19/pakistan-extends-airspace-ban-on-indian-aircraft-till-november-24/",
+        "https://minutemirror.com.pk/pakistan-extends-ban-on-indian-flights-for-19th-time-as-india-faces-estimated-5-billion-loss-647057",
+        "https://en.wikipedia.org/wiki/2025%E2%80%932026_Pakistani_airspace_closure_for_Indian_airlines"
+      ]
+    },
+    {
+      "name": "US/Israel-Iran war: Iran and Iraq airspace closed, Gulf exposure",
+      "status": "active",
+      "since": "2026-02-28",
+      "affects": [
+        "DXB",
+        "DOH",
+        "AUH",
+        "KWI",
+        "BAH",
+        "MCT",
+        "Emirates",
+        "Qatar Airways",
+        "Etihad",
+        "Kuwait Airways",
+        "Gulf Air"
+      ],
+      "effect": "The war shut every Gulf hub in March; the April and June ceasefires collapsed, Hormuz shipping attacks continue, and EASA's bulletins for Iran, Iraq and the Persian Gulf/Gulf of Oman run to 16 Nov 2026, so short-notice Gulf closures remain possible.",
+      "sources": [
+        "https://en.wikipedia.org/wiki/2026_Iran_war",
+        "https://www.aljazeera.com/news/2026/10/11/hormuz-attacks-intensify-as-efforts-to-end-war-on-iran-stall",
+        "https://www.iranintl.com/en/202609303787",
+        "https://simpleflying.com/airlines-most-disrupted-middle-east-airspace-closures-2026/"
+      ]
+    },
+    {
+      "name": "Houthi missile attacks on Saudi airports and warning to airlines on Saudi airspace",
+      "status": "active",
+      "since": "2026-10-06",
+      "affects": [
+        "RUH",
+        "JED",
+        "Saudia",
+        "Air India",
+        "IndiGo",
+        "Etihad",
+        "Emirates",
+        "Lufthansa"
+      ],
+      "effect": "Strikes on Riyadh, Abha and Dammam killed about 20 people; Riyadh is closed, many airlines have suspended Saudi flights to 24 Oct, and the FAA's caution NOTAM runs to 10 Dec. This puts at risk the Saudi overflight corridor that Air India depends on (uncertain: no Air India reroute reported yet).",
+      "sources": [
+        "https://en.wikipedia.org/wiki/October_2026_attacks_on_Saudi_Arabia_airports",
+        "https://www.jpost.com/middle-east/article-911273",
+        "https://aerocorner.com/news/faa-notam-saudi-arabia-caution-us-airlines/",
+        "https://simpleflying.com/air-india-launches-new-17-hour-nonstop-flights-to-north-america-in-1-month/"
+      ]
+    },
+    {
+      "name": "Red Sea / Bab al-Mandab crisis (Houthis)",
+      "status": "watch",
+      "since": "2026-09-01",
+      "affects": [
+        "Air India",
+        "JED"
+      ],
+      "effect": "The Houthis control the Bab al-Mandab strait and are escalating; no airspace closures over the Red Sea have been reported, but Yemen and the southern Red Sea are effectively off-limits, which narrows the India-Egypt-Europe corridor.",
+      "sources": [
+        "https://www.aljazeera.com/news/2026/9/13/red-sea-nations-watch-as-houthis-seize-bab-al-mandeb-strait",
+        "https://www.inss.org.il/wp-content/uploads/2026/09/No.-2200.pdf"
+      ]
+    },
+    {
+      "name": "Northern corridor via Caucasus and Afghanistan for non-Indian carriers",
+      "status": "active",
+      "since": "2026-02-28",
+      "affects": [
+        "Lufthansa",
+        "British Airways",
+        "SWISS",
+        "Turkish Airlines",
+        "Air France",
+        "KLM"
+      ],
+      "effect": "With the central Middle East closed, Europe-India flights run north via the Caucasus, Caspian, Afghanistan and Pakistan, an option Indian carriers do not have because of Pakistan's ban; flights are longer but stable.",
+      "sources": [
+        "https://safeairspace.net/afghanistan/",
+        "https://www.bangladeshmonitor.com.bd/news-pdf/pakistan-afghanistan-airspace-turns-into-global-aviation-hotspot-amid-middle-eastern-tensions"
+      ]
+    },
+    {
+      "name": "Russian airspace closed to US/EU/UK/Canadian carriers",
+      "status": "active",
+      "since": "2022-03-01",
+      "affects": [
+        "United",
+        "American",
+        "Air Canada",
+        "Air India"
+      ],
+      "effect": "Western carriers cannot overfly Russia, and Air India also avoids Russian airspace on US/Canada routes, so US-India flights are longer and leave fewer diversion options.",
+      "sources": [
+        "https://onemileatatime.com/news/us-bound-air-india-flight-diverts-russia/",
+        "https://simpleflying.com/air-india-launches-new-17-hour-nonstop-flights-to-north-america-in-1-month/"
+      ]
+    },
+    {
+      "name": "Air India North America cuts and technical stops",
+      "status": "active",
+      "since": "2026-03-01",
+      "affects": [
+        "Air India",
+        "FCO",
+        "VIE",
+        "EWR",
+        "JFK"
+      ],
+      "effect": "Winter 2026 has Mumbai-Newark 3x weekly and Mumbai-JFK daily via Rome; Delhi-Chicago is suspended; jet fuel at more than twice normal prices drove the cuts, and the 25-aircraft 787 retrofit runs into 2027.",
+      "sources": [
+        "https://www.indianeagle.com/traveldiary/air-india-indigo-international-flights-routes",
+        "https://livefromalounge.com/air-india-makes-deep-cuts-to-international-flight-network-june-2026-onwards-singapore-us-china-australia-and-canada-see-many-cuts/",
+        "https://aerospaceglobalnews.com/news/air-india-boeing-787-retrofit/"
+      ]
+    },
+    {
+      "name": "IndiGo ends widebody/Norse 787 operations",
+      "status": "active",
+      "since": "2026-10-25",
+      "affects": [
+        "IndiGo",
+        "AMS",
+        "LHR"
+      ],
+      "effect": "London Heathrow is paused until A350 deliveries (late 2027 or later), and Mumbai-Amsterdam moves to the A321XLR.",
+      "sources": [
+        "https://www.goindigo.in/press-releases/indigo-concludes-norse-atlantic-damp-lease-operations.html"
+      ]
+    },
+    {
+      "name": "Reduced Gulf carrier Boston frequencies",
+      "status": "active",
+      "since": "2026-09-15",
+      "affects": [
+        "Emirates",
+        "Qatar Airways"
+      ],
+      "effect": "Emirates is down to 6 weekly to Boston and Qatar to 4 weekly (from 27 Oct), so missed connections may mean waits of a day or more.",
+      "sources": [
+        "https://www.aeroroutes.com/eng/260811-eksep26us",
+        "https://www.insideflyer.com/posts/qatar-airways-maintains-reduced-us-flights-for-winter-2026-27"
+      ]
+    },
+    {
+      "name": "US federal funding deadline (possible shutdown)",
+      "status": "watch",
+      "since": null,
+      "affects": [
+        "BOS",
+        "EWR",
+        "JFK",
+        "United",
+        "American"
+      ],
+      "effect": "The current continuing resolution expires on 11 Dec 2026; the Feb-Apr 2026 DHS shutdown caused TSA sick-outs, multi-hour lines and more than 1,100 TSA resignations, so a lapse would overlap the 18-28 Dec travel dates.",
+      "sources": [
+        "https://en.wikipedia.org/wiki/2026_United_States_federal_government_shutdowns",
+        "https://www.traveltourister.com/news/us-government-shutdown-october-2026-tsa-faa-flights-airport-queues-travel-guide/"
+      ]
+    },
+    {
+      "name": "Lufthansa labour disputes",
+      "status": "watch",
+      "since": "2026-02-12",
+      "affects": [
+        "Lufthansa",
+        "FRA",
+        "MUC"
+      ],
+      "effect": "Pilot strikes are suspended under arbitration since 10 Aug 2026, but the cabin-crew (UFO) talks are open and the pilots' pay contract expires 31 Dec 2026.",
+      "sources": [
+        "https://aviospace.org/lufthansa-reaches-deal-with-pilots-to-end-strike-threat-after-e200-million-disruption/"
+      ]
+    },
+    {
+      "name": "French ATC / public-sector strikes",
+      "status": "watch",
+      "since": "2026-02-01",
+      "affects": [
+        "CDG",
+        "Air France"
+      ],
+      "effect": "There were repeated 2026 episodes, the latest DGAC-ordered CDG cuts on 29 Sep; no December notice has been filed yet.",
+      "sources": [
+        "https://aerocorner.com/news/france-dgac-strike-cdg-marseille-flight-cuts/",
+        "https://pixidia.com/en/france-atc-strike-ascension-may-2026/"
+      ]
+    },
+    {
+      "name": "Mumbai CSMIA terminal works / Navi Mumbai shift",
+      "status": "watch",
+      "since": "2026-10-01",
+      "affects": [
+        "BOM",
+        "IndiGo",
+        "Air India",
+        "KLM",
+        "Air France"
+      ],
+      "effect": "MIAL wants about a third of international flights moved to Navi Mumbai (NMI), which had not happened as of 1 Oct, and T1 closes on 25 Oct with flights moving to T2. Search NMI as an alternate origin and check the airport code on bookings.",
+      "sources": [
+        "https://www.theweek.in/news/biz-tech/2026/10/01/flying-out-of-mumbai-today-check-if-the-flight-or-terminal-has-shifted.html",
+        "https://www.newsbytesapp.com/news/india/csmia-shifts-about-30-international-flights-to-nmia-oct-1/tldr"
+      ]
+    },
+    {
+      "name": "Delhi winter fog season",
+      "status": "watch",
+      "since": null,
+      "affects": [
+        "DEL",
+        "Air India",
+        "IndiGo",
+        "American",
+        "United"
+      ],
+      "effect": "Dense fog from mid-December regularly causes dozens of cancellations a day at Delhi, so avoid tight BOM-DEL-US connections around 18 Dec and 27-29 Dec.",
+      "sources": [
+        "https://www.siasat.com/delhi-airport-sees-cancellation-of-66-flights-due-to-fog-3320141/",
+        "https://happyfares.in/blog/delhi-fog-cat-iii-landings-explained-2026/"
+      ]
+    },
+    {
+      "name": "Boston/Northeast winter storms and peak holiday demand",
+      "status": "watch",
+      "since": null,
+      "affects": [
+        "BOS",
+        "EWR",
+        "JFK",
+        "YYZ",
+        "YUL"
+      ],
+      "effect": "Nor'easters have historically cancelled 200-800 Logan flights in a day, and 18 Dec and 26-28 Dec are peak days with little spare seat capacity for rebooking.",
+      "sources": [
+        "https://www.cbsnews.com/boston/news/noreaster-logan-airport-flights-boston-amtrak-snow",
+        "https://www.boston.com/travel/flights/2024/02/13/hundreds-of-flights-cancelled-at-logan-airport-airlines-waiving-fees-due-to-storm/"
+      ]
+    },
+    {
+      "name": "US entry/visa environment for Indian F-1 students",
+      "status": "watch",
+      "since": "2025-09-02",
+      "affects": [
+        "BOS",
+        "EWR",
+        "JFK"
+      ],
+      "effect": "India is not on the 39-country travel-ban list; the F-1 fixed-admission (end of duration of status) rule was paused by a court on 14 Sep 2026; most interview waivers ended in 2025, so a student with an expired F-1 stamp needs an in-person interview in India; and CBP's device-search directive took effect on 1 Jan 2026.",
+      "sources": [
+        "https://www.nafsa.org/regulatory-information/proclamation-december-16-2025-travel-ban-effective-january-1-2026",
+        "https://inomi.in/2026/09/21/us-f1-visa-changes-2026-duration-of-status-cpt-opt/",
+        "https://www.businesstoday.in/amp/nri/visa/story/us-kills-most-visa-waivers-h-1b-f-1-even-kids-must-now-attend-interviews-491911-2025-09-01",
+        "https://americanbazaaronline.com/2026/07/02/viral-whatsapp-post-alarms-indian-students-traveling-to-america-483966/"
+      ]
+    },
+    {
+      "name": "India fuel/forex squeeze and high fares",
+      "status": "active",
+      "since": "2026-05-10",
+      "affects": [
+        "Air India",
+        "IndiGo"
+      ],
+      "effect": "With Hormuz disrupted, jet fuel has run at more than twice normal prices and PM Modi urged Indians to defer foreign travel, which has led to capacity cuts and higher fares on India routes.",
+      "sources": [
+        "https://www.asianhospitality.com/modi-urges-indians-delay-foreign-travel/",
+        "https://livefromalounge.com/air-india-makes-deep-cuts-to-international-flight-network-june-2026-onwards-singapore-us-china-australia-and-canada-see-many-cuts/"
+      ]
+    }
+  ]
+}

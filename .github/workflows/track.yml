@@ -1,0 +1,64 @@
+name: Track fares
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"     # every 6 hours, UTC
+  workflow_dispatch:           # "Run workflow" button for a manual run
+
+permissions:
+  contents: write              # commit prices.db + report.html back
+  issues: write                # open an issue (= email) on a new low
+  pages: write                 # publish report.html to GitHub Pages
+  id-token: write
+
+concurrency:
+  group: track                 # never two runs writing prices.db at once
+
+defaults:
+  run:
+    shell: bash                # bash -eo pipefail, so `| tee` keeps the exit code
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - run: python test_tracker.py
+
+      - name: Scrape and report
+        run: python tracker.py | tee run.log
+
+      - name: Open an issue on a new low or first time under target
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q '^ALERT:' run.log; then
+            gh issue create --title "$(grep -m1 '^ALERT:' run.log | cut -c8-)" --body "$(tail -n 6 run.log)"
+          fi
+
+      - name: Save price history and report
+        if: always()               # keep partial data even if the scrape step failed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prices.db report.html
+          git diff --cached --quiet || { git commit -m "track: $(date -u +%FT%TZ)" && git push; }
+
+      - name: Build Pages site
+        if: always()
+        run: mkdir -p site && cp report.html site/index.html
+      - uses: actions/upload-pages-artifact@v5
+        if: always()
+        with:
+          path: site
+      - id: deploy
+        if: always()
+        uses: actions/deploy-pages@v5
