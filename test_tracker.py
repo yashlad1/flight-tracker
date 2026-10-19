@@ -93,10 +93,11 @@ def test_render_page_says_who_flies_and_escapes_scraped_text():
     cheapest = jr["totals"][0]                                  # 1 person out + 2 people back
     assert (cheapest["out"]["total"], cheapest["ret"]["total"], cheapest["total"]) == (500, 2100, 2600)
     page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, {}, set(), opts, [], jr), [], [])
-    assert "Prices by journey" in page and "Price for 1 person" in page and "Price for 2 people" in page
-    assert "<b>1 traveller</b> to Boston" in page and "<b>2 travellers</b> home to Mumbai" in page
+    assert "All flights by journey" in page and "Price for 1 person" in page and "Price for 2 people" in page
+    assert page.index("Whole trip") < page.index("All flights by journey")     # the answer comes first
+    assert "<b>1 person</b> to Boston" in page and "<b>2 people</b> home to Mumbai" in page
     assert "Mon 19 Oct, 3:45 pm" in page                       # UTC run time shown in Boston time
-    assert "$2,600" in page and "for 2 travellers, $1,050 each" in page   # 500 out + (1800 + 1 missing bag x $150 x 2)
+    assert "<dd>$2,600</dd>" in page and "$1,050 each" in page   # 500 out + (1800 + 1 missing bag x $150 x 2)
     assert "<script>x</script>" not in page and "&lt;script&gt;" in page
     assert "Book on Qatar Airways" in page and "flights.booking.com" in page
     assert '<meta name=robots content="noindex, nofollow, noarchive">' in page     # keep it out of search engines

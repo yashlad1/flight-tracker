@@ -183,7 +183,7 @@ def options(quotes, cfg, bags, geo, max_risk):
     return sorted(best.values(), key=lambda r: r["total"])
 
 
-def mark_split_fares(together, alone, alone_pax, min_saving=10):
+def mark_split_fares(together, alone, alone_pax, min_saving=50):
     """Flag return flights that are cheaper booked one traveller at a time. Booked together, every traveller pays
     the lowest fare with enough seats for all of them; if only one seat is left at a lower fare, one traveller can
     buy it alone and the other pays the together price. So the saving is (together each) - (alone price).
@@ -218,7 +218,7 @@ def journeys(quotes, cfg, bags, geo):
     for d, flights in rets.items():
         mark_split_fares(flights, *quotes.get(("ret_extra", d), ([], 0, ""))[:2])
     totals = []
-    for label, scope in (("Cheapest", "high"), ("No high-risk flight", "medium"), ("Low risk on every flight", "low")):
+    for label, scope in (("Cheapest", "high"), ("Cheapest without a high-risk flight", "medium"), ("Lowest risk", "low")):
         o = next((s for s in outs if within(s, scope)), None)
         r = min((s for v in rets.values() for s in v if within(s, scope)), key=lambda s: s["total"], default=None)
         deal = next((x for x in options(quotes, cfg, bags, geo, scope) if x["strategy"] == "B"), None)

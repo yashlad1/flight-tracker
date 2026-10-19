@@ -46,6 +46,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | Run on GitHub Actions instead of local cron; public repo with a GitHub Pages report link |
 | 2026-10-19 | "UI is super bad": full redesign of the report (see section 7) |
 | 2026-10-19 | The top of the report shows prices the way the user calculates them: 1 person out, 2 people back, and the sum, at three risk levels |
+| 2026-10-19 | Second design review (6/10) applied: whole-trip receipts first, journey tables second (cards on phones), round trip + one-way collapsed, risk legend, "+$X more than the cheapest", plain wording for separate bookings, savings under $50 hidden, 44 px targets, 14 px minimum text, table captions, half-height band on phones, chart hidden until 2 days of data |
 | 2026-10-19 | Remove the booking tips and footer from the report; keep it out of search engines with `<meta name=robots content="noindex, nofollow, noarchive">` (robots.txt is also published, but crawlers only read it at the domain root, which a project page can't control) |
 | 2026-10-19 | Flag return flights that are cheaper as 2 separate tickets (`mark_split_fares`: matches the 2-person and 1-person searches flight by flight; saving = together price each − 1-person price, shown only when ≥ $10), with steps to still sit together |
 
@@ -211,28 +212,23 @@ best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
 `render.py` builds one static page: inline CSS, an inline SVG chart, Overpass from Google Fonts, and no
 JavaScript. It has a light and a dark theme (`prefers-color-scheme`).
 
-**Design brief.** The user called the first version, a wide spreadsheet-style table, "super bad", and later
-misread who flies which way. So the page is built around three questions: what to book, what each person pays,
-and whether it is safe.
+**Design brief.** The user called the first version, a wide table, "super bad", later misread who flies which
+way, and thinks in journeys: "1 person Mumbai→Boston + 2 people Boston→Mumbai = trip". So the page leads with
+that sum.
 
 - **One loud element:** an airport-signage yellow band with person pictograms, 1 flying to Boston and 2 flying
-  home. Everything else is quiet: navy ink on cool white, one typeface (Overpass, derived from highway signage),
-  tabular figures.
-- **Options are tickets.** Each flight is a departure → layover city → arrival line with who is on it, then the
-  arithmetic (`fare + bags = total for N travellers, $X each`), then booking buttons. A perforated stub holds the
-  whole-trip total and each traveller's share.
-- **"Prices by journey"** comes first, because the user thinks in journeys: a table of 1-person Mumbai→Boston
-  prices and a table of 2-people Boston→Mumbai prices (per day), then **"Whole trip"** as an explicit sum,
-  `out + back = total`, for three scopes: cheapest, no high-risk flight, and low risk on every flight.
-  `tracker.journeys()` computes these; the round-trip deal (Plan B) is flagged under a row only when it is cheaper.
-  The "no high-risk flight" row exists because the independent price audit found a trip $50 above the cheapest
-  that avoids the Gulf, which the any/low split hid.
-- **"Every option"** is a list of compact `<details>` rows that open into the full ticket. A CSS-only switch
-  (`:has()` on two radio inputs) swaps between the any-risk and low-risk lists.
-- **Copy rules.** Risk is always written in words, never shown by colour alone. Plan A and Plan B are called
-  "Separate one-way tickets" and "Round trip + one-way". Jargon (PAX, leg) is gone.
-- **Quality floor.** Layout works from 375 px (no horizontal scroll) up to desktop, with visible focus outlines.
-  The only motion is the plane on the band, once, and only when reduced motion is not requested.
+  home (half height on phones). Everything else is quiet: navy ink on cool white, Overpass, tabular figures.
+- **"Whole trip" comes first**: three receipt cards (`tracker.journeys()` totals) for cheapest, cheapest without a
+  high-risk flight, and lowest risk. Each is a two-line sum with a yellow total row, the extra cost compared with
+  the cheapest, and booking buttons for both flights. A cheaper round trip + one-way sits inside the card in a
+  `<details>`; a separate-bookings saving shows only when it is at least $50.
+- **"All flights by journey"**: two tables with a hidden caption, which become cards under 600 px. Each card reads
+  flight → price and risk → booking buttons.
+- **"Other ways to book"**: Plan B options in a collapsed `<details>`, each opening into a ticket card.
+- **Copy rules.** Risk is always written in words with a one-line legend, never colour alone. People are "person
+  from Mumbai" / "person from Boston"; elsewhere it is "person" / "people". No PAX, no plan letters, no "trick".
+- **Quality floor.** No horizontal scroll at 375 px, every tap target at least 44 px, text at least 14 px, focus
+  outlines on every control, and one motion (the plane), off under reduced motion.
 
 **Booking links per flight:**
 

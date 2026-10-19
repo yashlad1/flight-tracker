@@ -17,14 +17,15 @@ font-variant-numeric:tabular-nums}
 a{color:var(--route)}
 a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
 h1,h2,h3,h4,p{margin:0}.nw{white-space:nowrap}
+small{font-size:14px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .top,main{max-width:1080px;margin:0 auto;padding:0 20px}
-.top{padding-top:24px;padding-bottom:16px}
-.top h1{font-size:20px;font-weight:800}.top p{color:var(--ink-2);font-size:15px}
+.top{padding-top:20px;padding-bottom:14px}.top h1{font-size:20px;font-weight:800}.top p{color:var(--ink-2);font-size:15px}
 /* the route band: the one loud element */
-.band{background:var(--sign);color:var(--sign-ink);padding:28px 20px 22px}
+.band{background:var(--sign);color:var(--sign-ink);padding:22px 20px}
 .band-route{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
 .place{display:flex;flex-direction:column;line-height:1}.place.end{text-align:right}
-.code{font-size:60px;font-weight:800;letter-spacing:-.02em}.name{font-size:18px;font-weight:600;margin-top:6px}
+.code{font-size:56px;font-weight:800;letter-spacing:-.02em}.name{font-size:17px;font-weight:600;margin-top:6px}
 .flows{display:grid;gap:10px}
 .flow{display:flex;align-items:center;gap:12px;font-size:18px;line-height:1.25}
 .flow small{display:block;font-size:15px}.flow.home{flex-direction:row-reverse;text-align:right}
@@ -32,604 +33,412 @@ h1,h2,h3,h4,p{margin:0}.nw{white-space:nowrap}
 .track{position:relative;height:3px;background:var(--sign-ink);border-radius:2px}
 .plane{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%) rotate(90deg);
 fill:var(--sign-ink);background:var(--sign);border-radius:50%}
-main{padding-top:28px;padding-bottom:40px}
-section{margin-top:44px}section:first-of-type{margin-top:0}
-h2{font-size:24px;font-weight:800;margin-bottom:12px}
+main{padding-top:26px;padding-bottom:48px}
+section,.alts{margin-top:44px}section:first-of-type{margin-top:0}
+h2{font-size:24px;font-weight:800;margin-bottom:10px}
+.intro{color:var(--ink-2);font-size:15px;margin:-2px 0 12px;max-width:80ch}
 .alert{margin:0 0 18px;padding:10px 14px;border-left:4px solid var(--high);background:var(--surface)}
-.intro,.fine{color:var(--ink-2);font-size:14px}.intro{margin:-4px 0 14px}.fine{margin-top:8px}
-/* prices by journey */
-.jgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.jcard{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px 20px 8px}
-.jcard h3{font-size:22px;font-weight:800}.jsub{color:var(--ink-2);font-size:14px;margin-bottom:8px}
-.jt{width:100%;border-collapse:collapse}.jt th{font-size:13px;color:var(--ink-2);font-weight:600;text-align:left;
-padding:6px 0;border-bottom:1px solid var(--rule)}.jt th.num{text-align:right}
-.jt td{padding:12px 0;border-bottom:1px solid var(--hair);vertical-align:top}.jt tr:last-child td{border-bottom:0}
-.jt td:first-child{padding-right:12px}.jt td+td,.jt th+th{padding-left:14px}
-.jt td b{font-weight:800}.jt td small{display:block;color:var(--ink-2);font-size:13px;line-height:1.35}
-.jt td.num b{font-size:20px}.jt .grp th{padding-top:16px;font-size:15px;color:var(--ink);font-weight:800;border-bottom:1px solid var(--rule)}
-.jt .risk{margin:0;font-size:14px}.jlinks{display:flex;flex-wrap:wrap;gap:0 14px;font-size:14px}
-.jlinks .lnk{min-height:36px}
-.h-total{margin-top:36px}
-.jt small.split{color:var(--low);font-weight:600}
-
-.tot{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 20px;margin-bottom:12px;
-display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:center}
-.t-label b{display:block;font-size:18px;font-weight:800}.t-label small{display:block;color:var(--ink-2);font-size:13px}
-.t-label .risk{margin-top:4px;font-size:14px}
-.t-sum{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.t-leg{display:flex;flex-direction:column;line-height:1.25;min-width:150px}.t-leg small{color:var(--ink-2);font-size:13px}
-.t-leg b{font-size:24px;font-weight:800}.t-leg span{font-size:13px;color:var(--ink-2)}
-.op{font-size:24px;font-weight:800;color:var(--ink-2)}
-.t-total{background:var(--sign);color:var(--sign-ink);border-radius:10px;padding:8px 14px}
-.t-total small,.t-total span{color:var(--sign-ink)}.t-total b{font-size:28px}
-.t-deal{grid-column:1/-1;font-size:14px;border-top:1px dashed var(--rule);padding-top:10px}
-/* tickets */
-.ticket{display:grid;grid-template-columns:1fr 220px;background:var(--surface);border:1px solid var(--rule);
-border-radius:14px;overflow:hidden}
-.main{padding:18px 22px 16px;min-width:0}
-.ticket h3{font-size:20px;font-weight:800}.ticket h3 small{font-size:15px;font-weight:600;color:var(--ink-2)}
-.plan{font-size:15px;color:var(--ink-2)}
-.risk{display:flex;align-items:flex-start;gap:8px;font-size:15px;margin-top:6px;font-weight:600}
+.legend-risk{font-size:15px;background:var(--surface);border:1px solid var(--hair);border-radius:10px;padding:0 14px;
+margin-bottom:16px;max-width:90ch}.legend-risk>summary{cursor:pointer;padding:10px 0;min-height:44px}
+.legend-risk .more{color:var(--route);font-weight:600;white-space:nowrap}.legend-risk>p{padding:0 0 12px}
+.risk{display:flex;align-items:flex-start;gap:8px;font-size:15px;font-weight:600}
 .dot{width:10px;height:10px;border-radius:50%;flex:none;margin-top:.45em}
 .r-low .dot{background:var(--low)}.r-medium .dot{background:var(--medium)}.r-high .dot{background:var(--high)}
 .r-low .risk{color:var(--low)}.r-medium .risk{color:var(--medium)}.r-high .risk{color:var(--high)}
+/* whole-trip receipts */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.tot{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 18px}
+.t-head h3{font-size:19px;font-weight:800}.t-meta{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin-top:2px}
+.delta{font-size:15px;color:var(--ink-2)}
+.receipt{margin:14px 0 0}.r-line{display:grid;grid-template-columns:1fr auto;gap:12px;padding:8px 0;
+border-top:1px solid var(--hair)}
+.r-line dt{font-weight:600;position:relative}.r-line dt small{display:block;font-weight:400;color:var(--ink-2)}
+.r-line dd{margin:0;font-weight:800;font-size:20px;text-align:right}
+.plus{color:var(--ink-2);font-weight:800;margin-right:4px}
+.r-total{border-top:2px solid var(--ink);margin-top:2px;background:var(--sign);color:var(--sign-ink);
+border-radius:0 0 8px 8px;padding:10px 12px;margin:2px -12px 0}
+.r-total dt{font-weight:800}.r-total dd{font-size:28px}
+.t-book{display:grid;gap:8px;margin-top:14px}.t-k{display:block;font-size:14px;color:var(--ink-2);font-weight:600}
+.same{margin-top:12px;color:var(--ink-2)}
+.split{display:block;color:var(--low);font-weight:600;margin-top:4px}
+.deal{margin-top:14px;border-top:1px dashed var(--rule);padding-top:4px}
+.deal>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:6px;font-weight:600;color:var(--low)}
+.deal>p{font-size:15px;color:var(--ink-2);margin:2px 0 10px}
+.deal .ticket{grid-template-columns:1fr;border-radius:10px}
+/* journey tables */
+.jgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.jcard{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 18px 6px}
+.jcard h3{font-size:21px;font-weight:800}.jsub{color:var(--ink-2);font-size:15px;margin-bottom:8px}
+.jt{width:100%;border-collapse:collapse}.jt th{font-size:14px;color:var(--ink-2);font-weight:600;text-align:left;
+padding:6px 0;border-bottom:1px solid var(--rule)}.jt th.num{text-align:right}
+.jt td{padding:12px 0;border-bottom:1px solid var(--hair);vertical-align:top}.jt tr:last-child td{border-bottom:0}
+.jt tr.fr td{border-bottom:0;padding-bottom:2px}.jt tr.bk td{padding-top:0}.jt tr.bk .book{margin-top:0}
+.jt td+td,.jt th+th{padding-left:14px}
+.jt td b{font-weight:800}.jt td small{display:block;color:var(--ink-2);line-height:1.35}
+.jt td.num{text-align:right}.jt td.num b{font-size:20px}
+.jt .grp th{padding-top:16px;font-size:16px;color:var(--ink);font-weight:800}
+.jt .risk{margin:0;font-size:15px}
+/* buttons and links */
+.book{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:8px;font-size:15px}
+.btn,.lnk{display:inline-flex;align-items:center;min-height:44px}
+.btn{background:var(--ink);color:var(--surface);text-decoration:none;font-weight:700;padding:0 16px;border-radius:8px}
+.btn:hover{background:var(--route)}.lnk{font-weight:600;padding:0 4px}
+/* alternatives: round trip + one-way */
+.alts>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;
+min-height:44px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.alts>summary::-webkit-details-marker{display:none}
+.alts>summary h2{display:inline;margin:0}.alts>summary span{color:var(--ink-2);font-size:15px}
+.alts>summary::after{content:"Show";margin-left:auto;font-weight:600;color:var(--route)}
+.alts[open]>summary::after{content:"Hide"}.alts[open]>summary{margin-bottom:12px}
+.opt{background:var(--surface);border:1px solid var(--rule);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.opt>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:2fr 1fr 1.4fr 20px;gap:14px;
+align-items:center;padding:14px 18px;min-height:44px}
+.opt>summary::-webkit-details-marker{display:none}
+.opt>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);
+transform:rotate(45deg);justify-self:end;margin-top:-4px}
+.opt[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.opt>summary>span{display:flex;flex-direction:column;line-height:1.3}.opt small{color:var(--ink-2)}
+.opt>summary .risk{flex-direction:row;margin:0}.o-price{text-align:right}.o-price b{font-size:22px;font-weight:800}
+.opt[open]>summary{border-bottom:1px solid var(--hair)}.opt>summary:hover{background:var(--paper)}
+.opt .ticket{border:0;border-radius:0}
+/* tickets (inside alternatives) */
+.ticket{display:grid;grid-template-columns:1fr 230px;background:var(--surface);border:1px solid var(--rule);overflow:hidden}
+.main{padding:16px 20px;min-width:0}
+.ticket h3{font-size:18px;font-weight:800}.ticket h3 small{font-weight:600;color:var(--ink-2)}
+.ticket .risk{margin-top:6px}
 .leg{border-top:1px solid var(--hair);margin-top:14px;padding-top:14px}
 .leg-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
 .leg-head h4{font-size:16px;font-weight:800}.who{font-size:14px;font-weight:600;padding:0 9px;border-radius:99px;
 background:var(--paper);border:1px solid var(--rule)}.airline{margin-left:auto;font-weight:600}
 .line{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin:10px 0 8px}
 .pt{display:flex;flex-direction:column;line-height:1.2}.pt b{font-size:22px;font-weight:800}
-.pt span{font-weight:600}.pt small{color:var(--ink-2);font-size:13px}.pt.end{text-align:right}
+.pt span{font-weight:600}.pt small{color:var(--ink-2)}.pt.end{text-align:right}
 .path{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 4px}
 .path::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed var(--rule)}
-.dur,.stops{position:relative;background:var(--surface);padding:0 8px;font-size:13px;color:var(--ink-2)}
+.dur,.stops{position:relative;background:var(--surface);padding:0 8px;font-size:14px;color:var(--ink-2)}
 .stops{display:flex;gap:10px;color:var(--ink);font-weight:600}.stop small{font-weight:400;color:var(--ink-2)}
-.sum{font-size:15px}.sum b{font-weight:800}
-.book{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;font-size:15px}
-.btn,.lnk{display:inline-flex;align-items:center;min-height:44px}
-.btn{background:var(--ink);color:var(--surface);text-decoration:none;font-weight:700;padding:0 18px;border-radius:8px}
-.btn:hover{background:var(--route)}.lnk{font-weight:600;padding:0 2px}
-.why{margin-top:10px;font-size:14px;color:var(--ink-2)}.why summary{cursor:pointer;font-weight:600;padding:12px 0}
+.sum{font-size:15px}.sum b{font-weight:800}.fine{color:var(--ink-2);font-size:14px;margin-top:6px}
+.why{margin-top:8px;font-size:14px;color:var(--ink-2)}.why summary{cursor:pointer;font-weight:600;padding:12px 0}
 .why ul{margin:0;padding-left:18px}
-/* the stub: perforation + price */
-.stub{position:relative;padding:20px 22px;display:flex;flex-direction:column;justify-content:center;
+.stub{position:relative;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;
 border-left:2px dashed var(--rule);background:var(--paper)}
-.stub::before,.stub::after{content:"";position:absolute;left:-11px;width:20px;height:20px;border-radius:50%;
-background:var(--paper)}
-.stub::before{top:-11px}.stub::after{bottom:-11px}
-.opt .stub{border-left:0;border-top:2px dashed var(--rule)}
-.opt .stub::before{top:-11px;left:-11px}
-.opt .stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
-.stub-k{font-size:14px;color:var(--ink-2)}.total{font-size:40px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
-.stub dl{margin:14px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:15px;max-width:340px}
-.stub dt{font-weight:600}.stub dt small{display:block;font-weight:400;color:var(--ink-2);font-size:13px}
+.stub-k{font-size:14px;color:var(--ink-2)}.total{font-size:36px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+.stub dl{margin:12px 0 0;display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:15px}
+.stub dt{font-weight:600}.stub dt small{display:block;font-weight:400;color:var(--ink-2)}
 .stub dd{margin:0;font-weight:800;text-align:right}
-/* risk toggle, no JS */
-.toggle{position:relative;border:1px solid var(--rule);padding:0;margin:0 0 16px;display:inline-flex;
-background:var(--surface);border-radius:10px}
-.toggle input{position:absolute;width:1px;height:1px;opacity:0;margin:0}
-.toggle label{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;cursor:pointer;font-weight:600;
-font-size:15px;border-radius:9px}
-.toggle input:checked+label{background:var(--ink);color:var(--surface)}
-.toggle input:focus-visible+label{outline:3px solid var(--focus);outline-offset:-3px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.list-low{display:none}body:has(#show-low:checked) .list-low{display:block}
-body:has(#show-low:checked) .list-any{display:none}
-/* compact option rows */
-.opt{background:var(--surface);border:1px solid var(--rule);border-radius:12px;margin-bottom:10px;overflow:hidden}
-.opt>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1.3fr 1.4fr .9fr 1.3fr 20px;gap:14px;
-align-items:center;padding:14px 18px;min-height:44px}
-.opt>summary::-webkit-details-marker{display:none}
-.opt>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);
-transform:rotate(45deg);justify-self:end;margin-top:-4px}
-.opt[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
-.opt>summary>span{display:flex;flex-direction:column;line-height:1.3}.opt small{color:var(--ink-2);font-size:13px}
-.opt>summary .risk{flex-direction:row;margin:0}.o-price{text-align:right}.o-price b{font-size:22px;font-weight:800}
-.opt[open]>summary{border-bottom:1px solid var(--hair)}.opt>summary:hover{background:var(--paper)}
-.opt .ticket{border:0;border-radius:0;grid-template-columns:1fr}.opt .stub{background:var(--surface)}
+.deal .stub,.opt .stub{border-left:0;border-top:2px dashed var(--rule)}
 /* chart */
-.history svg{width:100%;max-width:760px;display:block}.grid{stroke:var(--hair);stroke-width:1}
+svg{max-width:100%}.grid{stroke:var(--hair);stroke-width:1}
 .tick{fill:var(--ink-2);font-size:12px}.end-lbl{fill:var(--ink);font-size:13px;font-weight:600}
 .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}
 circle.pt{stroke:var(--paper);stroke-width:2}circle.pt.s1{fill:var(--s1)}circle.pt.s2{fill:var(--s2)}
 .legend{font-size:14px;color:var(--ink-2);margin-bottom:6px}.key{display:inline-block;width:16px;height:3px;
 border-radius:2px;vertical-align:middle;margin:0 6px 0 0}.key.s1{background:var(--s1)}.key.s2{background:var(--s2);margin-left:18px}
-@media (max-width:900px){.jgrid{grid-template-columns:1fr}.tot{grid-template-columns:1fr}}
+@media (max-width:980px){.cards{grid-template-columns:1fr}.jgrid{grid-template-columns:1fr}}
 @media (max-width:760px){
- .code{font-size:42px}.band-route{grid-template-columns:1fr 1fr;gap:14px}.flows{grid-column:1/-1;grid-row:2}
- .place.end{grid-column:2;grid-row:1}.flow,.flow.home{flex-direction:row;text-align:left}.track{margin:4px 0}
+ .band{padding:14px 16px}.band-route{grid-template-columns:auto 1fr auto;gap:10px}
+ .code{font-size:30px}.name{font-size:14px;margin-top:2px}.flows{grid-column:1/-1;grid-row:2;gap:6px}
+ .flow,.flow.home{flex-direction:row;text-align:left;font-size:16px}.flow small{display:inline;font-size:14px}
+ .flow small::before{content:", "}.person{width:13px;height:21px}.track{grid-column:2;grid-row:1;align-self:center}
+ .flows .track{display:none}.place.end{grid-column:3;grid-row:1}
+ .top,main{padding:0 16px}.tot,.jcard{padding:14px}.r-total{margin:2px -14px 0;padding:10px 14px}
  .ticket{grid-template-columns:1fr}.stub{border-left:0;border-top:2px dashed var(--rule)}
- .stub::before{top:-11px;left:-11px}.stub::after{top:-11px;bottom:auto;left:auto;right:-11px}
- .main{padding:16px}.pt b{font-size:19px}.airline{margin-left:0;width:100%}
- .jcard{padding:14px 14px 4px}.t-sum{gap:8px}.t-leg{min-width:0}.t-leg b{font-size:21px}.op{font-size:20px}
- .t-total{width:100%}
- .opt>summary{grid-template-columns:1fr auto 14px;gap:6px 12px}.o-when{grid-column:1}.o-route{grid-column:1}
- .opt>summary .risk{grid-column:1}.o-price{grid-column:2;grid-row:1/span 3;align-self:start}
- .opt>summary::after{grid-column:3;grid-row:1/span 3}
+ .main{padding:14px}.pt b{font-size:19px}.airline{margin-left:0;width:100%}
+ .opt>summary{grid-template-columns:1fr auto 14px;gap:6px 12px}.o-when{grid-column:1}.opt>summary .risk{grid-column:1}
+ .o-price{grid-column:2;grid-row:1/span 2;align-self:start}.opt>summary::after{grid-column:3;grid-row:1/span 2}
+}
+@media (max-width:600px){
+ .jt thead{display:none}.jt,.jt tbody{display:block}
+ .jt tr{display:grid;grid-template-columns:1fr auto;grid-template-areas:"fl fl" "num rk";gap:4px 12px;
+  padding:12px 0;border-bottom:1px solid var(--hair)}
+ .jt tr.grp{display:block;padding:14px 0 4px;border-bottom:1px solid var(--rule)}.jt .grp th{padding:0}
+ .jt tr.fr{border-bottom:0;padding-bottom:0}.jt tr.bk{display:block;padding:0 0 10px;border-bottom:1px solid var(--hair)}
+ .jt td{display:block;padding:0;border:0}.jt td+td{padding-left:0}
+ .jt td.fl{grid-area:fl}.jt td.num{grid-area:num;text-align:left}.jt td.rk{grid-area:rk;justify-self:end}
 }
 @media (prefers-reduced-motion:no-preference){.plane{animation:fly 1.6s ease-out 1}
  @keyframes fly{from{left:8%}to{left:50%}}}
 </style></head>
 <body>
 <header class=top><h1>Flight price tracker</h1>
-<p>Last checked Mon 19 Oct, 5:11 pm (Boston time). Prices are checked every 6 hours.</p></header>
+<p>Last checked Mon 19 Oct, 5:11 pm (Boston time). Prices update every 6 hours; a price trend chart appears once there are 2 days of checks.</p></header>
 <section class=band aria-label="The trip">
 <div class=band-route>
   <div class=place><span class=code>BOM</span><span class=name>Mumbai</span></div>
   <div class=flows>
     <div class="flow go"><span class=people aria-hidden=true><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg></span>
-      <span><b>1 traveller</b> to Boston<small>landing Fri 18 Dec</small></span></div>
+      <span><b>1 person</b> to Boston<small>landing Fri 18 Dec</small></span></div>
     <div class=track><svg class=plane viewBox='0 0 24 24' aria-hidden=true><path d='M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z'/></svg></div>
     <div class="flow home"><span class=people aria-hidden=true><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg><svg class=person viewBox='0 0 20 32' aria-hidden=true><circle cx=10 cy=5 r=4.5 /><path d='M4 12a6 6 0 0 1 12 0v9h-2.5v10h-7V21H4z'/></svg></span>
-      <span><b>2 travellers</b> home to Mumbai<small>leaving Sat 26, Sun 27 or Mon 28 Dec</small></span></div>
+      <span><b>2 people</b> home to Mumbai<small>leaving Sat 26, Sun 27 or Mon 28 Dec</small></span></div>
   </div>
   <div class="place end"><span class=code>BOS</span><span class=name>Boston</span></div>
 </div>
 </section>
 <main>
 
-<section class=journeys aria-labelledby=h-j><h2 id=h-j>Prices by journey</h2>
-<p class=intro>Every price includes 2 bags of 23&nbsp;kg for each person.</p>
-<div class=jgrid>
-<div class=jcard><h3>Mumbai to Boston</h3>
-  <p class=jsub>1 person, landing Fri 18 Dec, cheapest first</p>
-  <table class=jt><thead><tr><th scope=col>Flight</th><th scope=col class=num>Price for 1 person</th><th scope=col>Risk</th></tr></thead><tbody><tr class=r-high>
-  <td><b>Etihad</b>
-    <small>Fri 18 Dec, 04:40 Mumbai to 13:40 Boston</small>
-    <small>via Abu Dhabi 2h 20m</small>
-    <span class=jlinks><a class=lnk href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$665</b><small>$465 fare + $200 bags</small></td>
-  <td><span class=risk><span class=dot></span>High</span></td>
-</tr><tr class=r-high>
-  <td><b>Emirates</b>
-    <small>Fri 18 Dec, 04:15 Mumbai to 13:55 Boston</small>
-    <small>via Dubai 2h 30m</small>
-    <span class=jlinks><a class=lnk href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$695</b><small>$595 fare + $100 bags</small></td>
-  <td><span class=risk><span class=dot></span>High</span></td>
-</tr><tr class=r-low>
-  <td><b>Virgin Atlantic</b>
-    <small>Fri 18 Dec, 10:40 Mumbai to 20:15 Boston</small>
-    <small>via London 1h 40m</small>
-    <span class=jlinks><a class=lnk href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$715</b><small>$535 fare + $180 bags</small></td>
-  <td><span class=risk><span class=dot></span>Low</span></td>
-</tr><tr class=r-medium>
-  <td><b>Air France, Delta</b>
-    <small>Fri 18 Dec, 05:10 Mumbai to 14:22 Boston</small>
-    <small>via Paris 1h 30m</small>
-    <span class=jlinks><a class=lnk href='https://wwws.airfrance.us/' target=_blank rel=noopener>Book on Air France</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$801</b><small>$601 fare + $200 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr></tbody></table></div>
-<div class=jcard><h3>Boston to Mumbai</h3>
-  <p class=jsub>2 people, cheapest 2 for each day</p>
-  <table class=jt><thead><tr><th scope=col>Flight</th><th scope=col class=num>Price for 2 people</th><th scope=col>Risk</th></tr></thead><tbody><tr class=grp><th colspan=3 scope=colgroup>Leaving Sat 26 Dec</th></tr><tr class=r-medium>
-  <td><b>Lufthansa</b>
-    <small>Sat 26 Dec, 20:40 Boston to 23:55 Mumbai (Sun 27 Dec)</small>
-    <small>via Munich 1h 50m</small>
-    <span class=jlinks><a class=lnk href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$2,404</b><small>$1,202 each</small><small>$2,004 fare + $400 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr><tr class=r-medium>
-  <td><b>American, British Airways</b>
-    <small>Sat 26 Dec, 19:10 Boston to 00:15 Mumbai (Mon 28 Dec)</small>
-    <small>via London 2h 35m</small>
-    <span class=jlinks><a class=lnk href='https://www.aa.com/' target=_blank rel=noopener>Book on American</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$2,480</b><small>$1,240 each</small><small>$2,280 fare + $200 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr><tr class=grp><th colspan=3 scope=colgroup>Leaving Sun 27 Dec</th></tr><tr class=r-high>
-  <td><b>Etihad</b>
-    <small>Sun 27 Dec, 15:40 Boston to 19:00 Mumbai (Mon 28 Dec)</small>
-    <small>via Abu Dhabi 1h 25m</small>
-    <span class=jlinks><a class=lnk href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$2,428</b><small>$1,214 each</small><small>$2,028 fare + $400 bags</small></td>
-  <td><span class=risk><span class=dot></span>High</span></td>
-</tr><tr class=r-medium>
-  <td><b>Lufthansa</b>
-    <small>Sun 27 Dec, 20:40 Boston to 23:55 Mumbai (Mon 28 Dec)</small>
-    <small>via Munich 1h 50m</small>
-    <span class=jlinks><a class=lnk href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$2,470</b><small>$1,235 each</small><small class=split>About $106 less as 2 separate tickets</small><small>$2,070 fare + $400 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr><tr class=grp><th colspan=3 scope=colgroup>Leaving Mon 28 Dec</th></tr><tr class=r-medium>
-  <td><b>Lufthansa</b>
-    <small>Mon 28 Dec, 20:40 Boston to 23:55 Mumbai (Tue 29 Dec)</small>
-    <small>via Munich 1h 50m</small>
-    <span class=jlinks><a class=lnk href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$1,966</b><small>$983 each</small><small class=split>About $18 less as 2 separate tickets</small><small>$1,566 fare + $400 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr><tr class=r-medium>
-  <td><b>American, British Airways</b>
-    <small>Mon 28 Dec, 19:10 Boston to 00:15 Mumbai (Wed 30 Dec)</small>
-    <small>via London 2h 35m</small>
-    <span class=jlinks><a class=lnk href='https://www.aa.com/' target=_blank rel=noopener>Book on American</a>
-    <a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></span></td>
-  <td class=num><b>$2,172</b><small>$1,086 each</small><small>$1,972 fare + $200 bags</small></td>
-  <td><span class=risk><span class=dot></span>Medium</span></td>
-</tr></tbody></table></div>
+<section aria-labelledby=h-trip><h2 id=h-trip>Whole trip</h2>
+<p class=intro>The cheapest flight to Boston for 1 person, plus the
+cheapest flight home for 2 people. Every price includes 2 bags of
+23&nbsp;kg per person.</p>
+<details class=legend-risk><summary><b>Risk</b> means the chance of a cancellation or long delay, not safety. <span class=more>What the levels mean</span></summary><p><b>High</b>: connects through Abu Dhabi, Dubai, where flights were closed or cancelled at short notice this year. <b>Medium</b>: an airline or airport with strikes or other disruption this year. <b>Low</b>: no known problems. Google Flights also shows a general notice for these routes: air traffic disruptions may affect flights.</p></details>
+<div class=cards><article class="tot r-high">
+<header class=t-head><h3>Cheapest</h3>
+  <p class=t-meta><span class=risk><span class=dot></span>High risk</span></p></header>
+<dl class=receipt>
+  <div class=r-line><dt>Mumbai to Boston, 1 person<small>Etihad, Fri 18 Dec, 04:40, via Abu Dhabi 2h 20m</small></dt><dd>$665</dd></div>
+  <div class=r-line><dt><span class=plus aria-hidden=true>+</span>Boston to Mumbai, 2 people<small>Lufthansa, Mon 28 Dec, 20:40, via Munich 1h 50m, $983 each</small></dt><dd>$1,966</dd></div>
+  <div class="r-line r-total"><dt>Whole trip, 2 people</dt><dd>$2,631</dd></div>
+</dl>
+<div class=t-book>
+  <div><span class=t-k>Mumbai to Boston</span><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
+  <div><span class=t-k>Boston to Mumbai</span><div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
 </div>
-<h2 class=h-total id=h-total>Whole trip</h2>
-<p class=intro>The cheapest Mumbai to Boston flight plus the
-cheapest flight home, at three levels of risk.</p>
-<div class="tot r-high">
-  <div class=t-label><b>Cheapest</b><small>The lowest price, whatever the risk.</small>
-    <span class=risk><span class=dot></span>High risk</span></div>
-  <div class=t-sum>
-    <div class=t-leg><small>Mumbai to Boston, 1 person</small>
-      <b>$665</b><span>Etihad, Fri 18 Dec</span></div>
-    <div class=op aria-hidden=true>+</div>
-    <div class=t-leg><small>Boston to Mumbai, 2 people</small>
-      <b>$1,966</b><span>Lufthansa, Mon 28 Dec, $983 each</span></div>
-    <div class=op aria-hidden=true>=</div>
-    <div class="t-leg t-total"><small>Whole trip</small><b>$2,631</b><span>for both travellers</span></div>
-  </div><p class=t-deal>Booking the 2 return tickets separately saves about <b>$18</b> (whole trip about $2,613).</p>
-</div><div class="tot r-medium">
-  <div class=t-label><b>No high-risk flight</b><small>Skips every flight rated high risk, such as stops in Abu Dhabi, Dubai.</small>
-    <span class=risk><span class=dot></span>Medium risk</span></div>
-  <div class=t-sum>
-    <div class=t-leg><small>Mumbai to Boston, 1 person</small>
-      <b>$715</b><span>Virgin Atlantic, Fri 18 Dec</span></div>
-    <div class=op aria-hidden=true>+</div>
-    <div class=t-leg><small>Boston to Mumbai, 2 people</small>
-      <b>$1,966</b><span>Lufthansa, Mon 28 Dec, $983 each</span></div>
-    <div class=op aria-hidden=true>=</div>
-    <div class="t-leg t-total"><small>Whole trip</small><b>$2,681</b><span>for both travellers</span></div>
-  </div><p class=t-deal>Booking the 2 return tickets separately saves about <b>$18</b> (whole trip about $2,663).</p>
-</div><div class="tot r-low">
-  <div class=t-label><b>Low risk on every flight</b><small>Only flights rated low risk, in both directions.</small>
-    <span class=risk><span class=dot></span>Low risk</span></div>
-  <div class=t-sum>
-    <div class=t-leg><small>Mumbai to Boston, 1 person</small>
-      <b>$715</b><span>Virgin Atlantic, Fri 18 Dec</span></div>
-    <div class=op aria-hidden=true>+</div>
-    <div class=t-leg><small>Boston to Mumbai, 2 people</small>
-      <b>$2,754</b><span>Virgin Atlantic, Sun 27 Dec, $1,377 each</span></div>
-    <div class=op aria-hidden=true>=</div>
-    <div class="t-leg t-total"><small>Whole trip</small><b>$3,469</b><span>for both travellers</span></div>
-  </div><p class=t-deal>Booking trick: a round trip for the Mumbai traveller plus a one-way for the Boston traveller brings this to <b>$3,227</b>, saving $242. It is in the options list below.</p>
-</div><p class=fine>Google Flights is also showing a general notice on these routes: air traffic disruptions may affect flights.</p></section>
-<section class=all aria-labelledby=h-all><h2 id=h-all>Every booking option, with details</h2>
-<p class=intro>Separate one-way tickets, or a round trip plus a one-way. Open a line to see each flight and how to
-book it.</p>
-<fieldset class=toggle><legend class=sr>Show</legend>
-<input type=radio name=show id=show-any checked><label for=show-any>Show everything</label>
-<input type=radio name=show id=show-low><label for=show-low>Show only low risk</label></fieldset>
-<div class=list-any><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Separate one-ways</small></span>
-  <span class=o-route>Etihad and Lufthansa<small>via Abu Dhabi, Munich</small></span>
-  <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$2,631</b><small>Mumbai traveller $1,648<br>Boston traveller $983</small></span>
-</summary><article class="ticket r-high">
+</article><article class="tot r-medium">
+<header class=t-head><h3>Cheapest without a high-risk flight</h3>
+  <p class=t-meta><span class=risk><span class=dot></span>Medium risk</span><span class=delta>$50 more than the cheapest</span></p></header>
+<dl class=receipt>
+  <div class=r-line><dt>Mumbai to Boston, 1 person<small>Virgin Atlantic, Fri 18 Dec, 10:40, via London 1h 40m</small></dt><dd>$715</dd></div>
+  <div class=r-line><dt><span class=plus aria-hidden=true>+</span>Boston to Mumbai, 2 people<small>Lufthansa, Mon 28 Dec, 20:40, via Munich 1h 50m, $983 each</small></dt><dd>$1,966</dd></div>
+  <div class="r-line r-total"><dt>Whole trip, 2 people</dt><dd>$2,681</dd></div>
+</dl>
+<div class=t-book>
+  <div><span class=t-k>Mumbai to Boston</span><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
+  <div><span class=t-k>Boston to Mumbai</span><div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
+</div>
+</article><article class="tot r-low">
+<header class=t-head><h3>Lowest risk</h3>
+  <p class=t-meta><span class=risk><span class=dot></span>Low risk</span><span class=delta>$838 more than the cheapest</span></p></header>
+<dl class=receipt>
+  <div class=r-line><dt>Mumbai to Boston, 1 person<small>Virgin Atlantic, Fri 18 Dec, 10:40, via London 1h 40m</small></dt><dd>$715</dd></div>
+  <div class=r-line><dt><span class=plus aria-hidden=true>+</span>Boston to Mumbai, 2 people<small>Virgin Atlantic, Sun 27 Dec, 22:11, via London 2h 30m, $1,377 each</small></dt><dd>$2,754</dd></div>
+  <div class="r-line r-total"><dt>Whole trip, 2 people</dt><dd>$3,469</dd></div>
+</dl>
+<div class=t-book>
+  <div><span class=t-k>Mumbai to Boston</span><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
+  <div><span class=t-k>Boston to Mumbai</span><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></div>
+</div><details class=deal><summary>Cheaper way to book this: <b>$3,227</b>, saves
+$242</summary>
+<p>Buy a round trip for the person from Mumbai and a one-way for the person from Boston, on the same flight home. It is two bookings: if
+one is changed or cancelled, the other is not rebooked with it.</p><article class="ticket r-low">
 <div class=main>
-  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
-    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high; Lufthansa rated medium</p></header>
+  <header><h3>Virgin Atlantic: leave Boston Sun 27 Dec
+    <small>(land in Mumbai Tue 29 Dec)</small></h3>
+    <p class=risk><span class="dot"></span>Low risk</p></header>
   <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Person from Mumbai</span><span class=airline>Virgin Atlantic</span></div>
   <div class=line>
-    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
-    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
+    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
+    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
+    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,490 fare</span> + <span class=nw>$360 bags</span> =
+    <span class=nw><b>$1,850</b> for 1 person</span></p>
+  <p class=fine>This ticket also covers the person from Mumbai's flight home: choose the same return flight as the person from Boston's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Lufthansa</span></div>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Person from Boston</span><span class=airline>Virgin Atlantic</span></div>
   <div class=line>
-    <div class=pt><b>20:40</b><span>Boston</span><small>Mon 28 Dec</small></div>
-    <div class=path><span class=dur>16h 45m</span><span class=stops><span class=stop>Munich <small>1h 50m</small></span></span></div>
-    <div class="pt end"><b>23:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
+    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
+    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
+    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,566 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,966</b> for 2 travellers, $983 each</span></p>
-  <div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,197 fare</span> + <span class=nw>$180 bags</span> =
+    <span class=nw><b>$1,377</b> for 1 person</span></p>
+  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div>
-  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.</li></ul></details>
+  <details class=why><summary>Why low risk, and other notes</summary><ul><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
 </div>
 <aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$2,631</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,648</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$983</dd></dl>
+  <span class=stub-k>Whole trip</span><b class=total>$3,227</b><span class=stub-k>for 2 people</span>
+  <dl><dt>Round trip <small>person from Mumbai</small></dt><dd>$1,850</dd>
+      <dt>One-way home <small>person from Boston</small></dt><dd>$1,377</dd></dl>
 </aside>
-</article></details><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Round trip + one-way</small></span>
-  <span class=o-route>Emirates<small>via Dubai</small></span>
+</article></details>
+</article></div></section>
+<section aria-labelledby=h-flights><h2 id=h-flights>All flights by journey</h2>
+<p class=intro>Pick a different flight. Each price is for everyone on that flight, bags included.</p>
+<div class=jgrid>
+<div class=jcard><h3>Mumbai to Boston</h3><p class=jsub>1 person, landing Fri 18 Dec, cheapest first</p>
+  <table class=jt><caption class=sr>Mumbai to Boston flights, price for 1 person</caption><thead><tr><th scope=col>Flight</th><th scope=col class=num>Price for 1 person</th><th scope=col>Risk</th></tr></thead><tbody><tr class="fr r-high">
+  <td class=fl><b>Etihad</b>
+    <small>Fri 18 Dec: 04:40 Mumbai to 13:40 Boston</small>
+    <small>via Abu Dhabi 2h 20m</small></td>
+  <td class=num><b>$665</b><small>$465 fare + $200 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>High</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-high">
+  <td class=fl><b>Emirates</b>
+    <small>Fri 18 Dec: 04:15 Mumbai to 13:55 Boston</small>
+    <small>via Dubai 2h 30m</small></td>
+  <td class=num><b>$695</b><small>$595 fare + $100 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>High</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-low">
+  <td class=fl><b>Virgin Atlantic</b>
+    <small>Fri 18 Dec: 10:40 Mumbai to 20:15 Boston</small>
+    <small>via London 1h 40m</small></td>
+  <td class=num><b>$715</b><small>$535 fare + $180 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Low</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-medium">
+  <td class=fl><b>Air France, Delta</b>
+    <small>Fri 18 Dec: 05:10 Mumbai to 14:22 Boston</small>
+    <small>via Paris 1h 30m</small></td>
+  <td class=num><b>$801</b><small>$601 fare + $200 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://wwws.airfrance.us/' target=_blank rel=noopener>Book on Air France</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr></tbody></table></div>
+<div class=jcard><h3>Boston to Mumbai</h3><p class=jsub>2 people, cheapest 2 for each day</p>
+  <table class=jt><caption class=sr>Boston to Mumbai flights, price for 2 people</caption><thead><tr><th scope=col>Flight</th><th scope=col class=num>Price for 2 people</th><th scope=col>Risk</th></tr></thead><tbody><tr class=grp><th colspan=3 scope=colgroup>Leaving Sat 26 Dec</th></tr><tr class="fr r-medium">
+  <td class=fl><b>Lufthansa</b>
+    <small>Sat 26 Dec: 20:40 Boston to 23:55 Mumbai (Sun 27 Dec)</small>
+    <small>via Munich 1h 50m</small></td>
+  <td class=num><b>$2,404</b><small>$1,202 each</small><small>$2,004 fare + $400 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-medium">
+  <td class=fl><b>American, British Airways</b>
+    <small>Sat 26 Dec: 19:10 Boston to 00:15 Mumbai (Mon 28 Dec)</small>
+    <small>via London 2h 35m</small></td>
+  <td class=num><b>$2,480</b><small>$1,240 each</small><small>$2,280 fare + $200 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.aa.com/' target=_blank rel=noopener>Book on American</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class=grp><th colspan=3 scope=colgroup>Leaving Sun 27 Dec</th></tr><tr class="fr r-high">
+  <td class=fl><b>Etihad</b>
+    <small>Sun 27 Dec: 15:40 Boston to 19:00 Mumbai (Mon 28 Dec)</small>
+    <small>via Abu Dhabi 1h 25m</small></td>
+  <td class=num><b>$2,428</b><small>$1,214 each</small><small>$2,028 fare + $400 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>High</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-medium">
+  <td class=fl><b>Lufthansa</b>
+    <small>Sun 27 Dec: 20:40 Boston to 23:55 Mumbai (Mon 28 Dec)</small>
+    <small>via Munich 1h 50m</small></td>
+  <td class=num><b>$2,470</b><small>$1,235 each</small><small>$2,070 fare + $400 bags</small><small class=split>About $106 less if the 2 people book separately. It is then two bookings: if one is changed or cancelled, the other is not rebooked with it.</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class=grp><th colspan=3 scope=colgroup>Leaving Mon 28 Dec</th></tr><tr class="fr r-medium">
+  <td class=fl><b>Lufthansa</b>
+    <small>Mon 28 Dec: 20:40 Boston to 23:55 Mumbai (Tue 29 Dec)</small>
+    <small>via Munich 1h 50m</small></td>
+  <td class=num><b>$1,966</b><small>$983 each</small><small>$1,566 fare + $400 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr><tr class="fr r-medium">
+  <td class=fl><b>American, British Airways</b>
+    <small>Mon 28 Dec: 19:10 Boston to 00:15 Mumbai (Wed 30 Dec)</small>
+    <small>via London 2h 35m</small></td>
+  <td class=num><b>$2,172</b><small>$1,086 each</small><small>$1,972 fare + $200 bags</small></td>
+  <td class=rk><span class=risk><span class=dot></span>Medium</span></td>
+</tr><tr class=bk><td colspan=3><div class=book><a class=btn href='https://www.aa.com/' target=_blank rel=noopener>Book on American</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div></td></tr></tbody></table></div>
+</div></section>
+<details class=alts><summary><h2>Other ways to book: round trip + one-way</h2>
+<span>3 options, from $2,680</span></summary>
+<p class=intro>A round trip for the person from Mumbai plus a one-way for the person from Boston on the same flight home. Sometimes cheaper,
+but it is two bookings: if one is changed or cancelled, the other is not rebooked with it.</p>
+<details class="opt r-high"><summary>
+  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Emirates, via Dubai</small></span>
   <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$2,680</b><small>Mumbai traveller $1,513<br>Boston traveller $1,167</small></span>
+  <span class=o-price><b>$2,680</b><small>round trip $1,513 + one-way $1,167</small></span>
 </summary><article class="ticket r-high">
 <div class=main>
-  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Wed 30 Dec)</small></h3>
-    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Dubai; Emirates rated high</p></header>
+  <header><h3>Emirates: leave Boston Mon 28 Dec
+    <small>(land in Mumbai Wed 30 Dec)</small></h3>
+    <p class=risk><span class="dot"></span>High risk: connects in Dubai; Emirates rated high</p></header>
   <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Emirates</span></div>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Person from Mumbai</span><span class=airline>Emirates</span></div>
   <div class=line>
     <div class=pt><b>04:15</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
     <div class=path><span class=dur>20h 10m</span><span class=stops><span class=stop>Dubai <small>2h 30m</small></span></span></div>
     <div class="pt end"><b>13:55</b><span>Boston</span><small>Fri 18 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,313 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,513</b> for 1 traveller</span></p>
-  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI4agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,313 fare</span> + <span class=nw>$200 bags</span> =
+    <span class=nw><b>$1,513</b> for 1 person</span></p>
+  <p class=fine>This ticket also covers the person from Mumbai's flight home: choose the same return flight as the person from Boston's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI4agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Emirates</span></div>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Person from Boston</span><span class=airline>Emirates</span></div>
   <div class=line>
     <div class=pt><b>22:10</b><span>Boston</span><small>Mon 28 Dec</small></div>
     <div class=path><span class=dur>17h 35m</span><span class=stops><span class=stop>Dubai <small>2h 15m</small></span></span></div>
     <div class="pt end"><b>02:15</b><span>Mumbai</span><small>Wed 30 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,067 fare</span> + <span class=nw>$100 bags</span> = <span class=nw><b>$1,167</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,067 fare</span> + <span class=nw>$100 bags</span> =
+    <span class=nw><b>$1,167</b> for 1 person</span></p>
+  <div class=book><a class=btn href='https://www.emirates.com/us/english/' target=_blank rel=noopener>Book on Emirates</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div>
   <details class=why><summary>Why high risk, and other notes</summary><ul><li>Emirates: Boston service runs (cut from 7 to 6 weekly from 15 Sep 2026), but everything connects through DXB, which is exposed to the unresolved Iran war and Gulf airspace closures.</li><li>Dubai: Open and Emirates flies BOS 6x weekly, but DXB was hit by Iranian drones in March 2026, the war is unresolved, delays are heavy (about 300 on 18 Oct) and some foreign carriers (Lufthansa Group to 24 Oct, Air Canada to mid-Jan 2027) are still not flying there.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
 </div>
 <aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$2,680</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,513</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,167</dd></dl>
+  <span class=stub-k>Whole trip</span><b class=total>$2,680</b><span class=stub-k>for 2 people</span>
+  <dl><dt>Round trip <small>person from Mumbai</small></dt><dd>$1,513</dd>
+      <dt>One-way home <small>person from Boston</small></dt><dd>$1,167</dd></dl>
 </aside>
 </article></details><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Round trip + one-way</small></span>
-  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
+  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Etihad, via Abu Dhabi</small></span>
   <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$2,895</b><small>Mumbai traveller $1,681<br>Boston traveller $1,214</small></span>
+  <span class=o-price><b>$2,895</b><small>round trip $1,681 + one-way $1,214</small></span>
 </summary><article class="ticket r-high">
 <div class=main>
-  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Mon 28 Dec)</small></h3>
-    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
+  <header><h3>Etihad: leave Boston Sun 27 Dec
+    <small>(land in Mumbai Mon 28 Dec)</small></h3>
+    <p class=risk><span class="dot"></span>High risk: connects in Abu Dhabi; Etihad rated high</p></header>
   <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Person from Mumbai</span><span class=airline>Etihad</span></div>
   <div class=line>
     <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
     <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
     <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,681</b> for 1 traveller</span></p>
-  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> =
+    <span class=nw><b>$1,681</b> for 1 person</span></p>
+  <p class=fine>This ticket also covers the person from Mumbai's flight home: choose the same return flight as the person from Boston's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Etihad</span></div>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Person from Boston</span><span class=airline>Etihad</span></div>
   <div class=line>
     <div class=pt><b>15:40</b><span>Boston</span><small>Sun 27 Dec</small></div>
     <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
     <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Mon 28 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,014 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,214</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,014 fare</span> + <span class=nw>$200 bags</span> =
+    <span class=nw><b>$1,214</b> for 1 person</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div>
   <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
 </div>
 <aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$2,895</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,681</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,214</dd></dl>
+  <span class=stub-k>Whole trip</span><b class=total>$2,895</b><span class=stub-k>for 2 people</span>
+  <dl><dt>Round trip <small>person from Mumbai</small></dt><dd>$1,681</dd>
+      <dt>One-way home <small>person from Boston</small></dt><dd>$1,214</dd></dl>
 </aside>
 </article></details><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Sat 26 Dec</b><small>Separate one-ways</small></span>
-  <span class=o-route>Etihad and Lufthansa<small>via Abu Dhabi, Munich</small></span>
+  <span class=o-when><b>Leave Boston Sat 26 Dec</b><small>Etihad, via Abu Dhabi</small></span>
   <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$3,069</b><small>Mumbai traveller $1,867<br>Boston traveller $1,202</small></span>
+  <span class=o-price><b>$3,126</b><small>round trip $1,681 + one-way $1,445</small></span>
 </summary><article class="ticket r-high">
 <div class=main>
-  <header><h3>Leave Boston Sat 26 Dec <small>(land in Mumbai Sun 27 Dec)</small></h3>
-    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high; Lufthansa rated medium</p></header>
+  <header><h3>Etihad: leave Boston Sat 26 Dec
+    <small>(land in Mumbai Sun 27 Dec)</small></h3>
+    <p class=risk><span class="dot"></span>High risk: connects in Abu Dhabi; Etihad rated high</p></header>
   <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
+  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Person from Mumbai</span><span class=airline>Etihad</span></div>
   <div class=line>
     <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
     <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
     <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> =
+    <span class=nw><b>$1,681</b> for 1 person</span></p>
+  <p class=fine>This ticket also covers the person from Mumbai's flight home: choose the same return flight as the person from Boston's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI2agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Lufthansa</span></div>
-  <div class=line>
-    <div class=pt><b>20:40</b><span>Boston</span><small>Sat 26 Dec</small></div>
-    <div class=path><span class=dur>16h 45m</span><span class=stops><span class=stop>Munich <small>1h 50m</small></span></span></div>
-    <div class="pt end"><b>23:55</b><span>Mumbai</span><small>Sun 27 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$2,004 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,404</b> for 2 travellers, $1,202 each</span></p>
-  <div class=book><a class=btn href='https://www.lufthansa.com/us/en/homepage' target=_blank rel=noopener>Book on Lufthansa</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div>
-  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>Lufthansa: Strikes in Feb-Apr 2026 cancelled thousands of flights; pilot action is suspended under arbitration since 10 Aug, but the pilots&#x27; pay deal expires 31 Dec and the cabin-crew (UFO) dispute is still open.</li></ul></details>
-</div>
-<aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,069</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,867</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,202</dd></dl>
-</aside>
-</article></details><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Separate one-ways</small></span>
-  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
-  <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$3,093</b><small>Mumbai traveller $1,879<br>Boston traveller $1,214</small></span>
-</summary><article class="ticket r-high">
-<div class=main>
-  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Mon 28 Dec)</small></h3>
-    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
-  <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
-  <div class=line>
-    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
-    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$465 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$665</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Etihad</span></div>
-  <div class=line>
-    <div class=pt><b>15:40</b><span>Boston</span><small>Sun 27 Dec</small></div>
-    <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
-    <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Mon 28 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$2,028 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,428</b> for 2 travellers, $1,214 each</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div>
-  <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li></ul></details>
-</div>
-<aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,093</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,879</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,214</dd></dl>
-</aside>
-</article></details><details class="opt r-high"><summary>
-  <span class=o-when><b>Leave Boston Sat 26 Dec</b><small>Round trip + one-way</small></span>
-  <span class=o-route>Etihad<small>via Abu Dhabi</small></span>
-  <span class=risk><span class=dot></span>High risk</span>
-  <span class=o-price><b>$3,126</b><small>Mumbai traveller $1,681<br>Boston traveller $1,445</small></span>
-</summary><article class="ticket r-high">
-<div class=main>
-  <header><h3>Leave Boston Sat 26 Dec <small>(land in Mumbai Sun 27 Dec)</small></h3>
-    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
-    <p class=risk><span class="dot"></span>High disruption risk: connects in Abu Dhabi; Etihad rated high</p></header>
-  <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Etihad</span></div>
-  <div class=line>
-    <div class=pt><b>04:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>19h 30m</span><span class=stops><span class=stop>Abu Dhabi <small>2h 20m</small></span></span></div>
-    <div class="pt end"><b>13:40</b><span>Boston</span><small>Fri 18 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$1,281 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$1,681</b> for 1 traveller</span></p>
-  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI2agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Etihad</span></div>
+  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Person from Boston</span><span class=airline>Etihad</span></div>
   <div class=line>
     <div class=pt><b>15:40</b><span>Boston</span><small>Sat 26 Dec</small></div>
     <div class=path><span class=dur>16h 50m</span><span class=stops><span class=stop>Abu Dhabi <small>1h 25m</small></span></span></div>
     <div class="pt end"><b>19:00</b><span>Mumbai</span><small>Sun 27 Dec</small></div>
   </div>
-  <p class=sum><span class=nw>$1,245 fare</span> + <span class=nw>$200 bags</span> = <span class=nw><b>$1,445</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
+  <p class=sum><span class=nw>$1,245 fare</span> + <span class=nw>$200 bags</span> =
+    <span class=nw><b>$1,445</b> for 1 person</span></p>
+  <div class=book><a class=btn href='https://www.etihad.com/en-us/' target=_blank rel=noopener>Book on Etihad</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F26%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-26' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjZqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare prices</a></div>
 </div>
   <details class=why><summary>Why high risk, and other notes</summary><ul><li>Etihad: Etihad flies a daily 787-9 Abu Dhabi-Boston, but it suspended all AUH operations in March 2026 and is cancelling Saudi routes through 24 Oct.</li><li>Abu Dhabi: Etihad flies a daily 787-9 to BOS, but it fully shut down in March 2026 and is now cancelling Saudi routes through 24 Oct; several European carriers have suspended Abu Dhabi, and UAE airspace sits under EASA&#x27;s Gulf conflict bulletin.</li><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
 </div>
 <aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,126</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,681</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,445</dd></dl>
+  <span class=stub-k>Whole trip</span><b class=total>$3,126</b><span class=stub-k>for 2 people</span>
+  <dl><dt>Round trip <small>person from Mumbai</small></dt><dd>$1,681</dd>
+      <dt>One-way home <small>person from Boston</small></dt><dd>$1,445</dd></dl>
 </aside>
-</article></details></div><div class=list-low><details class="opt r-low"><summary>
-  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Round trip + one-way</small></span>
-  <span class=o-route>Virgin Atlantic<small>via London</small></span>
-  <span class=risk><span class=dot></span>Low risk</span>
-  <span class=o-price><b>$3,227</b><small>Mumbai traveller $1,850<br>Boston traveller $1,377</small></span>
-</summary><article class="ticket r-low">
-<div class=main>
-  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
-    <p class=plan>A round trip for the Mumbai traveller, plus a one-way home for the Boston traveller.</p>
-    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
-  <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston and back, round trip</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
-  <div class=line>
-    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
-    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$1,490 fare</span> + <span class=nw>$360 bags</span> = <span class=nw><b>$1,850</b> for 1 traveller</span></p>
-  <p class=fine>This ticket also covers the Mumbai traveller's flight home. When you book it, choose the same return flight as the Boston traveller's ticket below. The fare and bags shown cover both directions.</p><div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=roundtrip&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT&amp;leg2=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ROUNDTRIP&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18&amp;return=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPUxoaEgoyMDI2LTEyLTI3agUSA0JPU3IFEgNCT01CAQFIAZgBAQ&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Boston traveller</span><span class=airline>Virgin Atlantic</span></div>
-  <div class=line>
-    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
-    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
-    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$1,197 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$1,377</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUIBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div>
-  <details class=why><summary>Why low risk, and other notes</summary><ul><li>round-trip return leg not pinned: total is Google&#x27;s cheapest pairing, price the exact return flight before booking</li></ul></details>
-</div>
-<aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,227</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$1,850</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,377</dd></dl>
-</aside>
-</article></details><details class="opt r-low"><summary>
-  <span class=o-when><b>Leave Boston Sun 27 Dec</b><small>Separate one-ways</small></span>
-  <span class=o-route>Virgin Atlantic<small>via London</small></span>
-  <span class=risk><span class=dot></span>Low risk</span>
-  <span class=o-price><b>$3,469</b><small>Mumbai traveller $2,092<br>Boston traveller $1,377</small></span>
-</summary><article class="ticket r-low">
-<div class=main>
-  <header><h3>Leave Boston Sun 27 Dec <small>(land in Mumbai Tue 29 Dec)</small></h3>
-    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
-    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
-  <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
-  <div class=line>
-    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
-    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$535 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$715</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>Virgin Atlantic</span></div>
-  <div class=line>
-    <div class=pt><b>22:11</b><span>Boston</span><small>Sun 27 Dec</small></div>
-    <div class=path><span class=dur>18h 14m</span><span class=stops><span class=stop>London <small>2h 30m</small></span></span></div>
-    <div class="pt end"><b>02:55</b><span>Mumbai</span><small>Tue 29 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$2,394 fare</span> + <span class=nw>$360 bags</span> = <span class=nw><b>$2,754</b> for 2 travellers, $1,377 each</span></p>
-  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F27%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-27' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjdqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div>
-  
-</div>
-<aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,469</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$2,092</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,377</dd></dl>
-</aside>
-</article></details><details class="opt r-low"><summary>
-  <span class=o-when><b>Leave Boston Mon 28 Dec</b><small>Separate one-ways</small></span>
-  <span class=o-route>Virgin Atlantic and KLM<small>via London, Amsterdam</small></span>
-  <span class=risk><span class=dot></span>Low risk</span>
-  <span class=o-price><b>$3,470</b><small>Mumbai traveller $2,092<br>Boston traveller $1,378</small></span>
-</summary><article class="ticket r-low">
-<div class=main>
-  <header><h3>Leave Boston Mon 28 Dec <small>(land in Mumbai Wed 30 Dec)</small></h3>
-    <p class=plan>A one-way for the Mumbai traveller, then one booking home for both travellers.</p>
-    <p class=risk><span class="dot"></span>Low disruption risk</p></header>
-  <div class=leg>
-  <div class=leg-head><h4>Mumbai to Boston</h4><span class=who>Mumbai traveller</span><span class=airline>Virgin Atlantic</span></div>
-  <div class=line>
-    <div class=pt><b>10:40</b><span>Mumbai</span><small>Fri 18 Dec</small></div>
-    <div class=path><span class=dur>20h 05m</span><span class=stops><span class=stop>London <small>1h 40m</small></span></span></div>
-    <div class="pt end"><b>20:15</b><span>Boston</span><small>Fri 18 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$535 fare</span> + <span class=nw>$180 bags</span> = <span class=nw><b>$715</b> for 1 traveller</span></p>
-  <div class=book><a class=btn href='https://www.virginatlantic.com/' target=_blank rel=noopener>Book on Virgin Atlantic</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A1&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOM%2Cto%3ABOS%2Cdeparture%3A12%2F18%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOM.AIRPORT-BOS.AIRPORT/?type=ONEWAY&amp;adults=1&amp;cabinClass=ECONOMY&amp;from=BOM.AIRPORT&amp;to=BOS.AIRPORT&amp;depart=2026-12-18' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMThqBRIDQk9NcgUSA0JPU0IBAUgBmAEC&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div><div class=leg>
-  <div class=leg-head><h4>Boston to Mumbai</h4><span class=who>Both travellers</span><span class=airline>KLM</span></div>
-  <div class=line>
-    <div class=pt><b>20:55</b><span>Boston</span><small>Mon 28 Dec</small></div>
-    <div class=path><span class=dur>17h 05m</span><span class=stops><span class=stop>Amsterdam <small>1h 30m</small></span></span></div>
-    <div class="pt end"><b>00:30</b><span>Mumbai</span><small>Wed 30 Dec</small></div>
-  </div>
-  <p class=sum><span class=nw>$2,355 fare</span> + <span class=nw>$400 bags</span> = <span class=nw><b>$2,755</b> for 2 travellers, $1,378 each</span></p>
-  <div class=book><a class=btn href='https://www.klm.us/' target=_blank rel=noopener>Book on KLM</a><a class=lnk href='https://www.expedia.com/Flights-Search?trip=oneway&amp;passengers=adults%3A2&amp;options=cabinclass%3Aeconomy&amp;mode=search&amp;leg1=from%3ABOS%2Cto%3ABOM%2Cdeparture%3A12%2F28%2F2026TANYT' target=_blank rel=noopener>Expedia</a><a class=lnk href='https://flights.booking.com/flights/BOS.AIRPORT-BOM.AIRPORT/?type=ONEWAY&amp;adults=2&amp;cabinClass=ECONOMY&amp;from=BOS.AIRPORT&amp;to=BOM.AIRPORT&amp;depart=2026-12-28' target=_blank rel=noopener>Booking.com</a><a class=lnk href='https://www.google.com/travel/flights?tfs=GhoSCjIwMjYtMTItMjhqBRIDQk9TcgUSA0JPTUICAQFIAZgBAg&amp;hl=en&amp;gl=us&amp;curr=USD' target=_blank rel=noopener>Compare all sellers</a></div>
-</div>
-  
-</div>
-<aside class=stub>
-  <span class=stub-k>Whole trip</span><b class=total>$3,470</b><span class=stub-k>for both travellers</span>
-  <dl><dt>Mumbai traveller <small>there and back</small></dt><dd>$2,092</dd>
-      <dt>Boston traveller <small>home only</small></dt><dd>$1,378</dd></dl>
-</aside>
-</article></details></div>
-</section>
-<section class=history aria-labelledby=h-hist><h2 id=h-hist>Price over time</h2><p class=fine>Not enough history yet: prices have been checked 14 times, all on one day. The chart appears once there are checks on two different days.</p></section>
+</article></details></details>
+
 </main>
 </body></html>

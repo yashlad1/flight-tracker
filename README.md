@@ -19,40 +19,34 @@ There are no API keys and nothing to install: the code uses only the Python stan
 
 From top to bottom:
 
-1. **The trip band** (yellow): who flies which way. The **Mumbai traveller** flies to Boston (landing Fri 18 Dec)
-   and back; the **Boston traveller** joins them for the flight home. Every price includes 2 bags of 23 kg per
-   traveller on every flight.
-2. **Prices by journey**: two tables. **Mumbai to Boston, price for 1 person** (cheapest flights landing Fri 18
-   Dec), and **Boston to Mumbai, price for 2 people** (the cheapest flights for each return day, with the price per
-   person). Each price is fare + bags, and each flight has a booking link. A return flight marked "About $X less
-   as 2 separate tickets" is cheaper booked one traveller at a time.
-3. **Whole trip**: the 1-person price plus the 2-people price, written out as a sum (`$665 + $1,966 = $2,631`), for
-   three choices: the cheapest, the cheapest with no high-risk flight (for example no Gulf stop), and the cheapest
-   with every flight low risk. If a round trip + one-way booking beats a choice, it is flagged under it.
-4. **Every booking option, with details**: one line per return date and way of booking, with a switch between
-   "Show everything" and "Show only low risk". Open a line to see its full ticket.
+1. **The trip band** (yellow): 1 person flies Mumbai → Boston, landing Fri 18 Dec; 2 people fly home.
+2. **Whole trip**: the answer, as three receipts. Each one adds the price for 1 person Mumbai → Boston to the price
+   for 2 people Boston → Mumbai (`$665 + $1,966 = $2,631`), with booking buttons for both flights:
+   - **Cheapest**: the lowest price, whatever the risk.
+   - **Cheapest without a high-risk flight**: shows how much more it costs than the cheapest.
+   - **Lowest risk**: every flight low risk.
+
+   If a round trip + one-way costs less, the card offers it as "Cheaper way to book this". If the 2 people would
+   save at least $50 by booking separately, the card says so. A one-line legend explains what risk means.
+3. **All flights by journey**: two tables (cards on a phone). One shows Mumbai → Boston prices for 1 person; the
+   other shows Boston → Mumbai prices for 2 people, the cheapest 2 for each day. Each flight shows fare + bags, its
+   risk, and links to book on the airline's site, Expedia, Booking.com, or compare all sellers on Google Flights.
+4. **Other ways to book: round trip + one-way** (collapsed): a round trip for the person from Mumbai plus a one-way
+   for the person from Boston on the same flight home.
 5. **Price over time**: appears once there are checks on two different days.
 
+### What "risk" means
 
-### Reading a ticket
-
-- **The heading** gives the flight home: "Leave Boston Mon 28 Dec (land in Mumbai Tue 29 Dec)", then how you book
-  it in one sentence, then the disruption risk with its reason ("High disruption risk: connects in Abu Dhabi").
-- **Each flight** shows who is on it (Mumbai traveller, Boston traveller or Both travellers), the airline, local
-  departure and arrival times, the trip length and the layover city. Below that is the arithmetic, for example
-  `$1,566 fare + $400 bags = $1,966 for 2 travellers, $983 each`.
-- **Booking buttons** sit under each flight: the airline's own site, Expedia and Booking.com (already filled in
-  with the route, date and number of travellers), and "Compare all sellers" (Google Flights).
-- **The stub** shows the whole-trip total for both travellers and each traveller's share. The Mumbai traveller
-  pays for there and back; the Boston traveller pays for the flight home only. The two add up to the total.
-- **"Why … risk, and other notes"** expands to show the full reasons and any transit-visa warnings.
+The chance of a cancellation or long delay, not safety. **High**: the flight connects through a Gulf airport
+(currently Abu Dhabi or Dubai), where flights were closed or cancelled at short notice in 2026. **Medium**: an
+airline or airport with strikes or other disruption this year. **Low**: no known problems.
 
 ### Booking plans
 
-- **Separate one-way tickets** (Plan A in the code): a one-way for the Mumbai traveller, then one booking home for
-  both travellers.
-- **Round trip + one-way** (Plan B): a round trip for the Mumbai traveller, plus a one-way home for the Boston
-  traveller on the same airline. Round trips that start in India are sometimes cheaper than two one-ways.
+- **Separate one-way tickets** (Plan A in the code): a one-way for the person from Mumbai, then one booking home for
+  both people. This is what the Whole trip receipts add up.
+- **Round trip + one-way** (Plan B): a round trip for the person from Mumbai, plus a one-way home for the person
+  from Boston on the same airline and flight. Round trips that start in India are sometimes cheaper than two one-ways.
   Plan B prices are "from" prices: Google pairs the round trip with its cheapest return flight. Before booking,
   price the exact return flight both travellers will share.
 
