@@ -141,58 +141,41 @@ def ok(s, max_risk, cfg):
 
 
 def options(quotes, cfg, bags, geo, max_risk):
-    """Best option per return date for each strategy. quotes: {(kind, dates): (flights, pax, url)}."""
+    """Plan B, cheapest first, one per return date: a round trip for the outbound adults + a one-way home on the
+    same airline for the rest. (Plan A, all one-ways, is journeys().) quotes: {(kind, dates): (flights, pax, url)}."""
     out, ret = cfg["outbound"], cfg["return"]
-    lands = out["arrive_on"]
     legs_of = {(k, d): legs for k, d, legs, _ in searches(cfg)}
-    city = lambda code: cfg.get("cities", {}).get(code, code)
-    go, back_name = f"{city(out['from'])} → {city(out['to'])}", f"{city(ret['from'])} → {city(ret['to'])}"
 
     def scored(kind, dates, legs=1):
         flights, pax, url = quotes.get((kind, dates), ([], 0, ""))
-        return [dict(score(f, pax, cfg, bags, geo, legs), url=url, search=legs_of.get((kind, dates), []))
+        rows = [dict(score(f, pax, cfg, bags, geo, legs), url=url, search=legs_of.get((kind, dates), []))
                 for f in flights]
+        return [s for s in rows if ok(s, max_risk, cfg)]
 
-    best_out = min((s for d in out["depart_dates"] for s in scored("out", d)
-                    if s["f"].arrive.startswith(lands) and ok(s, max_risk, cfg)),
-                   key=lambda s: s["total"], default=None)
-    rows = []
+    best = {}
     for d2 in ret["depart_dates"]:
-        back = min((s for s in scored("ret", d2) if ok(s, max_risk, cfg)), key=lambda s: s["total"], default=None)
-        if best_out and back:
-            rows.append({"strategy": "A", "dates": f"{best_out['f'].depart[:10]} > {d2}",
-                         "legs": [(go, out["adults"], best_out), (back_name, ret["adults"], back)],
-                         "total": best_out["total"] + back["total"],
-                         # everyone flying out also flies back; the rest fly back only
-                         "per_person": [("Both ways", best_out["total"] / out["adults"] + back["total"] / ret["adults"]),
-                                        ("Return only", back["total"] / ret["adults"])],
-                         "risk": max(best_out["risk"], back["risk"], key=LEVELS.index), "note": ""})
-        extra = [s for s in scored("ret_extra", d2) if ok(s, max_risk, cfg)]
+        extra = scored("ret_extra", d2)
         for d1 in out["depart_dates"]:
             for rt in scored("rt", f"{d1}>{d2}", legs=2):
-                if not (rt["f"].arrive.startswith(lands) and ok(rt, max_risk, cfg) and extra):
-                    continue
                 same = [s for s in extra if s["f"].airlines[0] == rt["f"].airlines[0]]
-                if not same and cfg["prefs"].get("return_together", True):
+                if not (rt["f"].arrive.startswith(out["arrive_on"]) and same):
                     continue
-                partner = min(same or extra, key=lambda s: s["total"])
-                rows.append({"strategy": "B", "dates": f"{d1} > {d2}",
-                             "legs": [(f"Round trip {go.replace('→', '⇄')}", out["adults"], rt),
-                                      (f"{back_name} (2nd traveller)", ret["adults"] - out["adults"], partner)],
-                             "total": rt["total"] + partner["total"],
-                             "per_person": [("Both ways", rt["total"] / out["adults"]),
-                                            ("Return only", partner["total"] / partner["pax"])],
-                             "risk": max(rt["risk"], partner["risk"], key=LEVELS.index),
-                             "note": "round-trip return leg not pinned: total is Google's cheapest pairing, "
-                                     "price the exact return flight before booking"
-                                     + ("" if same else "; extra traveller is on a different airline")})
-    # keep the cheapest B per return date
-    best = {}
-    for r in rows:
-        k = (r["strategy"], r["dates"][-10:])
-        if k not in best or r["total"] < best[k]["total"]:
-            best[k] = r
+                partner = min(same, key=lambda s: s["total"])
+                if d2 in best and best[d2]["total"] <= rt["total"] + partner["total"]:
+                    continue
+                best[d2] = {"dates": f"{d1} > {d2}", "legs": [(out["adults"], rt), (partner["pax"], partner)],
+                            "total": rt["total"] + partner["total"],
+                            "per_person": [rt["total"] / out["adults"], partner["total"] / partner["pax"]],
+                            "risk": max(rt["risk"], partner["risk"], key=LEVELS.index)}
     return sorted(best.values(), key=lambda r: r["total"])
+
+
+def best_trip(t):
+    """(total, how) for one journeys() risk scope: the one-way pair or the round-trip deal, whichever is cheaper."""
+    deal = t["deal"]
+    if deal and (t["total"] is None or deal["total"] < t["total"]):
+        return deal["total"], f"round trip + one-way, home {deal['dates'][-10:]}"
+    return t["total"], (f"one-ways, home {t['ret']['date']}" if t["total"] else "")
 
 
 def mark_split_fares(together, alone, alone_pax, min_saving=50):
@@ -233,7 +216,7 @@ def journeys(quotes, cfg, bags, geo):
     for label, scope in (("Cheapest", "high"), ("Cheapest without a high-risk flight", "medium"), ("Lowest risk", "low")):
         o = next((s for s in outs if within(s, scope)), None)
         r = min((s for v in rets.values() for s in v if within(s, scope)), key=lambda s: s["total"], default=None)
-        deal = next((x for x in options(quotes, cfg, bags, geo, scope) if x["strategy"] == "B"), None)
+        deal = next(iter(options(quotes, cfg, bags, geo, scope)), None)
         totals.append({"label": label, "scope": scope, "out": o, "ret": r, "deal": deal,
                        "total": o["total"] + r["total"] if o and r else None,
                        "risk": max(o["risk"], r["risk"], key=LEVELS.index) if o and r else None})
@@ -245,7 +228,7 @@ def db():
     con = sqlite3.connect(HERE / "prices.db")
     con.execute("CREATE TABLE IF NOT EXISTS quotes(run_at TEXT, kind TEXT, dates TEXT, pax INT,"
                 " url TEXT, level TEXT, notice TEXT, flight TEXT)")
-    con.execute("CREATE TABLE IF NOT EXISTS best(run_at TEXT, scope TEXT, total REAL, label TEXT)")
+    con.execute("CREATE TABLE IF NOT EXISTS best(run_at TEXT, scope TEXT, total REAL)")
     return con
 
 
@@ -296,13 +279,12 @@ def scrape(cfg, con):
 
 def latest(con, run_at=None):
     run_at = run_at or con.execute("SELECT max(run_at) FROM quotes").fetchone()[0]
-    quotes, levels, notices = {}, {}, set()
-    for kind, dates, pax, url, level, notice, fj in con.execute(
-            "SELECT kind, dates, pax, url, level, notice, flight FROM quotes WHERE run_at=?", (run_at,)):
+    quotes, notices = {}, set()
+    for kind, dates, pax, url, notice, fj in con.execute(
+            "SELECT kind, dates, pax, url, notice, flight FROM quotes WHERE run_at=?", (run_at,)):
         quotes.setdefault((kind, dates), ([], pax, url))[0].append(Flight(**json.loads(fj)))
-        levels[(kind, dates)] = level
         notices.add(notice)
-    return run_at, quotes, levels, notices - {None}
+    return run_at, quotes, notices - {None}
 
 
 # --- report ---------------------------------------------------------------------------------------------
@@ -312,40 +294,39 @@ def missing(cfg, quotes):
 
 
 def evaluate(con, cfg, bags, geo, run_at=None):
-    run_at, quotes, levels, notices = latest(con, run_at)
+    run_at, quotes, notices = latest(con, run_at)
     if run_at is None:
         sys.exit("No stored runs yet: run `python3 tracker.py` first.")
-    return (run_at, quotes, levels, notices, options(quotes, cfg, bags, geo, cfg["prefs"]["max_risk"]),
-            options(quotes, cfg, bags, geo, "low"), journeys(quotes, cfg, bags, geo))
+    return run_at, quotes, notices, options(quotes, cfg, bags, geo, "high"), journeys(quotes, cfg, bags, geo)
 
 
 def report(con, cfg, bags, geo, ev):
-    history = con.execute("SELECT run_at, scope, total, label FROM best ORDER BY run_at").fetchall()
+    history = con.execute("SELECT run_at, scope, total FROM best ORDER BY run_at").fetchall()
     (HERE / "report.html").write_text(render.page(cfg, geo, ev, missing(cfg, ev[1]), history))
 
 
 def alert(con, ev, cfg):
     """Record this run's best totals; notify on an all-time low or on first dropping under target."""
-    run_at, quotes, _, _, any_opts, low_opts, _ = ev
+    run_at, quotes, _, _, jr = ev
     if gaps := missing(cfg, quotes):                # a partial run would fake a price jump in history
         print("Incomplete run, not recorded in history; missing:", ", ".join(gaps), file=sys.stderr)
         return
     q = "SELECT {} FROM best WHERE scope='any' AND run_at<?"
     prev_min = con.execute(q.format("min(total)"), (run_at,)).fetchone()[0]
     prev_last = con.execute(q.format("total") + " ORDER BY run_at DESC LIMIT 1", (run_at,)).fetchone()
-    for scope, opts in (("any", any_opts), ("low", low_opts)):
-        if opts:
-            o = opts[0]
-            con.execute("INSERT INTO best VALUES(?,?,?,?)", (run_at, scope, o["total"], f"{o['strategy']} {o['dates']}"))
+    by_scope = {t["scope"]: best_trip(t) for t in jr["totals"]}
+    for scope, risk_scope in (("any", "high"), ("low", "low")):
+        if by_scope[risk_scope][0] is not None:
+            con.execute("INSERT INTO best VALUES(?,?,?)", (run_at, scope, by_scope[risk_scope][0]))
     con.commit()
-    if not any_opts:
+    best, how = by_scope["high"]
+    if best is None:
         return
-    best = any_opts[0]["total"]
     target = cfg["prefs"].get("target_total_usd")
     new_low = prev_min is not None and best < prev_min
     crossed = target and best <= target and (prev_last is None or prev_last[0] > target)
     if new_low or crossed:
-        msg = f"{'New low' if new_low else 'Under target'} ${best:,.0f} ({any_opts[0]['strategy']} {any_opts[0]['dates']})"
+        msg = f"{'New low' if new_low else 'Under target'} ${best:,.0f} ({how})"
         print("ALERT:", msg)
         if sys.platform == "darwin":
             subprocess.run(["osascript", "-e", f'display notification "{msg}" with title "Flight tracker"'], check=False)
@@ -364,9 +345,9 @@ def main():
         ev = evaluate(con, cfg, bags, geo, scrape(cfg, con))
         alert(con, ev, cfg)
     report(con, cfg, bags, geo, ev)
-    for o in ev[4][:3]:
-        pp = ", ".join(f"{who} ${cost:,.0f}" for who, cost in o["per_person"])
-        print(f"  {o['strategy']} {o['dates']}: ${o['total']:,.0f} total; per person: {pp} ({o['risk']} risk)")
+    for t in ev[-1]["totals"]:
+        total, how = best_trip(t)
+        print(f"  {t['label']}: " + (f"${total:,.0f} ({how})" if total else "no flights match"))
     print("Report:", HERE / "report.html")
     if not args.report and (gaps := missing(cfg, ev[1])):
         sys.exit(f"Incomplete run, no results for: {', '.join(gaps)}")   # non-zero so CI reports it

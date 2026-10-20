@@ -135,14 +135,14 @@ def test_render_page_says_who_flies_and_escapes_scraped_text():
     cfg = {"cities": {"BOM": "Mumbai", "BOS": "Boston"},
            "outbound": {"from": "BOM", "to": "BOS", "depart_dates": ["2026-12-18"], "arrive_on": "2026-12-18", "adults": 1},
            "return": {"from": "BOS", "to": "BOM", "depart_dates": ["2026-12-28"], "adults": 2},
-           "prefs": {"bags_per_person": 2, "max_stops": 2, "max_risk": "high", "max_layover_hours": 3}}
+           "prefs": {"bags_per_person": 2, "max_stops": 2, "max_layover_hours": 3}}
     q = {("out", "2026-12-18"): ([F(500, ["Qatar Airways"])], 1, "https://g/out"),
          ("ret", "2026-12-28"): ([F(1800, ["<script>x</script>"])], 2, "https://g/ret")}
     opts = tracker.options(q, cfg, BAGS, GEO, "high")
     jr = tracker.journeys(q, cfg, BAGS, GEO)
     cheapest = jr["totals"][0]                                  # 1 person out + 2 people back
     assert (cheapest["out"]["total"], cheapest["ret"]["total"], cheapest["total"]) == (500, 2100, 2600)
-    page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, {}, set(), opts, [], jr), [], [])
+    page = render.page(cfg, GEO, ("2026-10-19T19:45:48+00:00", q, set(), opts, jr), [], [])
     assert "All flights by journey" in page and "Price for 1 person" in page and "Price for 2 people" in page
     assert page.index("Whole trip") < page.index("All flights by journey")     # the answer comes first
     assert "<b>1 person</b> to Boston" in page and "<b>2 people</b> home to Mumbai" in page
@@ -207,32 +207,57 @@ def test_risk():
     assert tracker.risk(f, GEO)[0] == "medium"
 
 
-def test_options_pick_cheapest_per_strategy_and_date():
+def trip_fixture():
     cfg = {"outbound": {"from": "BOM", "to": "BOS", "depart_dates": ["2026-12-17"], "arrive_on": "2026-12-18", "adults": 1},
            "return": {"from": "BOS", "to": "BOM", "depart_dates": ["2026-12-26"], "adults": 2},
-           "prefs": {"bags_per_person": 2, "max_stops": 2, "max_risk": "high"}}
+           "prefs": {"bags_per_person": 2, "max_stops": 2}}
     q = {("out", "2026-12-17"): ([F(400, ["Qatar Airways"], arrive="2026-12-17T13:00"),    # lands a day early
                                    F(500, ["Qatar Airways"]), F(450, ["Lufthansa"])], 1, "u"),
          ("ret", "2026-12-26"): ([F(1800, ["Qatar Airways"])], 2, "u"),
          ("rt", "2026-12-17>2026-12-26"): ([F(1200, ["Qatar Airways"])], 1, "u"),
          ("ret_extra", "2026-12-26"): ([F(950, ["Qatar Airways"]), F(800, ["Lufthansa"])], 1, "u")}
-    a, b = sorted(tracker.options(q, cfg, BAGS, GEO, "high"), key=lambda r: r["strategy"])
-    assert a["total"] == 500 + 1800                 # Lufthansa 450 + 100 bag fee loses to Qatar 500
-    assert a["per_person"] == [("Both ways", 500 + 900), ("Return only", 900)]   # sums back to the total
-    # B: Qatar round trip 1200 + same-airline Qatar one-way 950 (preferred over cheaper Lufthansa 800+100)
-    assert b["total"] == 1200 + 950 and "different airline" not in b["note"]
-    assert b["per_person"] == [("Both ways", 1200), ("Return only", 950)]
+    return cfg, q
+
+
+def test_plans_pick_the_cheapest_allowed_flights():
+    cfg, q = trip_fixture()
+    cheapest = tracker.journeys(q, cfg, BAGS, GEO)["totals"][0]
+    assert cheapest["total"] == 500 + 1800          # Plan A: Lufthansa 450 + 100 bag fee loses to Qatar 500
+    # Plan B: Qatar round trip 1200 + same-airline Qatar one-way 950 (preferred over cheaper Lufthansa 800+100)
+    (b,) = tracker.options(q, cfg, BAGS, GEO, "high")
+    assert b["total"] == 1200 + 950 and b["per_person"] == [1200, 950]   # each ticket; sums back to the total
+    assert tracker.best_trip(cheapest) == (2150, "round trip + one-way, home 2026-12-26")
     cfg["prefs"]["max_layover_hours"] = 1                      # every fixture flight has 0 layovers
-    assert len(tracker.options(q, cfg, BAGS, GEO, "high")) == 2
-    q[("ret_extra", "2026-12-26")] = ([F(800, ["Lufthansa"])], 1, "u")
-    assert [r["strategy"] for r in tracker.options(q, cfg, BAGS, GEO, "high")] == ["A"]   # B can't fly together
-    cfg["prefs"]["return_together"] = False
-    assert "different airline" in tracker.options(q, cfg, BAGS, GEO, "high")[0]["note"]
+    assert len(tracker.options(q, cfg, BAGS, GEO, "high")) == 1
     cfg["prefs"]["exclude_airlines"] = ["Qatar Airways"]
-    assert tracker.options(q, cfg, BAGS, GEO, "high") == []     # every return option flies Qatar
+    assert tracker.options(q, cfg, BAGS, GEO, "high") == []     # every round trip flies Qatar
     cfg["prefs"]["exclude_airlines"] = []
-    low = tracker.options(q, cfg, BAGS, {"hubs": {}, "airlines": {"Qatar Airways": {"level": "high", "note": "x"}}}, "low")
-    assert [r["total"] for r in low] == []          # every return option is Qatar -> filtered out
+    high_qatar = {"hubs": {}, "airlines": {"Qatar Airways": {"level": "high", "note": "x"}}}
+    assert tracker.options(q, cfg, BAGS, high_qatar, "low") == []
+    q[("ret_extra", "2026-12-26")] = ([F(800, ["Lufthansa"])], 1, "u")
+    assert tracker.options(q, cfg, BAGS, GEO, "high") == []     # B needs both travellers home on one airline
+    assert tracker.best_trip(tracker.journeys(q, cfg, BAGS, GEO)["totals"][0]) == (2300, "one-ways, home 2026-12-26")
+
+
+def test_alert_records_the_cheaper_plan_and_flags_a_new_low():
+    import contextlib
+    import io
+    import sqlite3
+    cfg, q = trip_fixture()
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE best(run_at TEXT, scope TEXT, total REAL)")
+    con.execute("INSERT INTO best VALUES('2026-10-19T00:00:00+00:00', 'any', 2500)")
+    ev = ("2026-10-20T00:00:00+00:00", q, set(), tracker.options(q, cfg, BAGS, GEO, "high"),
+          tracker.journeys(q, cfg, BAGS, GEO))
+    out, run = io.StringIO(), tracker.subprocess.run
+    tracker.subprocess.run = lambda *a, **k: None          # no macOS notification from a test
+    try:
+        with contextlib.redirect_stdout(out):
+            tracker.alert(con, ev, cfg)
+    finally:
+        tracker.subprocess.run = run
+    assert con.execute("SELECT scope, total FROM best WHERE run_at=?", (ev[0],)).fetchall() == [("any", 2150), ("low", 2150)]
+    assert out.getvalue() == "ALERT: New low $2,150 (round trip + one-way, home 2026-12-26)\n"
 
 
 if __name__ == "__main__":

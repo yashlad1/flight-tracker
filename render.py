@@ -7,7 +7,7 @@ yellow route band. Overpass (a highway-signage face) throughout. People are name
 """
 import html
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 HOME_TZ = ZoneInfo("America/New_York")      # "last checked" is shown in Boston time
@@ -44,9 +44,8 @@ def day(iso):
 
 
 def local(run_at):
-    """Run timestamps are UTC (old rows are naive UTC); return Boston time."""
-    t = datetime.fromisoformat(run_at)
-    return (t if t.tzinfo else t.replace(tzinfo=timezone.utc)).astimezone(HOME_TZ)
+    """Run timestamps are UTC with an offset; return Boston time."""
+    return datetime.fromisoformat(run_at).astimezone(HOME_TZ)
 
 
 def checked(run_at):
@@ -238,12 +237,13 @@ def journeys_html(cfg, jr, per_date=2, top=4):
 
 
 # --- round trip + one-way tickets (in the collapsed alternatives section) ----------------------------------------
-def leg(cfg, r, i, name, pax, s):
+def leg(cfg, i, pax, s):
+    """Leg 0 of a Plan B option is the round trip, leg 1 the one-way home."""
     f = s["f"]
     p1, p2 = names(cfg)
-    rt = name.startswith("Round trip")
-    who = cap(p1) if i == 0 else (people(pax) if r["strategy"] == "A" else cap(p2))
-    a, b = (cfg["outbound"]["from"], cfg["outbound"]["to"]) if i == 0 else (cfg["return"]["from"], cfg["return"]["to"])
+    rt = i == 0
+    who = cap(p1 if rt else p2)
+    a, b = (cfg["outbound"]["from"], cfg["outbound"]["to"]) if rt else (cfg["return"]["from"], cfg["return"]["to"])
     title = f"{e(city(cfg, a))} to {e(city(cfg, b))}" + (" and back, round trip" if rt else "")
     stops = "".join(f"<span class=stop>{e(c.split(', ')[-1])} <small>{hm(m)}</small></span>"
                     for c, m in zip(f.layover_names or f.layovers, f.layover_min)) or "<span class=stop>Nonstop</span>"
@@ -266,7 +266,7 @@ def leg(cfg, r, i, name, pax, s):
 
 def risk_line(r, geo):
     short, full = [], []
-    for _, _, s in r["legs"]:
+    for _, s in r["legs"]:
         f = s["f"]
         for code, name in zip(f.layovers, f.layover_names or f.layovers):
             if geo.get("hubs", {}).get(code, {}).get("level", "low") != "low":
@@ -276,27 +276,27 @@ def risk_line(r, geo):
             if lvl != "low":
                 short.append(f"{a} rated {lvl}")
         full += s["notes"]
-    if r["note"]:
-        full.append(r["note"])
+    full.append("round-trip return leg not pinned: total is Google's cheapest pairing, price the exact return "
+                "flight before booking")
     head = f"{r['risk'].capitalize()} risk"
     short = list(dict.fromkeys(short))
     return head + (": " + "; ".join(short) if short else ""), list(dict.fromkeys(full))
 
 
 def ticket(cfg, geo, r):
-    f_home = r["legs"][1][2]["f"]
-    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, _, s in r["legs"]))
+    f_home = r["legs"][1][1]["f"]
+    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, s in r["legs"]))
     line, full = risk_line(r, geo)
     why = (f"<details class=why><summary>Why {r['risk']} risk, and other notes</summary><ul>"
            + "".join(f"<li>{e(n)}</li>" for n in full) + "</ul></details>") if full else ""
-    (_, c1), (_, c2) = r["per_person"]
+    c1, c2 = r["per_person"]
     p1, p2 = names(cfg)
     return f"""<article class="ticket r-{r['risk']}">
 <div class=main>
   <header><h3>{e(airlines)}: leave {e(city(cfg, cfg['return']['from']))} {day(f_home.depart)}
     <small>(land in {e(city(cfg, cfg['return']['to']))} {day(f_home.arrive)})</small></h3>
     <p class=risk><span class="dot"></span>{e(line)}</p></header>
-  {''.join(leg(cfg, r, i, n, p, s) for i, (n, p, s) in enumerate(r['legs']))}
+  {''.join(leg(cfg, i, p, s) for i, (p, s) in enumerate(r['legs']))}
   {why}
 </div>
 <aside class=stub>
@@ -308,10 +308,10 @@ def ticket(cfg, geo, r):
 
 
 def alt_row(cfg, geo, r):
-    leave = day(r["legs"][1][2]["f"].depart)
-    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, _, s in r["legs"]))
-    via = ", ".join(dict.fromkeys(n.split(", ")[-1] for _, _, s in r["legs"] for n in (s["f"].layover_names or s["f"].layovers)))
-    (_, c1), (_, c2) = r["per_person"]
+    leave = day(r["legs"][1][1]["f"].depart)
+    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, s in r["legs"]))
+    via = ", ".join(dict.fromkeys(n.split(", ")[-1] for _, s in r["legs"] for n in (s["f"].layover_names or s["f"].layovers)))
+    c1, c2 = r["per_person"]
     return f"""<details class="opt r-{r['risk']}"><summary>
   <span class=o-when><b>Leave {e(city(cfg, cfg['return']['from']))} {leave}</b><small>{e(airlines)}, via {e(via) or 'nonstop'}</small></span>
   <span class=risk><span class=dot></span>{r['risk'].capitalize()} risk</span>
@@ -319,8 +319,8 @@ def alt_row(cfg, geo, r):
 </summary>{ticket(cfg, geo, r)}</details>"""
 
 
-def chart(history):
-    rows = [(r, s, t) for r, s, t, _ in history]
+def chart(rows):
+    """rows: [(run_at, scope, total)] from the best table."""
     runs = sorted({r for r, _, _ in rows})
     if len({local(r).date() for r in runs}) < 2:
         return ""
@@ -352,12 +352,11 @@ def chart(history):
 
 
 def page(cfg, geo, ev, gaps, history):
-    run_at, _, _, notices, any_opts, low_opts, jr = ev
+    run_at, _, notices, alts, jr = ev
     trend = chart(history)
     cheapest = jr["totals"][0]["total"] or 0
     seen = {}
     cards = "".join(trip_card(cfg, geo, t, cheapest, seen) for t in jr["totals"])
-    alts = [o for o in any_opts if o["strategy"] == "B"]
     p1, p2 = names(cfg)
     warn = "".join(f"<p class=alert>No results for {e(g)} on the last check, so prices may be incomplete.</p>"
                    for g in gaps)

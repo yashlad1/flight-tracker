@@ -127,8 +127,6 @@ effect on the last stored prices, or wait for the next run.
 | `prefs.bags_per_person` | 2 | 23 kg checked bags each person needs, each direction |
 | `prefs.max_stops` | 2 | Most stops allowed on one journey |
 | `prefs.max_layover_hours` | 3 | Skip any itinerary with a single layover longer than this |
-| `prefs.return_together` | true | Plan B: both return travellers must be on the same airline |
-| `prefs.max_risk` | high | Highest risk shown in "Best options" (low, medium or high) |
 | `prefs.exclude_airlines` | IndiGo, Air India, Akasa Air, Turkish Airlines | Drop any itinerary that uses one of these on any flight |
 | `prefs.target_total_usd` | 2600 | Alert the first time the cheapest whole trip drops to this |
 

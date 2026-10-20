@@ -19,7 +19,5 @@ adults = 2
 bags_per_person = 2        # 23 kg checked pieces needed, each direction
 max_stops = 2
 max_layover_hours = 3      # skip itineraries with any single layover longer than this
-return_together = true     # strategy B: both return travellers must be on the same airline
-max_risk = "high"          # hide options above this in "Best options": low | medium | high
 exclude_airlines = ["IndiGo", "Air India", "Akasa Air", "Turkish Airlines"]   # dropped if on any leg
 target_total_usd = 2600    # alert (GitHub issue / macOS notification) when the cheapest trip first drops to this

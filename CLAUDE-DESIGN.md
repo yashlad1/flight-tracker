@@ -3,7 +3,7 @@
 This document explains how the flight tracker works and why it is built this way, and lists what is known to be
 weak, so a reviewer can suggest improvements. For user-facing docs, see `README.md`.
 
-Built 2026-10-19 with Claude Code. Snapshot: about 1,460 lines of Python and YAML, 16 tests, no third-party
+Built 2026-10-19 with Claude Code. Snapshot: about 1,480 lines of Python and YAML, 17 tests, no third-party
 dependencies.
 
 ---
@@ -48,6 +48,7 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | 2026-10-19 | The top of the report shows prices the way the user calculates them: 1 person out, 2 people back, and the sum, at three risk levels |
 | 2026-10-19 | Second design review (6/10) applied: whole-trip receipts first, journey tables second (cards on phones), round trip + one-way collapsed, risk legend, "+$X more than the cheapest", plain wording for separate bookings, savings under $50 hidden, 44 px targets, 14 px minimum text, table captions, half-height band on phones, chart hidden until 2 days of data |
 | 2026-10-19 | Remove the booking tips and footer from the report; keep it out of search engines with `<meta name=robots content="noindex, nofollow, noarchive">` (robots.txt is also published, but crawlers only read it at the domain root, which a project page can't control) |
+| 2026-10-19 | Ponytail audit cuts: Plan A is computed once (`journeys`) instead of again inside `options`; `return_together` and `max_risk` removed (Plan B always keeps both travellers on one airline; the alternatives list shows every risk level); the unused price-level plumbing, the write-only `best.label` column and the naive-timestamp fallback are gone |
 | 2026-10-19 | Flag return flights that are cheaper as 2 separate tickets (`mark_split_fares`: matches the 2-person and 1-person searches flight by flight; saving = together price each − 1-person price, shown only when ≥ $10), with steps to still sit together |
 
 ---
@@ -63,8 +64,8 @@ attacks on Saudi airspace). Then keep watching prices until booking.
           gflights.parse ──▶ Flight objects ──▶ prices.db: quotes (last 8 runs)
                                                        │
             data/baggage.json ──▶ bag_cost ─┐          ▼
-            data/geo_risk.json ──▶ risk ────┼──▶ score ──▶ options (Plan A / Plan B,
-                         trip.toml filters ─┘                  cheapest per return date)
+            data/geo_risk.json ──▶ risk ────┼──▶ score ──▶ journeys (Plan A) + options
+                         trip.toml filters ─┘                  (Plan B), per risk level
                                                        │
                        ┌───────────────────────────────┼─────────────────────┐
                        ▼                               ▼                     ▼
@@ -75,9 +76,9 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 | File | Lines | Responsibility |
 |---|---|---|
 | `gflights.py` | ~180 | Build the `tfs` protobuf query, fetch with retries and block detection, parse aria-labels into `Flight` |
-| `tracker.py` | ~380 | Config and data loading, costing, risk, filters, plan building, SQLite, alerts, CLI |
+| `tracker.py` | ~360 | Config and data loading, costing, risk, filters, plan building, SQLite, alerts, CLI |
 | `render.py` | ~610 | The report page: pure functions from data to one self-contained HTML file, booking links, chart |
-| `test_tracker.py` | ~230 | 16 plain-`assert` tests; runs with `python3` or `pytest` |
+| `test_tracker.py` | ~270 | 17 plain-`assert` tests; runs with `python3` or `pytest` |
 | `.github/workflows/track.yml` | ~65 | Schedule, tests, scrape, issue alert, commit-back, Pages deploy |
 
 The split is deliberate: `gflights.py` knows nothing about this trip and could be reused; everything
@@ -117,7 +118,8 @@ carrier on this route.
    Layover IATA codes come from the row text (`2 stops in JFK, DOH`). Self-transfer and separate-ticket badges are
    matched in the row text.
 4. **Extras.** Google's "Prices are currently low / typical / high" signal and its live "Travel update" banner are
-   captured too.
+   captured too. The banner is shown in the risk legend; the price level is only logged, and stored in
+   `quotes.level`.
 
 **Facts established by testing (2026-10-19):**
 
@@ -204,14 +206,15 @@ The batchexecute RPC isn't an option: since Aug 2026 it needs a header only a br
 
 ### Plans
 
-- **Plan A** = cheapest allowed `out` that lands on `arrive_on` + cheapest allowed `ret` for each return date.
-  The outbound is chosen once, since it doesn't depend on the return date.
-- **Plan B** = an `rt` (outbound must land on `arrive_on`) + a `ret_extra` on the same return date. With
-  `return_together`, the `ret_extra` flight must share the round trip's first airline. B totals are lower bounds:
+- **Plan A** (`journeys`) = cheapest allowed `out` that lands on `arrive_on` + cheapest allowed `ret` on any return
+  date, at each risk level (high, medium, low).
+- **Plan B** (`options`) = an `rt` (outbound must land on `arrive_on`) + a `ret_extra` on the same return date and
+  the round trip's first airline, so both travellers fly home together. B totals are lower bounds:
   Google's round-trip price uses its cheapest return for that outbound, and the scraper never sees which return
   flight that is.
-- The output is the cheapest option per (plan, return date), sorted by total. It is computed twice: once with
-  `max_risk`, once with risk = low.
+- `options` returns the cheapest B per return date, sorted by total. The collapsed section lists them at any risk;
+  each whole-trip card offers the cheapest B at its own risk level when it beats Plan A.
+- History and alerts record the cheaper of A and B at the "any" and "low" levels (`best_trip`).
 
 ### Bags
 
@@ -226,9 +229,8 @@ the table (e.g. JetBlue on BOS–JFK). Unknown carriers fall back to `default`.
 
 ### Per traveller
 
-- Plan A: both-ways traveller = out total + return total ÷ 2; return-only traveller = return total ÷ 2.
-- Plan B: each traveller's own ticket.
-- The two always add up to the trip total (this is tested).
+- Plan A: the receipt shows the 2-person return booking per person (return total ÷ 2).
+- Plan B: each traveller's own ticket (`per_person`); the two add up to the trip total (this is tested).
 
 ### Filters
 
@@ -260,7 +262,7 @@ SQLite at `prices.db`, committed to git by CI:
 
 ```sql
 quotes(run_at TEXT, kind TEXT, dates TEXT, pax INT, url TEXT, level TEXT, notice TEXT, flight TEXT /* JSON Flight */)
-best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL, label TEXT)
+best(run_at TEXT, scope TEXT /* 'any' | 'low' */, total REAL)
 ```
 
 - `quotes` keeps only the last `KEEP_RUNS` (8) runs, then runs `VACUUM`. Without pruning, about 270 runs by
