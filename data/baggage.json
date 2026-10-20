@@ -18,12 +18,13 @@
       ]
     },
     "Emirates": {
-      "lowest_fare_pieces": 1,
+      "lowest_fare_pieces": 2,
       "standard_fare_pieces": 2,
       "extra_bag_usd": 100,
-      "note": "Piece concept to/from the Americas: Economy Special 1x23kg, Saver/Flex/Flex Plus 2x23kg (weight concept applies if the trip has a Europe sector or >24h Dubai stopover); extra_bag_usd is an estimated Special->Saver upgrade, cheaper than a paid extra piece.",
+      "note": "Google Flights shows '2 free checked bags' on the cheapest fare both ways (BOM-BOS 18 Dec, BOS-BOM 28 Dec). Economy Special elsewhere is 1x23kg.",
       "confidence": "high",
       "sources": [
+        "Google Flights booking page, checked 2026-10-19",
         "https://www.emirates.com/us/english/before-you-fly/baggage/checked-baggage/"
       ]
     },
@@ -60,12 +61,13 @@
       ]
     },
     "Lufthansa": {
-      "lowest_fare_pieces": 0,
+      "lowest_fare_pieces": 1,
       "standard_fare_pieces": 1,
       "extra_bag_usd": 100,
-      "note": "Intercontinental: Economy Light 0 bags, Economy Classic 1x23kg, no current India-USA 2-piece exception; Light first bag ~USD 85-100 online, discounted 2nd piece ~USD 100 on USA routes (standard long-haul extra bag USD 235-255).",
-      "confidence": "medium",
+      "note": "Google Flights shows '1st checked bag per passenger free' on the cheapest BOS-BOM fare (28 Dec); 2nd bag is extra.",
+      "confidence": "high",
       "sources": [
+        "Google Flights booking page, checked 2026-10-19",
         "https://www.lufthansa.com/in/en/freigepaeck-regeln",
         "https://www.lufthansa.com/in/en/uebergepaeck"
       ]
@@ -125,12 +127,13 @@
       ]
     },
     "KLM": {
-      "lowest_fare_pieces": 0,
-      "standard_fare_pieces": 1,
+      "lowest_fare_pieces": 2,
+      "standard_fare_pieces": 2,
       "extra_bag_usd": 100,
-      "note": "Same Air France-KLM economy brands (Light 0, Standard/Flex 1x23kg) and fee table as Air France; India-US has no 2-piece exception.",
-      "confidence": "medium",
+      "note": "Google Flights shows '2 free checked bags per passenger' on the cheapest BOS-BOM fare (28 Dec).",
+      "confidence": "high",
       "sources": [
+        "Google Flights booking page, checked 2026-10-19",
         "https://wwws.airfrance.us/information/legal/us-regulation",
         "https://www.klm.com/information/legal/fees-paid-options"
       ]
