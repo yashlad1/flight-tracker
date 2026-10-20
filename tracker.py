@@ -278,6 +278,10 @@ def scrape(cfg, con):
             time.sleep(3 + random.random() * 4)     # be polite; Google throttles bursts
         try:
             flights, level, notice, url = gflights.search(legs, pax)
+        except gflights.Blocked as e:               # every later search would hit the same wall
+            print(f"  BLOCKED by Google at {kind} {dates}: {e}. Skipping the remaining searches.",
+                  file=sys.stderr, flush=True)
+            break
         except Exception as e:                      # one bad search must not sink the run
             print(f"  {kind} {dates}: FAILED {e!r}", file=sys.stderr, flush=True)
             continue

@@ -79,7 +79,11 @@ lists every site selling it with its price. For Plan B, book both tickets on the
 4. commits `prices.db` and `report.html` back to the repo;
 5. publishes the report to GitHub Pages.
 
-If Google returns nothing for any search, the run fails and GitHub emails you about the failure.
+If Google returns nothing for any search, the run fails and GitHub emails you about the failure. If Google
+answers with a block page instead of results, the log says which one in a single `BLOCKED by Google` line (a 429
+"unusual traffic" page, a consent page or a CAPTCHA), the remaining searches are skipped, and the run fails the
+same way. Every request sends Google's "Reject all" consent cookie (`SOCS`), so EU-style consent walls shouldn't
+appear.
 
 To run it now: **Actions → Track fares → Run workflow**, or
 
@@ -174,7 +178,9 @@ Both JSON files are snapshots dated 2026-10-19 (`as_of`). Asking Claude to "refr
 
 | Symptom | Likely cause | What to do |
 |---|---|---|
-| GitHub emails "run failed", report shows "Incomplete run" | Google changed its page or blocked the runner | Open the run log; if every search found 0 flights, check the regexes in `gflights.py` against a saved page |
+| Run log says `BLOCKED by Google … 429 "unusual traffic" page` or `CAPTCHA page` | Google is rate-limiting or has flagged the runner's IP | Wait for the next scheduled run. If it keeps happening, see "If blocking starts" in `CLAUDE-DESIGN.md` |
+| Run log says `BLOCKED by Google … consent page` | The `SOCS` consent cookie in `gflights.py` stopped working | Update `SOCS` from a browser that clicked "Reject all" on google.com |
+| GitHub emails "run failed", report shows "Incomplete run", no `BLOCKED` line | Google changed its page, or a `FAILED` line shows a network or server error | Open the run log; if every search found 0 flights, check the regexes in `gflights.py` against a saved page. A one-off `FAILED` usually clears on the next run |
 | A search sometimes finds 0 flights | Google served an empty page | The scraper already retries 3 times; occasional misses are normal |
 | No alert issue was opened | Price isn't a new low, or it was already under target last run | Expected |
 | Report looks stale | The Pages deploy failed | Re-run the workflow |

@@ -9,6 +9,7 @@ import html
 import random
 import re
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
@@ -16,6 +17,13 @@ from datetime import date, datetime
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36")
+# Google's "Reject all" consent cookie (value from Firefox's cookie-banner tests), so a runner on an EU-style IP
+# gets results instead of the consent wall.
+SOCS = "CAESHAgBEhJnd3NfMjAyNDAzMjUtMF9SQzEaAmVuIAEaBgiAw42wBg"
+
+
+class Blocked(Exception):
+    """Google answered with a block page instead of results."""
 
 
 @dataclass
@@ -131,14 +139,37 @@ def parse(page, search_day):
     return flights, (level[1] if level else None), (html.unescape(notice[1]).strip() if notice else None)
 
 
+def blocked(url, status, page):
+    """Name the block page Google served instead of results, or None (e.g. an empty shell).
+
+    Only call it on pages without results: normal pages mention reCAPTCHA in their scripts."""
+    if "consent.google." in url or "Before you continue" in page:
+        return "consent page (consent.google.com)"
+    if status == 429 or "unusual traffic" in page:
+        return '429 "unusual traffic" page (rate limit or flagged IP)'
+    if "/sorry/" in url or "g-recaptcha" in page:
+        return "CAPTCHA page"
+    return None
+
+
 def fetch(url, tries=3):
-    """GET a results page; Google occasionally serves an empty shell, so retry."""
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"})
+    """GET a results page. Google occasionally serves an empty shell, so retry; raise Blocked on a block page,
+    where retrying would only dig the hole deeper."""
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9",
+                                               "Cookie": f"SOCS={SOCS}"})
     for attempt in range(tries):
         try:
-            page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+            with urllib.request.urlopen(req, timeout=30) as r:
+                page = r.read().decode("utf-8", "replace")
             if LABEL.search(page):
                 return page
+            if why := blocked(r.url, r.status, page):
+                raise Blocked(why)
+        except urllib.error.HTTPError as e:         # the 429 page arrives as an HTTP error; status + URL name it
+            if why := blocked(e.url, e.code, ""):
+                raise Blocked(why) from None
+            if attempt == tries - 1:
+                raise
         except OSError:
             if attempt == tries - 1:
                 raise

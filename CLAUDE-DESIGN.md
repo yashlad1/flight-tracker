@@ -3,7 +3,7 @@
 This document explains how the flight tracker works and why it is built this way, and lists what is known to be
 weak, so a reviewer can suggest improvements. For user-facing docs, see `README.md`.
 
-Built 2026-10-19 with Claude Code. Snapshot: about 950 lines of Python and YAML, 12 tests, no third-party
+Built 2026-10-19 with Claude Code. Snapshot: about 1,460 lines of Python and YAML, 16 tests, no third-party
 dependencies.
 
 ---
@@ -74,10 +74,10 @@ attacks on Saudi airspace). Then keep watching prices until booking.
 
 | File | Lines | Responsibility |
 |---|---|---|
-| `gflights.py` | ~150 | Build the `tfs` protobuf query, fetch with retries, parse aria-labels into `Flight` |
-| `tracker.py` | ~300 | Config and data loading, costing, risk, filters, plan building, SQLite, alerts, CLI |
-| `render.py` | ~400 | The report page: pure functions from data to one self-contained HTML file, booking links, chart |
-| `test_tracker.py` | ~170 | 12 plain-`assert` tests; runs with `python3` or `pytest` |
+| `gflights.py` | ~180 | Build the `tfs` protobuf query, fetch with retries and block detection, parse aria-labels into `Flight` |
+| `tracker.py` | ~380 | Config and data loading, costing, risk, filters, plan building, SQLite, alerts, CLI |
+| `render.py` | ~610 | The report page: pure functions from data to one self-contained HTML file, booking links, chart |
+| `test_tracker.py` | ~230 | 16 plain-`assert` tests; runs with `python3` or `pytest` |
 | `.github/workflows/track.yml` | ~65 | Schedule, tests, scrape, issue alert, commit-back, Pages deploy |
 
 The split is deliberate: `gflights.py` knows nothing about this trip and could be reused; everything
@@ -100,6 +100,15 @@ carrier on this route.
 2. **Fetch.** A plain `urllib` GET with a desktop Chrome User-Agent and `hl=en&gl=us&curr=USD`. Results are
    server-rendered, so no browser is needed. Google sometimes returns an empty shell; `fetch` retries 3 times with
    backoff. Searches are spaced 3–7 s apart.
+   - Every request sends `SOCS`, Google's "Reject all" consent cookie (the value Firefox's cookie-banner tests
+     record as Reject), so a runner on an EU-style IP gets results instead of the consent wall. The value is
+     untested from an EU IP: GitHub's runners and the dev machine are both in the US.
+   - When a response has no results, `blocked()` checks whether it is a block page: a consent page
+     (`consent.google.com` or "Before you continue"), a 429 "unusual traffic" page, or a CAPTCHA (`/sorry/` or
+     `g-recaptcha`). `fetch` then raises `Blocked` at once instead of retrying into it. `tracker.scrape` logs one
+     `BLOCKED by Google at <search>: <which page>` line, skips the remaining searches, and the run fails as
+     incomplete. The check only runs on pages without results, because normal results pages mention reCAPTCHA
+     in their scripts.
 3. **Parse.** Each result has an aria-label like:
    `From 904 US dollars. 2 stops flight with JetBlue, Qatar Airways and IndiGo. Leaves … at 6:09 PM on Saturday,
    December 26 and arrives at … Total duration 22 hr 11 min. Layover (1 of 2) is a 1 hr 28 min layover at John F.
@@ -123,6 +132,62 @@ carrier on this route.
 - If the number of parsed layover airports doesn't match the stop count, the risk becomes medium ("fail closed").
 - An incomplete run (any search with 0 results) exits non-zero, so CI emails a failure, and it is kept out of the
   price history so the chart doesn't show a fake jump.
+- A block page is named in the log instead of showing up as "0 flights" (see Fetch above).
+
+### The inline `ds:1` JSON: evaluated, not adopted (2026-10-19)
+
+The page also embeds the results as JSON in `AF_initDataCallback({key: 'ds:1', …})`, which the fli library
+parses. A prototype parser was compared with the aria-label parser on all 14 searches of one live run: **14 of
+14 identical**, 127 flights, every field equal (price, airlines, departure and arrival, duration, stops, layover
+codes, minutes and airport names). The saved fixture can't be used for this, because it is a slice without the
+script blocks. ds:1 was not adopted, because it isn't clearly better:
+
+- **No gain today.** The output is identical, so switching only moves the risk.
+- **It still needs the HTML.** The self-transfer and separate-ticket badges couldn't be found in ds:1: no live
+  result on these routes has one (none in the last 8 stored runs either). "Prices are currently …" and the travel
+  banner are HTML-only as well. Switching would mean depending on both formats instead of one.
+- **It fails quietly.** If Google renumbers a field, positional indices can return plausible wrong numbers (a
+  duration read as a price) that go straight into the history. The aria-label regex fails loudly: no match means
+  0 flights, and the run fails.
+
+Switch if the aria-label wording changes and ds:1 still matches. The fields, as of 2026-10-19:
+`data[2][0]` holds the top results and `data[3][0]` the others, each a row `r`:
+
+| Field | Where |
+|---|---|
+| price (USD total) | `r[1][0][1]` (missing for unpriced rows, e.g. some SAS results) |
+| airlines | `r[0][1]` |
+| segments | `r[0][2]`; stops = segments − 1 (`r[0][10]` is *not* the stop count) |
+| departure | date `r[0][4]` `[y, m, d]`, time `r[0][5]` `[h, m]` (zeros are left out: `[21]` = 21:00) |
+| arrival | date `r[0][7]`, time `r[0][8]` |
+| duration (min) | `r[0][9]` |
+| layovers | `r[0][13]`: each `[minutes, IATA, IATA, _, airport, city, …]` |
+
+### Bag filter in `tfs` (field 13): tested, no effect (2026-10-19)
+
+fast-flights encodes `Info.baggage = Baggage{carry_on_bags = 2, checked_bags = 3}` at field 13. One BOM→BOS
+search (18 Dec, 1 adult) was fetched with no field 13, `checked_bags` 0, 1 and 2:
+
+- Google reads the field: it echoes `[0, 1]` (carry-on 0, checked 1) back in `ds:0` for both 1 and 2 checked
+  bags, so it caps the filter at one checked bag.
+- **No price changed** on any of the 8 flights. KLM moved $755 → $756 between fetches, with `checked_bags = 0`
+  too, so that is drift.
+- With the filter on, Google drops its "Prices are currently typical" signal from the page.
+
+So the server-rendered page doesn't add bag fees (the browser presumably reprices through the RPC, which plain HTTP
+can't call), and the filter couldn't express a 2nd bag anyway. `data/baggage.json` stays the source of bag costs.
+
+### If blocking starts
+
+GitHub runners use Azure IPs. If `BLOCKED` lines become regular, in rough order of effort:
+
+1. Run from a home IP instead (local cron, see the README) or a self-hosted runner.
+2. Use `curl_cffi` to send Chrome's TLS fingerprint, as fli does. That is the first third-party dependency.
+3. Move the price source to a paid API (SerpApi's free tier covers about 6 searches a day; see the research
+   note in the kb).
+
+The batchexecute RPC isn't an option: since Aug 2026 it needs a header only a browser can generate. Automating
+`/travel/flights/booking` isn't either, because robots.txt disallows it.
 
 ---
 
@@ -256,9 +321,12 @@ GitHub issue.
 
 ## 8. How it was verified
 
-- **Unit tests (12):**
+- **Unit tests (16):**
   - `tfs` encoding against a known-good URL;
   - parsing a synthetic page and a slice of a real saved Google page;
+  - block-page detection (consent, 429, CAPTCHA, empty shell); `fetch` raising `Blocked` on the first block page
+    without retrying, while a server error is still retried and re-raised and an empty shell still returns `""`
+    after 3 tries; the consent cookie on every request;
   - nonstop rows never inherit layovers;
   - exclusions;
   - word-boundary airline lookup;
@@ -284,9 +352,10 @@ GitHub issue.
 
 ## 9. Known weaknesses (most important first)
 
-1. **Scraping is unofficial.** A Google markup change silently breaks parsing. That shows up as an incomplete run
-   and a failed CI job, but it needs manual regex repair. It is also against Google's terms of service for
-   automated use (personal, low rate).
+1. **Scraping is unofficial.** A Google markup change breaks parsing. That shows up as an incomplete run and a
+   failed CI job, but it needs manual regex repair (or the switch to ds:1 described in section 3). Blocks are
+   named in the log but not worked around. It is also against Google's terms of service for automated use
+   (personal, low rate).
 2. **Coverage is Google's top 8–12 results per search.** The browser shows more after JavaScript loads. During
    verification, one $1,191 round trip appeared in the browser but not in the scrape.
 3. **Plan B is a lower bound.** The round trip's return flight is not pinned, and its risk and layover limits are

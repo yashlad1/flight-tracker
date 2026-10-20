@@ -47,6 +47,56 @@ def test_parse_real_google_page():
     assert flights[1].layover_names == ["Munich International Airport, Munich"]
 
 
+def test_blocked_names_the_block_page():
+    shell = "https://www.google.com/travel/flights?tfs=x"
+    assert gflights.blocked("https://consent.google.com/ml?continue=x", 200, "").startswith("consent")
+    assert gflights.blocked(shell, 200, "<h1>Before you continue to Google</h1>").startswith("consent")
+    assert gflights.blocked("https://www.google.com/sorry/index", 429, "").startswith("429")
+    assert gflights.blocked(shell, 200, "detected unusual traffic from your computer network").startswith("429")
+    assert gflights.blocked("https://www.google.com/sorry/index", 200, "") == "CAPTCHA page"
+    assert gflights.blocked(shell, 200, '<div class="g-recaptcha">') == "CAPTCHA page"
+    assert gflights.blocked(shell, 200, "<html><body></body></html>") is None       # empty shell: just retry
+
+
+def test_fetch_stops_at_a_block_but_retries_everything_else():
+    import io
+    import urllib.error
+    import urllib.response
+    url = "https://www.google.com/travel/flights?tfs=x"
+    error = lambda u, code: urllib.error.HTTPError(u, code, "", {}, io.BytesIO(b""))
+    page = lambda u, body: urllib.response.addinfourl(io.BytesIO(body), {}, u, 200)
+    cookies, outcomes = [], []
+
+    def fake_urlopen(req, timeout):
+        cookies.append(req.get_header("Cookie"))
+        r = outcomes.pop(0)
+        if isinstance(r, Exception):
+            raise r
+        return r
+
+    def run(*responses):
+        cookies.clear()
+        outcomes[:] = responses
+        try:
+            return gflights.fetch(url)
+        except Exception as e:
+            return e
+
+    real = gflights.urllib.request.urlopen, gflights.time.sleep
+    gflights.urllib.request.urlopen, gflights.time.sleep = fake_urlopen, lambda s: None
+    try:
+        e = run(error("https://www.google.com/sorry/index", 429))
+        assert isinstance(e, gflights.Blocked) and str(e).startswith("429") and len(cookies) == 1
+        e = run(page("https://consent.google.com/ml?continue=x", b"<title>Before you continue to Google</title>"))
+        assert isinstance(e, gflights.Blocked) and str(e).startswith("consent") and len(cookies) == 1
+        e = run(*[error(url, 500)] * 3)                     # not a block: retried, then raised as before
+        assert isinstance(e, urllib.error.HTTPError) and e.code == 500 and len(cookies) == 3
+        assert run(*[page(url, b"<html></html>") for _ in range(3)]) == "" and len(cookies) == 3   # empty shell
+    finally:
+        gflights.urllib.request.urlopen, gflights.time.sleep = real
+    assert cookies == [f"SOCS={gflights.SOCS}"] * 3          # the consent cookie goes with every request
+
+
 def test_nonstop_never_inherits_layovers_or_flags():
     page = ROW.format(p="700", rt="", stops="Nonstop", al="United", arr="Monday, December 28",
                       codes="1 stop in LHR", badge="<span>Self transfer</span>")
