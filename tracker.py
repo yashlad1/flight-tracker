@@ -42,8 +42,12 @@ def load():
             if v["level"] not in LEVELS:
                 sys.exit(f"data/geo_risk.json {section}.{k}: level must be one of {LEVELS}")
     for k, v in [("default", bags["default"]), *bags["airlines"].items()]:
-        if not all(isinstance(v.get(x), (int, float)) for x in ("lowest_fare_pieces", "extra_bag_usd")):
-            sys.exit(f"data/baggage.json {k}: lowest_fare_pieces and extra_bag_usd must be numbers")
+        fee = v.get("extra_bag_usd")
+        fees_ok = isinstance(fee, (int, float)) or (isinstance(fee, list) and fee and
+                                                    all(isinstance(x, (int, float)) for x in fee))
+        if not (isinstance(v.get("lowest_fare_pieces"), int) and fees_ok):
+            sys.exit(f"data/baggage.json {k}: lowest_fare_pieces must be a number and extra_bag_usd a number "
+                     f"or a list of numbers [1st bag, 2nd bag, ...]")
     return cfg, bags, geo
 
 
@@ -62,13 +66,20 @@ def lookup(table, name):
 
 
 # --- costing ---------------------------------------------------------------
-def bag_cost(f, pax, need, bags, legs=1):
-    """USD to bring every passenger up to `need` x 23kg. Uses the first listed airline we
-    know (segment order ~ first marketing carrier, whose rules apply to US-origin trips)."""
+def bag_rule(f, bags):
+    """(airline, rule) for a flight: the first listed airline we know (segment order ~ first marketing
+    carrier, whose rules apply to US-origin trips), else the default rule."""
     carrier = next((a for a in f.airlines if lookup(bags["airlines"], a)), None)
-    rule = lookup(bags["airlines"], carrier) if carrier else bags["default"]
-    missing = max(0, need - rule["lowest_fare_pieces"])
-    return missing * rule["extra_bag_usd"] * pax * legs, carrier or "unknown airline"
+    return (carrier, lookup(bags["airlines"], carrier)) if carrier else ("unknown airline", bags["default"])
+
+
+def bag_cost(f, pax, need, bags, legs=1):
+    """USD to bring every passenger up to `need` x 23kg. extra_bag_usd is one price for every extra bag, or a list
+    priced by bag number ([1st checked bag, 2nd checked bag]); the bags a fare includes are the first ones."""
+    carrier, rule = bag_rule(f, bags)
+    fees = rule["extra_bag_usd"] if isinstance(rule["extra_bag_usd"], list) else [rule["extra_bag_usd"]]
+    per_person = sum(fees[min(n, len(fees) - 1)] for n in range(rule["lowest_fare_pieces"], need))
+    return per_person * pax * legs, carrier
 
 
 def risk(f, geo):
@@ -109,6 +120,7 @@ def score(f, pax, cfg, bags, geo, legs=1):
     fee, carrier = bag_cost(f, pax, cfg["prefs"]["bags_per_person"], bags, legs)
     lvl, notes = risk(f, geo)
     return {"f": f, "pax": pax, "fare": f.price, "bags": fee, "bag_rule": carrier,
+            "two_bag_fare": bag_rule(f, bags)[1].get("two_bag_fare") if fee else None,
             "total": f.price + fee, "risk": lvl, "notes": notes}
 
 

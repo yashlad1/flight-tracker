@@ -151,8 +151,16 @@ def receipt_line(cfg, s, a, b, first):
     each = f", {money(s['total'] / pax)} each" if pax > 1 else ""
     return (f"<div class=r-line><dt>{'' if first else '<span class=plus aria-hidden=true>+</span>'}"
             f"{e(city(cfg, a))} to {e(city(cfg, b))}, {people(pax)}"
-            f"<small>{e(', '.join(f.airlines))}, {day(f.depart)}, {clock(f.depart)}, via {e(via_text(f))}{each}</small>"
-            f"</dt><dd>{money(s['total'])}</dd></div>")
+            f"<small>{e(', '.join(f.airlines))}, {day(f.depart)}, {clock(f.depart)}, via {e(via_text(f))}{each}. "
+            f"{money(s['fare'])} fare + {'bags included' if not s['bags'] else money(s['bags']) + ' bags'}</small>"
+            f"{upgrade_note(s)}</dt><dd>{money(s['total'])}</dd></div>")
+
+
+def upgrade_note(s):
+    """Where bags cost extra but a higher fare includes 2 x 23 kg, say so: upgrading is often cheaper."""
+    fare = s.get("two_bag_fare")
+    return (f"<small class=upg>Or choose {e(s['bag_rule'])}'s {e(fare)} fare or higher: 2 × 23&nbsp;kg included. "
+            f"Compare it with {money(s['bags'])} in bag fees.</small>") if fare else ""
 
 
 def split_note(s):
@@ -202,7 +210,7 @@ def j_row(cfg, s, a, b):
   <td class=fl><b>{e(', '.join(f.airlines))}</b>
     <small>{day(f.depart)}: {clock(f.depart)} {e(city(cfg, a))} to {clock(f.arrive)} {e(city(cfg, b))}{lands}</small>
     <small>via {e(via_text(f))}</small></td>
-  <td class=num><b>{money(s['total'])}</b>{each}<small>{money(s['fare'])} fare + {bags}</small>{split_note(s)}</td>
+  <td class=num><b>{money(s['total'])}</b>{each}<small>{money(s['fare'])} fare + {bags}</small>{upgrade_note(s)}{split_note(s)}</td>
   <td class=rk><span class=risk><span class=dot></span>{s['risk'].capitalize()}</span></td>
 </tr><tr class=bk><td colspan=3>{links_html(s)}</td></tr>"""
 
@@ -477,6 +485,8 @@ padding:var(--sp-3) var(--sp-4);margin-top:var(--sp-1);align-items:center}
 .t-k{display:block;font-size:var(--t-sm);color:var(--ink-2);font-weight:var(--w-mid)}
 .same{margin-top:var(--sp-3);color:var(--ink-2)}
 .split{display:block;color:var(--low);font-weight:var(--w-mid);margin-top:var(--sp-2)}
+.upg{display:block;color:var(--route);font-weight:var(--w-reg);margin-top:var(--sp-1)}
+.jt td.num .upg{max-width:30ch;margin-left:auto}
 .deal{margin-top:var(--sp-4);border-top:1px dashed var(--rule)}
 .deal>summary{cursor:pointer;min-height:44px;display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1) var(--sp-2);
 padding:var(--sp-2) 0;font-weight:var(--w-mid);color:var(--low)}

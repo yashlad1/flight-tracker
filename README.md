@@ -134,9 +134,14 @@ effect on the last stored prices, or wait for the next run.
 
 - **Fares** come from Google Flights in USD, and are totals for everyone on the booking.
 - **Bags**: `data/baggage.json` lists, per airline, how many 23 kg bags the cheapest economy fare includes on
-  India–US routes and the cost of each extra bag. Extra cost = missing bags per person × fee × travellers ×
-  directions (2 for a round trip). The rule used is the first airline on the itinerary that is in the file; for
-  trips to or from the US, the first airline's bag rules usually apply.
+  India–US routes and the price of each extra bag, priced by bag number (`[1st bag, 2nd bag]`, since many airlines
+  charge more for the 2nd). Extra cost = the prices of the missing bags × travellers × directions (2 for a round
+  trip). The rule used is the first airline on the itinerary that is in the file; for trips to or from the US, the
+  first airline's bag rules usually apply. The allowances were cross-checked on 2026-10-19 against what Google
+  Flights states for the actual flights. For example, Emirates and KLM include 2 × 23 kg on these routes, and
+  Lufthansa includes the 1st bag. Where a higher fare includes 2 × 23 kg (Etihad Value, Emirates Saver, Qatar
+  Classic, Virgin Atlantic Classic, American Main Plus), the report says so next to the bag fees, because
+  upgrading is often cheaper than buying bags.
 - **Per traveller**: Plan A splits the return booking evenly between the two travellers. Plan B gives each
   traveller their own ticket.
 

@@ -136,6 +136,17 @@ def test_bags_use_first_known_carrier():
     assert tracker.bag_cost(F(900, ["Nowhere Air"]), 1, 2, BAGS) == (150, "unknown airline")
 
 
+def test_bag_fees_priced_by_bag_number():
+    bags = {"default": {"lowest_fare_pieces": 1, "extra_bag_usd": 150},
+            "airlines": {"Virgin Atlantic": {"lowest_fare_pieces": 0, "extra_bag_usd": [75, 100]},
+                         "Lufthansa": {"lowest_fare_pieces": 1, "extra_bag_usd": [90, 90]},
+                         "Emirates": {"lowest_fare_pieces": 2, "extra_bag_usd": [212, 212]}}}
+    assert tracker.bag_cost(F(1, ["Virgin Atlantic"]), 1, 2, bags) == (175, "Virgin Atlantic")   # 1st $75 + 2nd $100
+    assert tracker.bag_cost(F(1, ["Virgin Atlantic"]), 2, 2, bags, legs=2) == (700, "Virgin Atlantic")
+    assert tracker.bag_cost(F(1, ["Lufthansa"]), 2, 2, bags) == (180, "Lufthansa")             # only the 2nd bag
+    assert tracker.bag_cost(F(1, ["Emirates"]), 2, 2, bags) == (0, "Emirates")                  # both included
+
+
 def test_risk():
     assert tracker.risk(F(1, ["Emirates"], ["LHR"], [120]), GEO) == ("low", [])
     lvl, notes = tracker.risk(F(1, ["Air India"], ["FRA"], [45]), GEO)

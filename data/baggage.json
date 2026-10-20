@@ -20,34 +20,49 @@
     "Emirates": {
       "lowest_fare_pieces": 2,
       "standard_fare_pieces": 2,
-      "extra_bag_usd": 100,
-      "note": "Google Flights shows '2 free checked bags' on the cheapest fare both ways (BOM-BOS 18 Dec, BOS-BOM 28 Dec). Economy Special elsewhere is 1x23kg.",
+      "extra_bag_usd": [
+        212,
+        212
+      ],
+      "note": "Google shows '2 free checked bags' on the cheapest fare both ways on this route. Economy Special elsewhere is 1x23kg; an extra piece South Asia-Americas is $250 at the airport, about $212 in advance.",
       "confidence": "high",
       "sources": [
         "Google Flights booking page, checked 2026-10-19",
-        "https://www.emirates.com/us/english/before-you-fly/baggage/checked-baggage/"
-      ]
+        "https://www.emirates.com/us/english/before-you-fly/baggage/checked-baggage/",
+        "https://www.emirates.com/us/english/before-you-fly/baggage/purchase-additional-baggage-allowance/"
+      ],
+      "two_bag_fare": "Saver"
     },
     "Qatar Airways": {
       "lowest_fare_pieces": 1,
       "standard_fare_pieces": 2,
-      "extra_bag_usd": 100,
-      "note": "To/from the Americas: Economy Lite 1x23kg, Classic/Convenience/Comfort 2x23kg; extra_bag_usd is an estimated Lite->Classic upgrade (airport extra piece is reportedly ~USD 255).",
-      "confidence": "high",
+      "extra_bag_usd": [
+        200,
+        200
+      ],
+      "note": "Economy Lite includes 1x23kg; Classic and higher 2x23kg to/from the Americas. Extra piece about $200 online, $255 at the airport.",
+      "confidence": "medium",
       "sources": [
-        "https://www.qatarairways.com/en-us/baggage/allowance.html"
-      ]
+        "https://www.qatarairways.com/en-us/baggage/allowance.html",
+        "https://www.qatarairways.com/en-us/baggage/excess.html"
+      ],
+      "two_bag_fare": "Economy Classic"
     },
     "Etihad": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 2,
-      "extra_bag_usd": 100,
-      "note": "To/from USA & Canada: Economy Basic has no checked bag (fees apply), Value/Comfort/Deluxe 2x23kg; Basic may not be sold on every India-US itinerary; extra_bag_usd estimated (official prepaid 23kg piece ~USD 140, upgrading Basic->Value usually cheaper per piece).",
+      "extra_bag_usd": [
+        200,
+        200
+      ],
+      "note": "Cheapest fare (Basic) has no checked bag (Google confirms on BOM-BOS and BOS-BOM). Extra bag $260 at the airport from 23 Apr 2026; buying online in advance is cheaper but the exact price is unverified, so $200 is used. Value and higher fares include 2x23kg to/from the USA.",
       "confidence": "medium",
       "sources": [
-        "https://www.etihad.com/en-us/help/faq/fares",
-        "https://www.etihad.com/en-il/fly-etihad/baggage/excess"
-      ]
+        "Google Flights booking page, checked 2026-10-19",
+        "https://www.etihad.com/en-us/help/baggage-information",
+        "https://www.etihad.com/en-us/help/faq/baggage"
+      ],
+      "two_bag_fare": "Economy Value"
     },
     "Turkish Airlines": {
       "lowest_fare_pieces": 1,
@@ -63,24 +78,30 @@
     "Lufthansa": {
       "lowest_fare_pieces": 1,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "Google Flights shows '1st checked bag per passenger free' on the cheapest BOS-BOM fare (28 Dec); 2nd bag is extra.",
-      "confidence": "high",
+      "extra_bag_usd": [
+        90,
+        90
+      ],
+      "note": "Google shows '1st checked bag per passenger free' on the cheapest BOS-BOM fare. No economy fare includes 2 bags; the discounted 2nd bag on USA routes is $90 (if it does not apply, about $200).",
+      "confidence": "medium",
       "sources": [
         "Google Flights booking page, checked 2026-10-19",
-        "https://www.lufthansa.com/in/en/freigepaeck-regeln",
-        "https://www.lufthansa.com/in/en/uebergepaeck"
+        "https://www.lufthansa.com/us/en/freigepaeck-regeln",
+        "https://www.lufthansa.com/us/en/current-fees"
       ]
     },
     "SWISS": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "Intercontinental: Economy Light 0 bags, Classic/Flex 1x23kg; Lufthansa Group excess rates (Light first bag ~USD 90-100, discounted 2nd piece ~USD 100 on USA routes) assumed.",
+      "extra_bag_usd": [
+        90,
+        200
+      ],
+      "note": "Economy Light has no checked bag (1st bag $90); other fares 1x23kg; a further bag about $190-210 online. No India-USA 2-bag rule.",
       "confidence": "medium",
       "sources": [
-        "https://www.swiss.com/US/en/prepare/baggage/checked-baggage",
-        "https://www.lufthansa.com/in/en/uebergepaeck"
+        "https://www.swiss.com/us/en/prepare/baggage/checked-baggage",
+        "https://www.swiss.com/us/en/prepare/baggage/excess-baggage"
       ]
     },
     "Austrian": {
@@ -97,76 +118,95 @@
     "British Airways": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "World Traveller Basic is hand-baggage only, Standard/Plus/Flex include 1x23kg on India routes; extra_bag_usd estimated (BA long-haul paid bag ~GBP 65-80).",
-      "confidence": "medium",
+      "extra_bag_usd": [
+        75,
+        100
+      ],
+      "note": "Basic is hand baggage only; Standard and Flex 1x23kg; no India 2-bag rule. Extra bag prices are from third-party sites (BA only has a calculator).",
+      "confidence": "low",
       "sources": [
-        "https://www.britishairways.com/content/information/baggage-essentials",
-        "https://www.britishairways.com/content/en/us/flights/india/delhi"
+        "https://www.britishairways.com/content/information/baggage-essentials"
       ]
     },
     "Virgin Atlantic": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 2,
-      "extra_bag_usd": 90,
-      "note": "Economy Light has no checked bag; Classic/Delight get 2x23kg on USA/Canada-India and UK-India; extra_bag_usd estimated (paid bag via calculator, or Light->Classic upgrade).",
+      "extra_bag_usd": [
+        75,
+        100
+      ],
+      "note": "Economy Light has no checked bag: 1st bag $75, 2nd $100. Classic and Delight include 2x23kg on USA-India.",
       "confidence": "high",
       "sources": [
-        "https://www.virginatlantic.com/en-US/help/articles/are-there-any-virgin-atlantic-routes-that-allow-extra-baggage-free-of-charge----198ea115-ecd3-4bc2-bb37-3bc332671b9d",
-        "https://www.virginatlantic.com/en-US/help/articles/how-much-is-an-extra-bag----f1102355-6499-427d-94c4-6b36630f4785"
-      ]
+        "https://help.virginatlantic.com/ca/en/baggage/check-in-baggage-allowance1.html"
+      ],
+      "two_bag_fare": "Economy Classic"
     },
     "Air France": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "Economy Light 0 bags, Standard/Flex 1x23kg, India not in the 2-piece exception list; US fee table: 2nd piece USD 75 (USA-Europe) / USD 100 (Europe-India), 20% off online.",
+      "extra_bag_usd": [
+        120,
+        120
+      ],
+      "note": "Economy Light has no checked bag, Standard/Flex 1x23kg; extra bags US/Canada to 'rest of world' about $120 each (same table as KLM).",
       "confidence": "medium",
       "sources": [
-        "https://wwws.airfrance.us/information/legal/us-regulation"
+        "https://wwws.airfrance.us/information/bagages/bagages-supplementaires-plus-grands-plus-lourds"
       ]
     },
     "KLM": {
       "lowest_fare_pieces": 2,
       "standard_fare_pieces": 2,
-      "extra_bag_usd": 100,
-      "note": "Google Flights shows '2 free checked bags per passenger' on the cheapest BOS-BOM fare (28 Dec).",
-      "confidence": "high",
+      "extra_bag_usd": [
+        120,
+        120
+      ],
+      "note": "Google shows '2 free checked bags per passenger' on the cheapest BOS-BOM fare (sold with Delta). KLM's own page says Light 0 / Standard 1 with extra bags $120 each to 'rest of world', so confirm at booking.",
+      "confidence": "medium",
       "sources": [
         "Google Flights booking page, checked 2026-10-19",
-        "https://wwws.airfrance.us/information/legal/us-regulation",
-        "https://www.klm.com/information/legal/fees-paid-options"
+        "https://www.klm.com/information/baggage/checked-baggage-allowance",
+        "https://www.klm.com/information/baggage/extra-oversized-overweight-baggage"
       ]
     },
     "United": {
       "lowest_fare_pieces": 0,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 165,
-      "note": "BOS-BOM calculator: Basic Economy 1st bag USD 90 + 2nd USD 240, Economy 1st free + 2nd USD 240; extra_bag_usd 165 is the per-piece average for Basic (use 240 if the cheapest fare is regular Economy).",
-      "confidence": "high",
+      "extra_bag_usd": [
+        90,
+        240
+      ],
+      "note": "Basic Economy: 1st bag $90, 2nd $240; Economy includes 1 (2nd $240). From a third-party reading of United's calculator.",
+      "confidence": "low",
       "sources": [
-        "https://www.united.com/en/us/checked-bag-fee-calculator/any-flights",
         "https://www.united.com/en/us/fly/baggage/checked-bags.html"
       ]
     },
     "American": {
       "lowest_fare_pieces": 1,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "India: 1st bag free in Main Cabin and Basic Economy (Basic for tickets issued on/after 23 Apr 2026), 2nd bag USD 100.",
+      "extra_bag_usd": [
+        100,
+        100
+      ],
+      "note": "India: 1st bag free in Basic (tickets issued from 23 Apr 2026) and Main Cabin; 2nd bag $100; Main Plus includes 2.",
       "confidence": "high",
       "sources": [
         "https://www.aa.com/i18n/travel-info/baggage/checked-baggage-policy.jsp"
-      ]
+      ],
+      "two_bag_fare": "Main Plus"
     },
     "Delta": {
       "lowest_fare_pieces": 1,
       "standard_fare_pieces": 1,
-      "extra_bag_usd": 100,
-      "note": "Delta's US-India terms show 1st bag free and 2nd bag USD 100 (stated for Main Basic; Main Cabin assumed the same), most BOS-BOM trips route via AF/KLM/Virgin.",
+      "extra_bag_usd": [
+        100,
+        100
+      ],
+      "note": "India: 1st bag free on Main Basic and Main Classic, 2nd bag $100 (Delta shows fees only in a calculator; secondary sources).",
       "confidence": "low",
       "sources": [
-        "https://www.delta.com/us/en/flight-deals/asia-flights/flights-to-mumbai",
         "https://www.delta.com/us/en/baggage/overview"
       ]
     },
