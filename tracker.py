@@ -288,6 +288,9 @@ def evaluate(con, cfg, bags, geo, run_at=None):
 
 
 def report(con, cfg, bags, geo, ev):
+    if not ev[1]:                                   # e.g. blocked at the first search: keep the last good page up
+        print("No results at all this run, so report.html was left as it was.", file=sys.stderr)
+        return
     history = con.execute("SELECT run_at, scope, total FROM best ORDER BY run_at").fetchall()
     (HERE / "report.html").write_text(render.page(cfg, geo, ev, missing(cfg, ev[1]), history))
 

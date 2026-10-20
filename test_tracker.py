@@ -289,6 +289,29 @@ def test_alert_records_the_cheaper_plan_and_flags_a_new_low():
     assert out.getvalue() == "ALERT: New low $2,150 (round trip + one-way, home 2026-12-26)\n"
 
 
+def test_a_run_with_no_results_keeps_the_last_report():
+    import contextlib
+    import io
+    import sqlite3
+    import tempfile
+    cfg, q = trip_fixture()
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE best(run_at TEXT, scope TEXT, total REAL)")
+    ev = lambda quotes: ("2026-10-20T06:00:00+00:00", quotes, set(), tracker.options(quotes, cfg, BAGS, GEO, "high"),
+                         tracker.journeys(quotes, cfg, BAGS, GEO))
+    here = tracker.HERE
+    with tempfile.TemporaryDirectory() as d, contextlib.redirect_stderr(io.StringIO()):
+        tracker.HERE = Path(d)
+        try:
+            (Path(d) / "report.html").write_text("last good report")
+            tracker.report(con, cfg, BAGS, GEO, ev({}))         # blocked at the first search: nothing stored
+            assert (Path(d) / "report.html").read_text() == "last good report"
+            tracker.report(con, cfg, BAGS, GEO, ev(q))          # a partial or full run still rewrites it
+            assert "Whole trip" in (Path(d) / "report.html").read_text()
+        finally:
+            tracker.HERE = here
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
