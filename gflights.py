@@ -40,6 +40,20 @@ class Flight:
     layover_names: list[str] = field(default_factory=list)  # "Zayed International Airport, Abu Dhabi"
 
 
+def lookup(table, name):
+    """Airline table lookup: exact (case-insensitive) first, then whole-word containment either
+    way ("American" ~ "American Airlines", but "ANA" !~ "Air Canada")."""
+    n = name.casefold()
+    for k, v in table.items():
+        if k.casefold() == n:
+            return v
+    word = lambda a, b: re.search(rf"\b{re.escape(a)}\b", b)
+    for k, v in table.items():
+        if word(k.casefold(), n) or word(n, k.casefold()):
+            return v
+    return None
+
+
 # --- protobuf encoding of the tfs param (schema as reverse-engineered by fast-flights) ---
 def _varint(n):
     out = b""
@@ -124,7 +138,8 @@ def parse(page, search_day):
                                      ("separate tickets", "Separate tickets")) if stops and needle in row]
         flights.append(Flight(
             price=int(d["price"].replace(",", "")),
-            airlines=[a.strip() for a in re.split(r", | and ", d["airlines"]) if a.strip()],
+            # "SWISS. Operated by Air Dolomiti": the operator is listed too, so exclusions and risk still see it
+            airlines=[a.strip() for a in re.split(r", | and |\. Operated by ", d["airlines"]) if a.strip()],
             depart=_when(d["dd"], d["dt"], search_day),
             arrive=_when(d["ad"], d["at"], search_day),
             duration_min=_minutes(d["dur"]),

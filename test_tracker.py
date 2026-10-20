@@ -104,6 +104,14 @@ def test_nonstop_never_inherits_layovers_or_flags():
     assert f.stops == 0 and f.layovers == [] and f.flags == []
 
 
+def test_operating_carrier_is_its_own_airline():
+    # live label, ret_extra 2026-12-28: "flight with Lufthansa and SWISS. Operated by Air Dolomiti."
+    page = ROW.format(p="820", rt="", stops="2 stops", al="Lufthansa and SWISS. Operated by Air Dolomiti",
+                      arr="Monday, December 28", codes="2 stops in JFK, DOH", badge="")
+    (f,), _, _ = gflights.parse(page, "2026-12-26")
+    assert f.airlines == ["Lufthansa", "SWISS", "Air Dolomiti"]
+
+
 def test_exclusions_hit_any_leg():
     cfg = {"prefs": {"exclude_airlines": ["Air India", "Turkish Airlines"]}}
     assert tracker.excluded(F(1, ["Lufthansa", "Air India"]), cfg)
@@ -207,6 +215,15 @@ def test_risk():
     assert tracker.risk(f, GEO)[0] == "medium"
 
 
+def test_risk_line_names_the_airline_risk_rated():
+    geo = {"hubs": {}, "airlines": {"Etihad Airways": {"level": "high", "note": "Gulf closures"}}}   # Google: "Etihad"
+    cfg, _ = trip_fixture()
+    s = tracker.score(F(1, ["Etihad"]), 1, cfg, BAGS, geo)
+    assert s["risk"] == "high"
+    line, _ = render.risk_line({"legs": [(1, s)], "risk": s["risk"]}, geo)
+    assert line == "High risk: Etihad rated high"
+
+
 def trip_fixture():
     cfg = {"outbound": {"from": "BOM", "to": "BOS", "depart_dates": ["2026-12-17"], "arrive_on": "2026-12-18", "adults": 1},
            "return": {"from": "BOS", "to": "BOM", "depart_dates": ["2026-12-26"], "adults": 2},
@@ -237,6 +254,18 @@ def test_plans_pick_the_cheapest_allowed_flights():
     q[("ret_extra", "2026-12-26")] = ([F(800, ["Lufthansa"])], 1, "u")
     assert tracker.options(q, cfg, BAGS, GEO, "high") == []     # B needs both travellers home on one airline
     assert tracker.best_trip(tracker.journeys(q, cfg, BAGS, GEO)["totals"][0]) == (2300, "one-ways, home 2026-12-26")
+
+
+def test_plan_b_same_airline_whatever_its_place_on_the_way_home():
+    cfg, q = trip_fixture()
+    # home trips list the Boston feeder first (live: "JetBlue, Qatar Airways"; "British Airways, American" out
+    # vs "American, British Airways" home)
+    q[("ret_extra", "2026-12-26")] = ([F(900, ["JetBlue", "Qatar Airways"])], 1, "u")
+    (b,) = tracker.options(q, cfg, BAGS, GEO, "high")
+    assert b["total"] == 1200 + 900 and b["airline"] == "Qatar Airways"
+    html = render.alt_row(cfg, GEO, b)
+    assert "<h3>Qatar Airways: leave" in html and "Book on JetBlue" not in html   # both tickets on Qatar's site
+    assert html.count("Book on Qatar Airways") == 2
 
 
 def test_alert_records_the_cheaper_plan_and_flags_a_new_low():

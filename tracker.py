@@ -12,7 +12,6 @@ geopolitical / connection risk (data/geo_risk.json).
 import argparse
 import json
 import random
-import re
 import sqlite3
 import subprocess
 import sys
@@ -24,7 +23,7 @@ from pathlib import Path
 
 import gflights
 import render
-from gflights import Flight
+from gflights import Flight, lookup
 
 HERE = Path(__file__).resolve().parent
 LEVELS = ["low", "medium", "high"]
@@ -49,20 +48,6 @@ def load():
             sys.exit(f"data/baggage.json {k}: lowest_fare_pieces must be a number and extra_bag_usd a number "
                      f"or a list of numbers [1st bag, 2nd bag, ...]")
     return cfg, bags, geo
-
-
-def lookup(table, name):
-    """Airline table lookup: exact (case-insensitive) first, then whole-word containment either
-    way ("American" ~ "American Airlines", but "ANA" !~ "Air Canada")."""
-    n = name.casefold()
-    for k, v in table.items():
-        if k.casefold() == n:
-            return v
-    word = lambda a, b: re.search(rf"\b{re.escape(a)}\b", b)
-    for k, v in table.items():
-        if word(k.casefold(), n) or word(n, k.casefold()):
-            return v
-    return None
 
 
 # --- costing ---------------------------------------------------------------
@@ -157,13 +142,15 @@ def options(quotes, cfg, bags, geo, max_risk):
         extra = scored("ret_extra", d2)
         for d1 in out["depart_dates"]:
             for rt in scored("rt", f"{d1}>{d2}", legs=2):
-                same = [s for s in extra if s["f"].airlines[0] == rt["f"].airlines[0]]
+                # its first carrier on any leg home: the way home lists the feeder first ("JetBlue, Qatar Airways")
+                same = [s for s in extra if rt["f"].airlines[0] in s["f"].airlines]
                 if not (rt["f"].arrive.startswith(out["arrive_on"]) and same):
                     continue
                 partner = min(same, key=lambda s: s["total"])
                 if d2 in best and best[d2]["total"] <= rt["total"] + partner["total"]:
                     continue
-                best[d2] = {"dates": f"{d1} > {d2}", "legs": [(out["adults"], rt), (partner["pax"], partner)],
+                best[d2] = {"dates": f"{d1} > {d2}", "airline": rt["f"].airlines[0],
+                            "legs": [(out["adults"], rt), (partner["pax"], partner)],
                             "total": rt["total"] + partner["total"],
                             "per_person": [rt["total"] / out["adults"], partner["total"] / partner["pax"]],
                             "risk": max(rt["risk"], partner["risk"], key=LEVELS.index)}

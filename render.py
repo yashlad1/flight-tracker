@@ -10,6 +10,8 @@ import urllib.parse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from gflights import lookup
+
 HOME_TZ = ZoneInfo("America/New_York")      # "last checked" is shown in Boston time
 
 AIRLINE_SITES = {
@@ -70,11 +72,11 @@ def via_text(f):
 
 
 # --- booking links ----------------------------------------------------------------------------------------------
-def book_links(s):
-    """[(label, url)]: the airline (first listed carrier we know, which usually sells the ticket), then Expedia and
-    Booking.com searches prefilled with route, dates and travellers, then the Google Flights search."""
+def book_links(s, airline=None):
+    """[(label, url)]: the airline (`airline`, else the first listed carrier we know, which usually sells the
+    ticket), then Expedia and Booking.com searches prefilled with route, dates and travellers, then Google Flights."""
     legs, pax = s["search"], s["pax"]
-    links = [(f"Book on {a}", AIRLINE_SITES[a]) for a in s["f"].airlines if a in AIRLINE_SITES][:1]
+    links = [(f"Book on {a}", AIRLINE_SITES[a]) for a in (airline, *s["f"].airlines) if a in AIRLINE_SITES][:1]
     if legs:
         q = {"trip": "oneway" if len(legs) == 1 else "roundtrip", "passengers": f"adults:{pax}",
              "options": "cabinclass:economy", "mode": "search"}
@@ -94,9 +96,9 @@ def link(label, url, cls):
     return f"<a class={cls} href='{e(url)}' target=_blank rel=noopener>{e(label)}</a>"
 
 
-def links_html(s, short=False):
+def links_html(s, short=False, airline=None):
     """Primary 'Book on <airline>' button, then text links. short: only the button and 'Compare prices'."""
-    ls = book_links(s)
+    ls = book_links(s, airline)
     ls = [ls[0], ls[-1]] if short and len(ls) > 2 else ls
     return "<div class=book>" + "".join(link(n, u, "btn" if i == 0 and n.startswith("Book on") else "lnk")
                                         for i, (n, u) in enumerate(ls)) + "</div>"
@@ -237,8 +239,8 @@ def journeys_html(cfg, jr, per_date=2, top=4):
 
 
 # --- round trip + one-way tickets (in the collapsed alternatives section) ----------------------------------------
-def leg(cfg, i, pax, s):
-    """Leg 0 of a Plan B option is the round trip, leg 1 the one-way home."""
+def leg(cfg, i, pax, s, airline):
+    """Leg 0 of a Plan B option is the round trip, leg 1 the one-way home; both are booked with `airline`."""
     f = s["f"]
     p1, p2 = names(cfg)
     rt = i == 0
@@ -260,7 +262,7 @@ def leg(cfg, i, pax, s):
   </div>
   <p class=sum><span class=nw>{money(s['fare'])} fare</span> + <span class=nw>{bags}</span> =
     <span class=nw><b>{money(s['total'])}</b> for {people(pax)}{each}</span></p>
-  {rt_note}{links_html(s)}
+  {rt_note}{links_html(s, airline=airline)}
 </div>"""
 
 
@@ -272,7 +274,7 @@ def risk_line(r, geo):
             if geo.get("hubs", {}).get(code, {}).get("level", "low") != "low":
                 short.append(f"connects in {name.split(', ')[-1]}")
         for a in f.airlines:
-            lvl = geo.get("airlines", {}).get(a, {}).get("level", "low")
+            lvl = (lookup(geo.get("airlines", {}), a) or {}).get("level", "low")     # same match as tracker.risk
             if lvl != "low":
                 short.append(f"{a} rated {lvl}")
         full += s["notes"]
@@ -285,7 +287,6 @@ def risk_line(r, geo):
 
 def ticket(cfg, geo, r):
     f_home = r["legs"][1][1]["f"]
-    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, s in r["legs"]))
     line, full = risk_line(r, geo)
     why = (f"<details class=why><summary>Why {r['risk']} risk, and other notes</summary><ul>"
            + "".join(f"<li>{e(n)}</li>" for n in full) + "</ul></details>") if full else ""
@@ -293,10 +294,10 @@ def ticket(cfg, geo, r):
     p1, p2 = names(cfg)
     return f"""<article class="ticket r-{r['risk']}">
 <div class=main>
-  <header><h3>{e(airlines)}: leave {e(city(cfg, cfg['return']['from']))} {day(f_home.depart)}
+  <header><h3>{e(r['airline'])}: leave {e(city(cfg, cfg['return']['from']))} {day(f_home.depart)}
     <small>(land in {e(city(cfg, cfg['return']['to']))} {day(f_home.arrive)})</small></h3>
     <p class=risk><span class="dot"></span>{e(line)}</p></header>
-  {''.join(leg(cfg, i, p, s) for i, (p, s) in enumerate(r['legs']))}
+  {''.join(leg(cfg, i, p, s, r['airline']) for i, (p, s) in enumerate(r['legs']))}
   {why}
 </div>
 <aside class=stub>
@@ -309,11 +310,10 @@ def ticket(cfg, geo, r):
 
 def alt_row(cfg, geo, r):
     leave = day(r["legs"][1][1]["f"].depart)
-    airlines = " and ".join(dict.fromkeys(s["f"].airlines[0] for _, s in r["legs"]))
     via = ", ".join(dict.fromkeys(n.split(", ")[-1] for _, s in r["legs"] for n in (s["f"].layover_names or s["f"].layovers)))
     c1, c2 = r["per_person"]
     return f"""<details class="opt r-{r['risk']}"><summary>
-  <span class=o-when><b>Leave {e(city(cfg, cfg['return']['from']))} {leave}</b><small>{e(airlines)}, via {e(via) or 'nonstop'}</small></span>
+  <span class=o-when><b>Leave {e(city(cfg, cfg['return']['from']))} {leave}</b><small>{e(r['airline'])}, via {e(via) or 'nonstop'}</small></span>
   <span class=risk><span class=dot></span>{r['risk'].capitalize()} risk</span>
   <span class=o-price><b>{money(r['total'])}</b><small>round trip {money(c1)} + one-way {money(c2)}</small></span>
 </summary>{ticket(cfg, geo, r)}</details>"""
